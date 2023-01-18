@@ -11,8 +11,13 @@ public class RestControllerHandler {
 
     @ExceptionHandler(value = UserAlreadyExistingException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String userAlreadyExistingHandler(UserAlreadyExistingException e){
+    public String userAlreadyExistingHandler(UserAlreadyExistingException e) {
         return e.getMessage();
     }
 
+    @ExceptionHandler(value = CategoryAlreadyExistingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String categoryAlreadyExistingHandler(CategoryAlreadyExistingException e) {
+        return e.getMessage();
+    }
 }
