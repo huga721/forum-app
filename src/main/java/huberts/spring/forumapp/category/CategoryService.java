@@ -1,6 +1,7 @@
 package huberts.spring.forumapp.category;
 
 import huberts.spring.forumapp.category.dto.CategoryDTO;
+import huberts.spring.forumapp.category.dto.CreateDTO;
 import huberts.spring.forumapp.exception.CategoryAlreadyExistingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ public class CategoryService implements CategoryServiceApi {
     private final CategoryRepository repository;
 
     @Override
-    public CategoryDTO createCategory(CategoryDTO category) {
+    public CategoryDTO createCategory(CreateDTO category) {
         String title = category.getTitle();
         if (repository.existsByTitle(title)) {
             throw new CategoryAlreadyExistingException("Category " + category.getTitle() +
@@ -23,7 +24,7 @@ public class CategoryService implements CategoryServiceApi {
         Category categoryCreated = categoryBuilder(title);
         repository.save(categoryCreated);
 
-        return categoryDTOBuilder(title);
+        return categoryDTOBuilder(categoryCreated);
     }
 
     @Override
@@ -34,11 +35,14 @@ public class CategoryService implements CategoryServiceApi {
     private static Category categoryBuilder (String title) {
         return Category.builder()
                 .title(title)
+                .posts(null)
                 .build();
     }
-    private static CategoryDTO categoryDTOBuilder (String title) {
+    private static CategoryDTO categoryDTOBuilder (Category category) {
         return CategoryDTO.builder()
-                .title(title)
+                .id(category.getId())
+                .title(category.getTitle())
+                .posts(category.getPosts())
                 .build();
     }
 }
