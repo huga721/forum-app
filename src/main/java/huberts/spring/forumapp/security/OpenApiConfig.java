@@ -1,4 +1,4 @@
-package huberts.spring.forumapp;
+package huberts.spring.forumapp.security;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
