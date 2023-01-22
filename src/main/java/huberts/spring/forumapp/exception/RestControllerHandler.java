@@ -20,4 +20,10 @@ public class RestControllerHandler {
     public String categoryAlreadyExistingHandler(CategoryAlreadyExistingException e) {
         return e.getMessage();
     }
+
+    @ExceptionHandler(value = CategoryDoesntExistException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String categoryDoesntExistHandler(CategoryDoesntExistException e) {
+        return e.getMessage();
+    }
 }
