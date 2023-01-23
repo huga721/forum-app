@@ -48,6 +48,7 @@ public class UserService implements UserServiceApi{
         return userRepository.findAll();
     }
 
+    @Override
     public void deleteUser(String username) {
         var user = findUser(username).get();
         userRepository.delete(user);
