@@ -21,6 +21,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @PropertySource("classpath:/customAppProperties.properties")
 @Component
 public class AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
     private int expirationTime;
     private final String secret;
 
