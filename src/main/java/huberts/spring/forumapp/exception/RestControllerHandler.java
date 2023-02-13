@@ -26,4 +26,29 @@ public class RestControllerHandler {
     public String categoryDoesntExistHandler(CategoryDoesntExistException e) {
         return e.getMessage();
     }
+
+    @ExceptionHandler(value = UsernameOrPasswordIsBlankOrEmpty.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String usernameIsBlankOrEmpty(UsernameOrPasswordIsBlankOrEmpty e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = UserDoesntExistException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String userDoesntExist(UserDoesntExistException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = RoleDoesntExistException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String roleDoesntExist(RoleDoesntExistException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = AccountBlockedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String accountIsBlocked(AccountBlockedException e) {
+        return e.getMessage();
+    }
+
 }
