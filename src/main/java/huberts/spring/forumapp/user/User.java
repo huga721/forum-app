@@ -3,16 +3,16 @@ package huberts.spring.forumapp.user;
 import huberts.spring.forumapp.post.Post;
 import huberts.spring.forumapp.role.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-@Entity(name = "user")
+@Entity(name = "`user`")
 @Builder
 @Data
 @AllArgsConstructor
@@ -23,14 +23,12 @@ public class User {
     private Long id;
     @Column(unique = true)
     private String username;
+    @NotNull
     private String password;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Collection<Role> roles = new ArrayList<>();
+    private boolean blocked;
+    @OneToOne
+    @JoinColumn(referencedColumnName = "`name`", name = "`role_name`")
+    private Role role;
     @OneToMany(mappedBy = "author")
     List<Post> posts = new ArrayList<>();
 }
