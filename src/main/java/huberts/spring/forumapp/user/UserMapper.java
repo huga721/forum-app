@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
 
-    User mapFromCredentials (String username, String password, Role role) {
+    User buildUser(String username, String password, Role role) {
         return User.builder()
                 .username(username)
                 .password(password)
@@ -22,11 +22,11 @@ public class UserMapper {
 
     List<UserDTO> mapFromList (List<User> listOfUser) {
         return listOfUser.stream()
-                .map(this::mapFromUser)
+                .map(this::buildUserDTO)
                 .collect(Collectors.toList());
     }
 
-    UserDTO mapFromUser (User user) {
+    UserDTO buildUserDTO(User user) {
         return UserDTO.builder()
                 .username(user.getUsername())
                 .role(user.getRole().getName())
