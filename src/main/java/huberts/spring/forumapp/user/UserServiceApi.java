@@ -4,12 +4,17 @@ import huberts.spring.forumapp.user.dto.RegisterDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserServiceApi {
     UserDTO addUser(RegisterDTO user);
-
-    Optional<User> findUser(String name);
-
-    List<User> findAll();
+    User findUser(String name);
+    List<UserDTO> findAllUsers();
+    List<UserDTO> findAllStaffUsers();
+    void deleteUserByUsername(String username);
+    UserDTO currentUser(String username);
+    UserDTO changeRole(String username, String roleName);
+    UserDTO banUser(String username);
+    UserDTO unbanUser(String username);
+    UserDTO findUserDTO(String username);
+    User currentLoggedUser(String token);
 }
