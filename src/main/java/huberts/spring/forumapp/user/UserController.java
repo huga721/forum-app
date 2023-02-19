@@ -1,16 +1,14 @@
 package huberts.spring.forumapp.user;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import huberts.spring.forumapp.security.annotation.AdminRole;
+import huberts.spring.forumapp.security.annotation.ModeratorRole;
+import huberts.spring.forumapp.security.annotation.UserRole;
+import huberts.spring.forumapp.user.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,21 +16,63 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
-
-    // TODO: Later make this endpoint ONLY FOR ADMIN
-    @GetMapping("/getAllUsers")
-    ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.findAll());
+    @GetMapping("/stuff")
+    ResponseEntity<List<UserDTO>> getStaffMembers() {
+        return ResponseEntity.ok(userService.findAllStaffUsers());
     }
 
-    @DeleteMapping("/deleteUser")
-    ResponseEntity<User> deleteUser(Authentication authentication) {
+    @GetMapping("/{username}")
+    ResponseEntity<UserDTO> getUser(@PathVariable String username) {
+        return ResponseEntity.ok(userService.findUserDTO(username));
+    }
+
+    @UserRole
+    @GetMapping("/profile")
+    ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
-        log.info(username);
-        userService.deleteUser(username);
+        return ResponseEntity.ok(userService.currentUser(username));
+    }
+
+    @UserRole
+    @DeleteMapping("/user/delete/account")
+    ResponseEntity<Void> deleteAccount(Authentication authentication) {
+        String username = authentication.getName();
+        userService.deleteUserByUsername(username);
         return ResponseEntity.ok().build();
+    }
+
+    @ModeratorRole
+    @GetMapping("/stuff/get/all")
+    ResponseEntity<List<UserDTO>> getAllUsers() {
+        return ResponseEntity.ok(userService.findAllUsers());
+    }
+
+    @ModeratorRole
+    @PatchMapping("/stuff/ban/{username}")
+    ResponseEntity<UserDTO> banUser(@PathVariable String username) {
+        return ResponseEntity.ok(userService.banUser(username));
+    }
+
+    @ModeratorRole
+    @PatchMapping("/stuff/unban/{username}")
+    ResponseEntity<UserDTO> unbanUser(@PathVariable String username) {
+        return ResponseEntity.ok(userService.unbanUser(username));
+    }
+
+    @AdminRole
+    @DeleteMapping("/stuff/delete/{username}")
+    ResponseEntity<Void> deleteUserByUsername(@PathVariable String username) {
+        userService.deleteUserByUsername(username);
+        return ResponseEntity.ok().build();
+    }
+
+    @AdminRole
+    @PatchMapping("/stuff/change/role/{username}/to/{roleName}")
+    ResponseEntity<UserDTO> changeRole(@PathVariable String username, @PathVariable String roleName) {
+        return ResponseEntity.ok(userService.changeRole(username, roleName));
     }
 }
 
