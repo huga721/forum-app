@@ -56,16 +56,16 @@ class UserServiceTest {
     void shouldCreateUserSuccess() {
         // given
         RegisterDTO credentials = new RegisterDTO("user", "password");
-        User user = new User(1L, "user", "encoded_password", false, roleUser, null);
-        UserDTO userDTO = new UserDTO("user", "ROLE_USER", null, false);
+        User user = new User(1L, "user", "encoded_password", false, roleUser, null, null);
+        UserDTO userDTO = new UserDTO("user", "ROLE_USER", null, false, null);
 
         // when
         when(passwordEncoder.encode("password")).thenReturn("encoded_password");
         when(roleRepository.findByName("ROLE_USER")).thenReturn(roleUser);
         when(userRepository.existsByUsername("user")).thenReturn(false);
-        when(userMapper.mapFromCredentials("user", "encoded_password", roleUser)).thenReturn(user);
+        when(userMapper.buildUser("user", "encoded_password", roleUser)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
-        when(userMapper.mapFromUser(user)).thenReturn(userDTO);
+        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
 
         UserDTO savedByService = userService.addUser(credentials);
 
@@ -170,7 +170,7 @@ class UserServiceTest {
         // when
         when(userRepository.existsByUsername(anyString())).thenReturn(true);
         when(userRepository.findByUsername(anyString())).thenReturn(expected);
-        User user = userRepository.findByUsername("username");
+        User user = userService.findUser("username");
 
         // then
         assertNotNull(user);
@@ -210,7 +210,7 @@ class UserServiceTest {
 
         // when
         when(userRepository.findByUsername("username")).thenReturn(user);
-        when(userMapper.mapFromUser(user)).thenReturn(userDTO);
+        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
 
         UserDTO result = userService.currentUser("username");
 
@@ -230,13 +230,15 @@ class UserServiceTest {
         when(roleRepository.existsByName("ROLE_ADMIN")).thenReturn(true);
         when(userRepository.findByUsername("username")).thenReturn(user);
         when(roleRepository.findByName("ROLE_ADMIN")).thenReturn(roleAdmin);
-        when(userMapper.mapFromUser(user)).thenReturn(expected);
+        when(userMapper.buildUserDTO(user)).thenReturn(expected);
 
         // then
         UserDTO userDTO = userService.changeRole("username", "ROLE_ADMIN");
+        User expectedRole = userRepository.findByUsername("username");
 
         assertNotNull(userDTO);
         assertEquals(userDTO.getRole(), expected.getRole());
+        assertEquals(expectedRole.getRole().getName(), userDTO.getRole());
     }
 
     @DisplayName("Ban user by username")
@@ -249,7 +251,7 @@ class UserServiceTest {
         // when
         when(userRepository.existsByUsername("username")).thenReturn(true);
         when(userRepository.findByUsername("username")).thenReturn(user);
-        when(userMapper.mapFromUser(user)).thenReturn(userDTO);
+        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
 
         UserDTO result = userService.banUser("username");
 
@@ -269,7 +271,7 @@ class UserServiceTest {
         // when
         when(userRepository.existsByUsername("username")).thenReturn(true);
         when(userRepository.findByUsername("username")).thenReturn(user);
-        when(userMapper.mapFromUser(user)).thenReturn(userDTO);
+        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
 
         UserDTO result = userService.unbanUser("username");
 
@@ -289,7 +291,7 @@ class UserServiceTest {
         // when
         when(userRepository.existsByUsername("username")).thenReturn(true);
         when(userRepository.findByUsername("username")).thenReturn(user);
-        when(userMapper.mapFromUser(user)).thenReturn(userDTO);
+        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
 
         UserDTO result = userService.findUserDTO("username");
 
