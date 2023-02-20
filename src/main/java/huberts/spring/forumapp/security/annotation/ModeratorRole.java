@@ -1,4 +1,4 @@
-package huberts.spring.forumapp.annotation;
+package huberts.spring.forumapp.security.annotation;
 
 import org.springframework.security.access.annotation.Secured;
 

@@ -1,4 +1,4 @@
-package huberts.spring.forumapp.annotation;
+package huberts.spring.forumapp.security.annotation;
 
 import org.springframework.security.access.annotation.Secured;
 
@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Secured({"ROLE_USER", "ROLE_MODERATOR", "ROLE_ADMIN"})
-public @interface UserRole {
+@Secured("ROLE_ADMIN")
+public @interface AdminRole {
 }
