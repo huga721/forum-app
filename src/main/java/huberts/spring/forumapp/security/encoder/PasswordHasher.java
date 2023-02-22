@@ -1,4 +1,4 @@
-package huberts.spring.forumapp.security;
+package huberts.spring.forumapp.security.encoder;
 
 
 import org.springframework.context.annotation.Bean;
@@ -7,8 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PassEncoder {
-
+public class PasswordHasher {
     @Bean
     PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
