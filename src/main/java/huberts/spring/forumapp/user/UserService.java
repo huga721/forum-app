@@ -1,11 +1,9 @@
 package huberts.spring.forumapp.user;
 
-import huberts.spring.forumapp.exception.RoleDoesntExistException;
-import huberts.spring.forumapp.exception.UserAlreadyExistingException;
-import huberts.spring.forumapp.exception.UserDoesntExistException;
-import huberts.spring.forumapp.exception.UsernameOrPasswordIsBlankOrEmpty;
+import huberts.spring.forumapp.exception.*;
 import huberts.spring.forumapp.role.Role;
 import huberts.spring.forumapp.role.RoleRepository;
+import huberts.spring.forumapp.user.dto.PasswordDTO;
 import huberts.spring.forumapp.user.dto.RegisterDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
 import jakarta.transaction.Transactional;
@@ -76,13 +74,23 @@ public class UserService implements UserServiceApi {
 
     @Override
     public UserDTO currentUser(String username) {
+        if (!userRepository.existsByUsername(username)) {
+            throw new UserDoesntExistException("User " + username + " doesn't exist.");
+        }
         User user = userRepository.findByUsername(username);
         return mapper.buildUserDTO(user);
     }
 
     @Override
-    public User currentLoggedUser(String token) {
-        return null;
+    public UserDTO changePassword(PasswordDTO newPassword, String username) {
+        String password = newPassword.getPassword();
+        if (password.isBlank()) {
+            throw new UsernameOrPasswordIsBlankOrEmpty("Username or password is blank or empty.");
+        }
+        String encodedPassword = passwordEncoder.encode(password);
+        User user = findUser(username);
+        user.setPassword(encodedPassword);
+        return mapper.buildUserDTO(user);
     }
 
     @Override
@@ -95,6 +103,12 @@ public class UserService implements UserServiceApi {
         }
 
         User user = userRepository.findByUsername(username);
+        String currentUsersRole = user.getRole().getName();
+
+        if (currentUsersRole.equals(roleName)) {
+            throw new RoleException("User already has that role.");
+        }
+
         Role role = roleRepository.findByName(roleName);
 
         user.setRole(role);
@@ -104,6 +118,9 @@ public class UserService implements UserServiceApi {
     @Override
     public UserDTO banUser(String username) {
         User user = findUser(username);
+        if (user.isBlocked()) {
+            throw new UserBlockException("User " + user.getUsername() + " is already banned.");
+        }
         user.setBlocked(true);
         return mapper.buildUserDTO(user);
     }
@@ -111,6 +128,9 @@ public class UserService implements UserServiceApi {
     @Override
     public UserDTO unbanUser(String username) {
         User user = findUser(username);
+        if (!user.isBlocked()) {
+            throw new UserBlockException("User " + user.getUsername() + " is not banned.");
+        }
         user.setBlocked(false);
         return mapper.buildUserDTO(user);
     }

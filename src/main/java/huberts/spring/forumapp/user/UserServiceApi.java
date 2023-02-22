@@ -1,5 +1,6 @@
 package huberts.spring.forumapp.user;
 
+import huberts.spring.forumapp.user.dto.PasswordDTO;
 import huberts.spring.forumapp.user.dto.RegisterDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
 
@@ -16,5 +17,5 @@ public interface UserServiceApi {
     UserDTO banUser(String username);
     UserDTO unbanUser(String username);
     UserDTO findUserDTO(String username);
-    User currentLoggedUser(String token);
+    UserDTO changePassword(PasswordDTO newPassword, String username);
 }
