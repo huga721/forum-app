@@ -1,9 +1,12 @@
 package huberts.spring.forumapp.user;
 
+import huberts.spring.forumapp.exception.RoleException;
+import huberts.spring.forumapp.exception.UserBlockException;
 import huberts.spring.forumapp.exception.UserDoesntExistException;
 import huberts.spring.forumapp.exception.UsernameOrPasswordIsBlankOrEmpty;
 import huberts.spring.forumapp.role.Role;
 import huberts.spring.forumapp.role.RoleRepository;
+import huberts.spring.forumapp.user.dto.PasswordDTO;
 import huberts.spring.forumapp.user.dto.RegisterDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
 import org.junit.jupiter.api.*;
@@ -17,9 +20,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -27,6 +28,17 @@ import static org.mockito.Mockito.*;
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-test.properties")
 class UserServiceTest {
+
+    private static final String USERNAME_USER = "user";
+    private static final String USERNAME_TEST = "test";
+    private static final String USERNAME_BLANK = "";
+    private static final String ROLE_NAME_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_NAME_MODERATOR = "ROLE_MODERATOR";
+    private static final String ROLE_NAME_USER = "ROLE_USER";
+    private static final String PASSWORD = "password";
+    private static final String PASSWORD_TO_CHANGE = "passwordTest";
+    private static final String PASSWORD_ENCODED = "encoded_password";
+    private static final String PASSWORD_EMPTY = "";
 
     @Mock
     private UserMapper userMapper;
@@ -45,89 +57,107 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        roleAdmin = new Role(1L, "ROLE_ADMIN", "123");
-        roleMod = new Role(2L, "ROLE_MODERATOR", "456");
-        roleUser = new Role(3L, "ROLE_USER", "789");
+        roleAdmin = Role.builder()
+                .name(ROLE_NAME_ADMIN)
+                .build();
+        roleMod = Role.builder()
+                .name(ROLE_NAME_MODERATOR)
+                .build();
+        roleUser = Role.builder()
+                .name(ROLE_NAME_USER)
+                .build();
 
     }
 
-    @DisplayName("Creating user is success, HTTP status 201")
+    @DisplayName("should create and save user")
     @Test
     void shouldCreateUserSuccess() {
         // given
-        RegisterDTO credentials = new RegisterDTO("user", "password");
-        User user = new User(1L, "user", "encoded_password", false, roleUser, null, null);
-        UserDTO userDTO = new UserDTO("user", "ROLE_USER", null, false, null);
-
+        RegisterDTO credentials = new RegisterDTO(USERNAME_USER, PASSWORD);
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .password(PASSWORD_ENCODED)
+                .role(roleUser)
+                .build();
+        UserDTO userDTO = UserDTO.builder()
+                .username(USERNAME_USER)
+                .role(ROLE_NAME_USER)
+                .build();
         // when
-        when(passwordEncoder.encode("password")).thenReturn("encoded_password");
-        when(roleRepository.findByName("ROLE_USER")).thenReturn(roleUser);
-        when(userRepository.existsByUsername("user")).thenReturn(false);
-        when(userMapper.buildUser("user", "encoded_password", roleUser)).thenReturn(user);
-        when(userRepository.save(user)).thenReturn(user);
-        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
+        when(passwordEncoder.encode(any(String.class))).thenReturn(PASSWORD_ENCODED);
+        when(roleRepository.findByName(any(String.class))).thenReturn(roleUser);
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(false);
+        when(userMapper.buildUser(any(String.class), any(String.class), any(Role.class))).thenReturn(user);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapper.buildUserDTO(any(User.class))).thenReturn(userDTO);
 
         UserDTO savedByService = userService.addUser(credentials);
-
         // then
         assertNotNull(savedByService);
         assertEquals(savedByService.getUsername(), user.getUsername());
         verify(userRepository).save(user);
     }
 
-    @DisplayName("Creating user is failed, username is blank, exception thrown")
+    @DisplayName("should not create user when username is blank")
     @Test
     void shouldNotCreateUserUsernameIsBlank() {
         // given
-        RegisterDTO user = new RegisterDTO("", "password");
-
+        RegisterDTO user = new RegisterDTO(USERNAME_BLANK, PASSWORD);
         // when
-        when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
-
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(false);
         // then
         assertThrows(UsernameOrPasswordIsBlankOrEmpty.class, () -> userService.addUser(user));
     }
 
-    @DisplayName("Creating user is failed, password is blank, exception thrown")
+    @DisplayName("should not create user when password is blank")
     @Test
     void shouldNotCreateUserPasswordIsBlank() {
         // given
-        RegisterDTO user = new RegisterDTO("user", "");
-
+        RegisterDTO user = new RegisterDTO(USERNAME_USER, PASSWORD_EMPTY);
         // when
-        when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
-
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(false);
         // then
         assertThrows(UsernameOrPasswordIsBlankOrEmpty.class, () -> userService.addUser(user));
     }
 
-    @DisplayName("Should return list of all users")
+    @DisplayName("should return list of all users")
     @Test
     void shouldReturnListOfUsers() {
         // given
         List<User> users = new ArrayList<>();
-        User user1 = User.builder().username("user1").password("pass").build();
-        User user2 = User.builder().username("user2").password("pass").build();
-        users.add(user1);
-        users.add(user2);
+        List<UserDTO> usersDTO = new ArrayList<>();
 
-        List<UserDTO> userDTOS = new ArrayList<>();
-        UserDTO us1 = UserDTO.builder().username("user1").build();
-        UserDTO us2 = UserDTO.builder().username("user2").build();
-        userDTOS.add(us1);
-        userDTOS.add(us2);
+        User userOne = User.builder()
+                .username(USERNAME_USER)
+                .password(PASSWORD)
+                .build();
+        User userTwo = User.builder()
+                .username(USERNAME_USER)
+                .password(PASSWORD)
+                .build();
+
+        UserDTO userOneDTO = UserDTO.builder()
+                .username(USERNAME_USER)
+                .build();
+        UserDTO userTwoDTO = UserDTO.builder()
+                .username(USERNAME_USER)
+                .build();
+
+        users.add(userOne);
+        users.add(userTwo);
+        usersDTO.add(userOneDTO);
+        usersDTO.add(userTwoDTO);
 
         given(userRepository.findAll()).willReturn(users);
-
         // when
-        when(userMapper.mapFromList(anyList())).thenReturn(userDTOS);
-        List<UserDTO> usersDTO = userService.findAllUsers();
-
+        when(userMapper.mapFromList(anyList())).thenReturn(usersDTO);
+        List<UserDTO> result = userService.findAllUsers();
         // then
-        assertThat(usersDTO, isNotNull()).hasSize(2);
+        assertNotNull(result);
+        assertEquals(usersDTO.size(), result.size());
     }
 
-    @DisplayName("Should return list of every admin and moderator")
+    @DisplayName("should return list of every admin and moderator")
     @Test
     void shouldReturnListOfAdminsAndModerators() {
         // given
@@ -135,145 +165,237 @@ class UserServiceTest {
         List<UserDTO> userDTOs = new ArrayList<>();
 
         User adminUser = User.builder().role(roleAdmin).build();
-        users.add(adminUser);
-
         User moderatorUser = User.builder().role(roleMod).build();
-        users.add(moderatorUser);
-
         User user = User.builder().role(roleUser).build();
+
+        users.add(adminUser);
+        users.add(moderatorUser);
         users.add(user);
 
-        UserDTO adminUserDTO = UserDTO.builder().role("ROLE_ADMIN").build();
+        UserDTO adminUserDTO = UserDTO.builder()
+                .role(ROLE_NAME_ADMIN)
+                .build();
         userDTOs.add(adminUserDTO);
 
-        UserDTO moderatorUserDTO = UserDTO.builder().role("ROLE_MODERATOR").build();
+        UserDTO moderatorUserDTO = UserDTO.builder()
+                .role(ROLE_NAME_MODERATOR)
+                .build();
         userDTOs.add(moderatorUserDTO);
-
         // when
         when(userRepository.findAll()).thenReturn(users);
-        when(userMapper.mapFromList(users)).thenReturn(userDTOs);
+        when(userMapper.mapFromList(anyList())).thenReturn(userDTOs);
 
         List<UserDTO> result = userService.findAllStaffUsers();
-
         // then
         assertEquals(2, result.size());
-        assertEquals("ROLE_ADMIN", result.get(0).getRole());
-        assertEquals("ROLE_MODERATOR", result.get(1).getRole());
+        assertEquals(ROLE_NAME_ADMIN, result.get(0).getRole());
+        assertEquals(ROLE_NAME_MODERATOR, result.get(1).getRole());
     }
 
-    @DisplayName("Should return user")
+    @DisplayName("should return user")
     @Test
     void returnUserSuccess() {
         // given
-        User expected = new User();
-
+        User user = User.builder()
+                .id(1L)
+                .username(USERNAME_TEST)
+                .role(roleUser)
+                .build();
         // when
-        when(userRepository.existsByUsername(anyString())).thenReturn(true);
-        when(userRepository.findByUsername(anyString())).thenReturn(expected);
-        User user = userService.findUser("username");
+        when(userRepository.existsByUsername(eq(USERNAME_TEST))).thenReturn(true);
+        when(userRepository.findByUsername(eq(USERNAME_TEST))).thenReturn(user);
 
+        User result = userService.findUser(USERNAME_TEST);
         // then
-        assertNotNull(user);
+        assertNotNull(result);
+        assertEquals(user.getUsername(), result.getUsername());
     }
 
 
-    @DisplayName("Should not return user, user doesnt exist in database, exception thrown")
+    @DisplayName("should not return user when user doesnt exist")
     @Test
-    void doesntReturnUser() {
+    void shouldNotReturnUser() {
         // when & then
-        when(userRepository.existsByUsername("username")).thenReturn(false);
-        assertThrows(UserDoesntExistException.class, () -> userService.findUser("username"));
+        when(userRepository.existsByUsername(USERNAME_USER)).thenReturn(false);
+        assertThrows(UserDoesntExistException.class, () -> userService.findUser(USERNAME_USER));
     }
 
 
-    @DisplayName("Should delete user")
+    @DisplayName("should delete user")
     @Test
-    void deleteUserIsSuccess() {
+    void shouldDeleteUser() {
         // given
-        User user = User.builder().username("username").build();
-
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .build();
         // when
-        when(userRepository.existsByUsername("username")).thenReturn(true);
-        when(userRepository.findByUsername("username")).thenReturn(user);
-
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
         // then
-        userService.deleteUserByUsername("username");
+        userService.deleteUserByUsername(USERNAME_USER);
         verify(userRepository, times(1)).delete(user);
     }
 
-    @DisplayName("Return current user")
+    @DisplayName("should return current user")
     @Test
-    void currentLoggedUser() {
+    void shouldReturnCurrentLoggedUser() {
         // given
-        User user = User.builder().username("username").build();
-        UserDTO userDTO = UserDTO.builder().username("username").build();
-
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .build();
+        UserDTO userDTO = UserDTO.builder()
+                .username(USERNAME_USER)
+                .build();
         // when
-        when(userRepository.findByUsername("username")).thenReturn(user);
-        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        when(userMapper.buildUserDTO(any(User.class))).thenReturn(userDTO);
 
-        UserDTO result = userService.currentUser("username");
-
+        UserDTO result = userService.currentUser(USERNAME_USER);
         // then
         assertNotNull(result);
     }
 
-    @DisplayName("Should change role of given user")
+    @DisplayName("should change password of given user")
     @Test
-    void changeRole() {
+    void shouldChangePassword() {
         // given
-        User user = User.builder().username("username").role(roleUser).build();
-        UserDTO expected = UserDTO.builder().username("username").role("ROLE_ADMIN").build();
+        PasswordDTO password = new PasswordDTO(PASSWORD_TO_CHANGE);
 
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .password(PASSWORD)
+                .build();
+        UserDTO userDTO = UserDTO.builder()
+                .username(USERNAME_USER)
+                .build();
         // when
-        when(userRepository.existsByUsername("username")).thenReturn(true);
-        when(roleRepository.existsByName("ROLE_ADMIN")).thenReturn(true);
-        when(userRepository.findByUsername("username")).thenReturn(user);
-        when(roleRepository.findByName("ROLE_ADMIN")).thenReturn(roleAdmin);
-        when(userMapper.buildUserDTO(user)).thenReturn(expected);
+        when(passwordEncoder.encode(any(String.class))).thenReturn(PASSWORD_TO_CHANGE);
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        when(userMapper.buildUserDTO(any(User.class))).thenReturn(userDTO);
 
+        UserDTO result = userService.changePassword(password, USERNAME_USER);
         // then
-        UserDTO userDTO = userService.changeRole("username", "ROLE_ADMIN");
-        User expectedRole = userRepository.findByUsername("username");
+        assertNotNull(result);
+    }
+
+    @DisplayName("should not change password when password is blank")
+    @Test
+    void shouldNotChangePassword_PasswordIsBlank() {
+        // given
+        PasswordDTO password = new PasswordDTO(PASSWORD_EMPTY);
+        // when & then
+        assertThrows(UsernameOrPasswordIsBlankOrEmpty.class, () -> userService.changePassword(password,USERNAME_USER));
+    }
+
+    @DisplayName("should change role of given user")
+    @Test
+    void shouldChangeRole() {
+        // given
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .role(roleUser)
+                .build();
+        UserDTO expected = UserDTO.builder()
+                .username(USERNAME_USER)
+                .role(ROLE_NAME_ADMIN)
+                .build();
+        // when
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(roleRepository.existsByName(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        when(roleRepository.findByName(any(String.class))).thenReturn(roleAdmin);
+        when(userMapper.buildUserDTO(any(User.class))).thenReturn(expected);
+        // then
+        UserDTO userDTO = userService.changeRole(USERNAME_USER, ROLE_NAME_ADMIN);
+        User expectedRole = userRepository.findByUsername(USERNAME_USER);
 
         assertNotNull(userDTO);
         assertEquals(userDTO.getRole(), expected.getRole());
         assertEquals(expectedRole.getRole().getName(), userDTO.getRole());
     }
 
-    @DisplayName("Ban user by username")
+    @DisplayName("should not change role when user already has that role")
+    @Test
+    void shouldNotChangeRole() {
+        // given
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .role(roleMod)
+                .build();
+        UserDTO expected = UserDTO.builder()
+                .username(USERNAME_USER)
+                .role(ROLE_NAME_ADMIN)
+                .build();
+        // when
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(roleRepository.existsByName(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        when(roleRepository.findByName(any(String.class))).thenReturn(roleMod);
+        when(userMapper.buildUserDTO(any(User.class))).thenReturn(expected);
+        // then
+        assertThrows(RoleException.class, () -> userService.changeRole(USERNAME_USER, ROLE_NAME_MODERATOR));
+    }
+
+    @DisplayName("should ban user by given username")
     @Test
     void shouldBanUser() {
         // given
-        User user = User.builder().username("username").blocked(false).build();
-        UserDTO userDTO = UserDTO.builder().username("username").blocked(true).build();
-
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .blocked(false)
+                .build();
+        UserDTO userDTO = UserDTO.builder()
+                .username(USERNAME_USER)
+                .blocked(true)
+                .build();
         // when
-        when(userRepository.existsByUsername("username")).thenReturn(true);
-        when(userRepository.findByUsername("username")).thenReturn(user);
-        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        when(userMapper.buildUserDTO(any(User.class))).thenReturn(userDTO);
 
-        UserDTO result = userService.banUser("username");
-
+        UserDTO result = userService.banUser(USERNAME_USER);
         // then
         assertNotNull(result);
         assertEquals(userDTO, result);
         assertTrue(result.isBlocked());
     }
 
-    @DisplayName("Unban user by username")
+    @DisplayName("should not ban user when user is already blocked")
+    @Test
+    void shouldNotBanUser_AlreadyBanned() {
+        // given
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .blocked(true)
+                .build();
+        // when
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        // then
+        assertThrows(UserBlockException.class, () -> userService.banUser(USERNAME_USER));
+    }
+
+    @DisplayName("should unban user by given username")
     @Test
     void shouldUnbanUser() {
         // given
-        User user = User.builder().username("username").blocked(true).build();
-        UserDTO userDTO = UserDTO.builder().username("username").blocked(false).build();
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .blocked(true)
+                .build();
+        UserDTO userDTO = UserDTO.builder()
+                .username(USERNAME_USER)
+                .blocked(false)
+                .build();
 
         // when
-        when(userRepository.existsByUsername("username")).thenReturn(true);
-        when(userRepository.findByUsername("username")).thenReturn(user);
-        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        when(userMapper.buildUserDTO(any(User.class))).thenReturn(userDTO);
 
-        UserDTO result = userService.unbanUser("username");
+        UserDTO result = userService.unbanUser(USERNAME_USER);
 
         // then
         assertNotNull(result);
@@ -281,20 +403,37 @@ class UserServiceTest {
         assertEquals(userDTO, result);
     }
 
-    @DisplayName("Return UserDTO")
+    @DisplayName("should not unban user when user is not banned")
+    @Test
+    void shouldNotUnbanUser() {
+        // given
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .blocked(false)
+                .build();
+        // when
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        // then
+        assertThrows(UserBlockException.class, () -> userService.unbanUser(USERNAME_USER));
+    }
+
+    @DisplayName("should return userDTO")
     @Test
     void shouldFindUserDTO() {
         // given
-        User user = User.builder().username("username").build();
-        UserDTO userDTO = UserDTO.builder().username("username").build();
-
+        User user = User.builder()
+                .username(USERNAME_USER)
+                .build();
+        UserDTO userDTO = UserDTO.builder()
+                .username(USERNAME_USER)
+                .build();
         // when
-        when(userRepository.existsByUsername("username")).thenReturn(true);
-        when(userRepository.findByUsername("username")).thenReturn(user);
-        when(userMapper.buildUserDTO(user)).thenReturn(userDTO);
+        when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+        when(userMapper.buildUserDTO(any(User.class))).thenReturn(userDTO);
 
-        UserDTO result = userService.findUserDTO("username");
-
+        UserDTO result = userService.findUserDTO(USERNAME_USER);
         // then
         assertNotNull(result);
         assertEquals(userDTO, result);

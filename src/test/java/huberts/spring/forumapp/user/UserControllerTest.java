@@ -5,11 +5,8 @@ import huberts.spring.forumapp.ContainerIT;
 import huberts.spring.forumapp.exception.*;
 import huberts.spring.forumapp.jwt.JwtKey;
 import huberts.spring.forumapp.user.dto.PasswordDTO;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.context.TestPropertySource;
@@ -21,9 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
-@Slf4j
 class UserControllerTest extends ContainerIT {
 
     private static final String USERNAME_USER_JWT = "userJwt";
@@ -110,7 +105,6 @@ class UserControllerTest extends ContainerIT {
     @Test
     void shouldReturnCurrentUser() throws Exception {
         String token = JwtKey.getUserJwt(mockMvc, objectMapper);
-        log.info("JWT: " + token);
 
         mockMvc.perform(MockMvcRequestBuilders.get(CURRENT_USER_PROFILE_ENDPOINT)
                         .header(AUTHORIZATION_HEADER, token))
