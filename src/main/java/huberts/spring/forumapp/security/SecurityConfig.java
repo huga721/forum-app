@@ -1,5 +1,7 @@
 package huberts.spring.forumapp.security;
 
+import huberts.spring.forumapp.security.filter.AuthFilter;
+import huberts.spring.forumapp.security.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

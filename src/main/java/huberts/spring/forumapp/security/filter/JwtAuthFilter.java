@@ -1,7 +1,8 @@
-package huberts.spring.forumapp.security;
+package huberts.spring.forumapp.security.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import huberts.spring.forumapp.security.DetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

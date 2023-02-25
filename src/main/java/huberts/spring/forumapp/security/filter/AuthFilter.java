@@ -1,6 +1,8 @@
-package huberts.spring.forumapp.security;
+package huberts.spring.forumapp.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import huberts.spring.forumapp.security.AuthManager;
+import huberts.spring.forumapp.security.AuthSuccessHandler;
 import huberts.spring.forumapp.user.dto.LoginDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
