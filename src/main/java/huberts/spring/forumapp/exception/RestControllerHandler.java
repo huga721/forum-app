@@ -51,9 +51,9 @@ public class RestControllerHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(value = CategoryTitleIsBlankOrEmptyException.class)
+    @ExceptionHandler(value = CategoryTitleException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String categoryTitleIsBlankOrEmpty(CategoryTitleIsBlankOrEmptyException e) {
+    public String categoryTitleIsBlankOrEmpty(CategoryTitleException e) {
         return e.getMessage();
     }
 
@@ -66,6 +66,18 @@ public class RestControllerHandler {
     @ExceptionHandler(value = RoleException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String userHasThatRole(RoleException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = CategoryDescriptionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String categoryDescription(CategoryDescriptionException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = TopicExistException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String topicDoesntExist(TopicExistException e) {
         return e.getMessage();
     }
 }
