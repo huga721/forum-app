@@ -1,7 +1,7 @@
 package huberts.spring.forumapp.exception;
 
-public class AccountBlockedException extends RuntimeException{
-    public AccountBlockedException(String message) {
-        super(message);
-    }
+import org.springframework.security.core.AuthenticationException;
+
+public class AccountBlockedException extends AuthenticationException {
+    public AccountBlockedException(String message) { super(message);}
 }
