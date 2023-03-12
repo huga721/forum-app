@@ -1,6 +1,6 @@
 package huberts.spring.forumapp.category.dto;
 
-import huberts.spring.forumapp.topic.dto.TopicDTO;
+import huberts.spring.forumapp.topic.dto.ShortTopicDTO;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,5 +11,5 @@ import java.util.List;
 public class CategoryDTO {
     private String title;
     private String description;
-    private List<TopicDTO> topics;
+    private List<ShortTopicDTO> topics;
 }
