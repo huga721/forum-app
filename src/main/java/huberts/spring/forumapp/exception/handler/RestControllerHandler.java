@@ -1,7 +1,24 @@
 package huberts.spring.forumapp.exception.handler;
 
 
-import huberts.spring.forumapp.exception.*;
+import huberts.spring.forumapp.exception.category.CategoryAlreadyExistingException;
+import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
+import huberts.spring.forumapp.exception.category.CategoryExistException;
+import huberts.spring.forumapp.exception.category.CategoryTitleException;
+import huberts.spring.forumapp.exception.comment.CommentExistException;
+import huberts.spring.forumapp.exception.like.LikeExistException;
+import huberts.spring.forumapp.exception.report.ReportExistException;
+import huberts.spring.forumapp.exception.report.ReportRealiseException;
+import huberts.spring.forumapp.exception.role.RoleDoesntExistException;
+import huberts.spring.forumapp.exception.role.RoleException;
+import huberts.spring.forumapp.exception.topic.TopicContentException;
+import huberts.spring.forumapp.exception.topic.TopicExistException;
+import huberts.spring.forumapp.exception.topic.TopicTitleException;
+import huberts.spring.forumapp.exception.user.UserAlreadyExistingException;
+import huberts.spring.forumapp.exception.user.UserBlockException;
+import huberts.spring.forumapp.exception.user.UserDoesntExistException;
+import huberts.spring.forumapp.exception.user.UsernameOrPasswordIsBlankOrEmpty;
+import huberts.spring.forumapp.exception.warning.WarningExistException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;

@@ -1,4 +1,4 @@
-package huberts.spring.forumapp.exception;
+package huberts.spring.forumapp.exception.report;
 
 public class ReportRealiseException extends RuntimeException {
     public ReportRealiseException(String message) {

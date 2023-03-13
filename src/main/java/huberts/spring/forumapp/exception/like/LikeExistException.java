@@ -1,4 +1,4 @@
-package huberts.spring.forumapp.exception;
+package huberts.spring.forumapp.exception.like;
 
 public class LikeExistException extends RuntimeException{
     public LikeExistException(String message) {

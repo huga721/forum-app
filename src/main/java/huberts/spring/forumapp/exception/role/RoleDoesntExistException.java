@@ -1,4 +1,4 @@
-package huberts.spring.forumapp.exception;
+package huberts.spring.forumapp.exception.role;
 
 public class RoleDoesntExistException extends RuntimeException{
     public RoleDoesntExistException(String message) {

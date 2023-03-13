@@ -1,4 +1,4 @@
-package huberts.spring.forumapp.exception;
+package huberts.spring.forumapp.exception.user;
 
 import org.springframework.security.core.AuthenticationException;
 

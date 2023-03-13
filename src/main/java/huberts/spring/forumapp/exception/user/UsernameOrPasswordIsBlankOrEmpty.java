@@ -1,4 +1,4 @@
-package huberts.spring.forumapp.exception;
+package huberts.spring.forumapp.exception.user;
 
 public class UsernameOrPasswordIsBlankOrEmpty extends RuntimeException{
     public UsernameOrPasswordIsBlankOrEmpty(String message) {
