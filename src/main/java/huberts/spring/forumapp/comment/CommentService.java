@@ -25,9 +25,10 @@ public class CommentService implements CommentServiceApi {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    private final String TOPIC_ID_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
-    private final String COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION = "There is no comment created by current user with id \"%d\".";
-    private final String COMMENT_DOESNT_EXIST_EXCEPTION = "Comment with id \"%d\" doesn't exist.";
+    private static final String TOPIC_ID_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
+    private static final String COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION = "There is no comment created by current user with id \"%d\".";
+    private static final String COMMENT_DOESNT_EXIST_EXCEPTION = "Comment with id \"%d\" doesn't exist.";
+    private static final String EXCEPTION_OCCURRED = "An exception occurred!";
 
     @Override
     public CommentDTO createComment(Long id, CommentContentDTO commentDTO, String username) {
@@ -44,65 +45,27 @@ public class CommentService implements CommentServiceApi {
 
     private Topic findTopicById(Long id) {
         log.info("Finding topic with id {}", id);
-        return topicRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error(String.format(TOPIC_ID_DOESNT_EXIST_EXCEPTION, id));
-                    return new TopicExistException(String.format(TOPIC_ID_DOESNT_EXIST_EXCEPTION, id));
-                });
+        return topicRepository.findById(id).orElseThrow(() -> {
+            String errorMessage = String.format(TOPIC_ID_DOESNT_EXIST_EXCEPTION, id);
+            log.error(EXCEPTION_OCCURRED, new TopicExistException(errorMessage));
+            return new TopicExistException(errorMessage);
+        });
     }
 
     @Override
-    public void deleteCommentByCurrentUser(Long id, String username) {
-        log.info("Deleting comment with id {} by username {}", id, username);
-        User user = userRepository.findByUsername(username).get();
-        Comment foundComment = findCommentByUserAndId(user, id);
-        commentRepository.delete(foundComment);
-        log.info("Comment deleted");
-    }
-
-    private Comment findCommentByUserAndId(User user, Long id) {
-        log.info("Finding comment with id {} and username {}", id, user.getUsername());
-        return commentRepository.findByUserAndId(user, id)
-                .orElseThrow(() -> {
-                    log.error(String.format(COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION, id));
-                    return new CommentExistException(String.format(COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION, id));
-                });
-    }
-
-    @Override
-    public void deleteCommentByModerator(Long id) {
-        log.info("Deleting comment with id {} by moderator or admin", id);
-        Comment foundComment = findCommentById(id);
-        commentRepository.delete(foundComment);
-        log.info("Comment deleted");
+    public CommentDTO getCommentById(Long id) {
+        log.info("Getting comment with id {}", id);
+        Comment result = findCommentById(id);
+        return CommentMapper.buildCommentDTO(result);
     }
 
     private Comment findCommentById(Long id) {
         log.info("Finding comment with id {}", id);
-        return commentRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error(String.format(COMMENT_DOESNT_EXIST_EXCEPTION, id));
-                    return new CommentExistException(String.format(COMMENT_DOESNT_EXIST_EXCEPTION, id));
-                });
-    }
-
-    @Override
-    public CommentDTO updateCommentByUser(Long id, CommentContentDTO commentContentDTO, String username) {
-        log.info("Updating content of comment with id {} by username {}", id, username);
-        User user = userRepository.findByUsername(username).get();
-        Comment foundComment = findCommentByUserAndId(user, id);
-        foundComment.setContent(commentContentDTO.getContent());
-        log.info("Comment updated");
-        return CommentMapper.buildCommentDTO(foundComment);
-    }
-
-    @Override
-    public CommentDTO updateCommentByModerator(Long id, CommentContentDTO commentContentDTO) {
-        log.info("Updating content of comment with id {} by moderator or admin", id);
-        Comment foundComment = findCommentById(id);
-        foundComment.setContent(commentContentDTO.getContent());
-        log.info("Comment updated");
-        return CommentMapper.buildCommentDTO(foundComment);
+        return commentRepository.findById(id).orElseThrow(() -> {
+            String errorMessage = String.format(COMMENT_DOESNT_EXIST_EXCEPTION, id);
+            log.error(EXCEPTION_OCCURRED, new CommentExistException(errorMessage));
+            return new CommentExistException(errorMessage);
+        });
     }
 
     @Override
@@ -126,8 +89,49 @@ public class CommentService implements CommentServiceApi {
     }
 
     @Override
-    public CommentDTO getCommentById(Long id) {
-        log.info("Getting comment with id {}", id);
-        return CommentMapper.buildCommentDTO(findCommentById(id));
+    public CommentDTO updateCommentByAuthor(Long id, CommentContentDTO commentContentDTO, String username) {
+        log.info("Updating content of comment with id {} by username {}", id, username);
+        User user = userRepository.findByUsername(username).get();
+        Comment foundComment = findCommentByUserAndId(user, id);
+        foundComment.setContent(commentContentDTO.getContent());
+        log.info("Comment updated");
+        return CommentMapper.buildCommentDTO(foundComment);
+    }
+
+    private Comment findCommentByUserAndId(User user, Long id) {
+        log.info("Finding comment with id {} and username {}", id, user.getUsername());
+        return commentRepository.findByUserAndId(user, id).orElseThrow(() -> {
+            String errorMessage = String.format(COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION, id);
+            log.error(EXCEPTION_OCCURRED, new CommentExistException(errorMessage));
+            return new CommentExistException(errorMessage);
+        });
+    }
+
+    @Override
+    public CommentDTO updateCommentByModerator(Long id, CommentContentDTO commentContentDTO) {
+        log.info("Updating content of comment with id {} by moderator or admin", id);
+        Comment foundComment = findCommentById(id);
+        foundComment.setContent(commentContentDTO.getContent());
+        log.info("Comment updated");
+        return CommentMapper.buildCommentDTO(foundComment);
+    }
+
+    @Override
+    public void deleteCommentByAuthor(Long id, String username) {
+        log.info("Deleting comment with id {} by username {}", id, username);
+
+        User user = userRepository.findByUsername(username).get();
+        Comment foundComment = findCommentByUserAndId(user, id);
+
+        commentRepository.delete(foundComment);
+        log.info("Comment deleted");
+    }
+
+    @Override
+    public void deleteCommentByModerator(Long id) {
+        log.info("Deleting comment with id {} by moderator or admin", id);
+        Comment foundComment = findCommentById(id);
+        commentRepository.delete(foundComment);
+        log.info("Comment deleted");
     }
 }
