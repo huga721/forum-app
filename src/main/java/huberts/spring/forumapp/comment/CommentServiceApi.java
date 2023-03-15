@@ -13,9 +13,9 @@ public interface CommentServiceApi {
     List<CommentDTO> getAllCommentsByTopicId(Long id);
     List<CommentDTO> getAllCommentsByUsername(String username);
 
-    CommentDTO updateCommentByUser(Long id, CommentContentDTO commentContentDTO, String username);
+    CommentDTO updateCommentByAuthor(Long id, CommentContentDTO commentContentDTO, String username);
     CommentDTO updateCommentByModerator(Long id, CommentContentDTO commentContentDTO);
 
-    void deleteCommentByCurrentUser(Long id, String username);
+    void deleteCommentByAuthor(Long id, String username);
     void deleteCommentByModerator(Long id);
 }
