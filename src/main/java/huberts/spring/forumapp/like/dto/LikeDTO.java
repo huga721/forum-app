@@ -8,4 +8,6 @@ import lombok.Data;
 public class LikeDTO {
     public Long id;
     public String who;
+    public String likedObject;
+    public Long likedObjectId;
 }
