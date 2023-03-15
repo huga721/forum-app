@@ -5,9 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LikeObjectDTO {
+public class LikeListDTO {
     public Long id;
     public String who;
-    public String likedObject;
-    public Long likedObjectId;
 }
