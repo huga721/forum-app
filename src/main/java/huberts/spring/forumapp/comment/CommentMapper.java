@@ -3,7 +3,7 @@ package huberts.spring.forumapp.comment;
 import huberts.spring.forumapp.comment.dto.CommentDTO;
 import huberts.spring.forumapp.like.Like;
 import huberts.spring.forumapp.like.LikeMapper;
-import huberts.spring.forumapp.like.dto.LikeDTO;
+import huberts.spring.forumapp.like.dto.LikeListDTO;
 import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.user.User;
 import org.springframework.stereotype.Component;
@@ -41,7 +41,7 @@ public class CommentMapper {
                 .collect(Collectors.toList());
     }
 
-    private static List<LikeDTO> mapToLikeDTO(List<Like> likes) {
+    private static List<LikeListDTO> mapToLikeDTO(List<Like> likes) {
         return LikeMapper.mapLikesToLikeDTO(likes);
     }
 }

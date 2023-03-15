@@ -1,6 +1,6 @@
 package huberts.spring.forumapp.comment.dto;
 
-import huberts.spring.forumapp.like.dto.LikeDTO;
+import huberts.spring.forumapp.like.dto.LikeListDTO;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,5 +15,5 @@ public class CommentDTO {
     private String author;
     private LocalDateTime createdAt;
     private int reportsReceived;
-    private List<LikeDTO> likes;
+    private List<LikeListDTO> likes;
 }
