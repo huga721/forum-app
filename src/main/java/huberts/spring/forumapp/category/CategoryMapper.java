@@ -2,7 +2,6 @@ package huberts.spring.forumapp.category;
 
 import huberts.spring.forumapp.category.dto.CategoryCreateDTO;
 import huberts.spring.forumapp.category.dto.CategoryDTO;
-import huberts.spring.forumapp.category.dto.ShortCategoryDTO;
 import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicMapper;
 import huberts.spring.forumapp.topic.dto.ShortTopicDTO;
@@ -37,13 +36,6 @@ public class CategoryMapper {
         return categories.stream()
                 .map(CategoryMapper::buildCategoryDTO)
                 .collect(Collectors.toList());
-    }
-
-    public static ShortCategoryDTO buildShortCategoryDTO(Category category) {
-        return ShortCategoryDTO.builder()
-                .title(category.getTitle())
-                .description(category.getDescription())
-                .build();
     }
 
     public static List<ShortTopicDTO> returnShortTopicDTO(List<Topic> topics) {
