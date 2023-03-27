@@ -1,7 +1,7 @@
 package huberts.spring.forumapp.exception.handler;
 
 
-import huberts.spring.forumapp.exception.category.CategoryAlreadyExistingException;
+import huberts.spring.forumapp.exception.category.CategoryAlreadyExistException;
 import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
 import huberts.spring.forumapp.exception.category.CategoryExistException;
 import huberts.spring.forumapp.exception.category.CategoryTitleException;
@@ -14,12 +14,11 @@ import huberts.spring.forumapp.exception.role.RoleException;
 import huberts.spring.forumapp.exception.topic.TopicContentException;
 import huberts.spring.forumapp.exception.topic.TopicExistException;
 import huberts.spring.forumapp.exception.topic.TopicTitleException;
-import huberts.spring.forumapp.exception.user.UserAlreadyExistingException;
-import huberts.spring.forumapp.exception.user.UserBlockException;
-import huberts.spring.forumapp.exception.user.UserDoesntExistException;
-import huberts.spring.forumapp.exception.user.UsernameOrPasswordIsBlankOrEmpty;
+import huberts.spring.forumapp.exception.user.*;
 import huberts.spring.forumapp.exception.warning.WarningExistException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class RestControllerHandler {
 
@@ -36,9 +36,9 @@ public class RestControllerHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(value = CategoryAlreadyExistingException.class)
+    @ExceptionHandler(value = CategoryAlreadyExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String categoryAlreadyExistingHandler(CategoryAlreadyExistingException e) {
+    public String categoryAlreadyExistingHandler(CategoryAlreadyExistException e) {
         return e.getMessage();
     }
 
@@ -124,8 +124,11 @@ public class RestControllerHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String argumentNotValid(MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
-        return bindingResult.getAllErrors().stream()
+        String errorMessage = bindingResult.getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage).findFirst().get();
+        MethodParameter parameter = e.getParameter();
+        log.error("An exception occurred during validation of method arguments!", new MethodArgumentNotValidException(parameter, bindingResult));
+        return "An exception occurred during validation of method arguments: " + errorMessage;
     }
 
     @ExceptionHandler(value = ReportExistException.class)
@@ -143,6 +146,12 @@ public class RestControllerHandler {
     @ExceptionHandler(value = WarningExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String cantRealiseReports(WarningExistException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = UserAdminDeleteException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String userDeleteException(UserAdminDeleteException e) {
         return e.getMessage();
     }
 }
