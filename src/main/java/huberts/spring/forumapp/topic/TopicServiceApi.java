@@ -6,13 +6,15 @@ import huberts.spring.forumapp.topic.dto.*;
 import java.util.List;
 
 public interface TopicServiceApi {
-    TopicDTO saveNewTopic(TopicCreateDTO topic, String username);
-    List<TopicDTO> findAll();
-    List<TopicDTO> findAllByTitle(String title);
-    TopicDTO findById(Long id);
-    TopicDTO changeContent(TopicContentDTO topicDto, String username, Long id);
-    TopicDTO changeContentByModerator(TopicEditDTO topicEditDTO, Long id);
-    TopicDTO changeTopicCategory(CategoryTitleDTO categoryTitleDTO, Long id);
-    void deleteTopic(String username, Long id);
-    void deleteTopicByModerator(Long id);
+    TopicDTO createTopic(TopicCreateDTO topic, String username);
+
+    TopicDTO getTopicById(Long id);
+    List<TopicDTO> getAllTopics();
+
+    TopicDTO updateTopicByAuthor(Long id, TopicEditDTO topicEditDTO, String username);
+    TopicDTO updateTopicByModerator(Long id, TopicEditDTO topicEditDTO, String moderatorName);
+    TopicDTO changeCategoryOfTopic(Long id, CategoryTitleDTO categoryTitleDTO, String moderatorName);
+
+    void deleteTopicByAuthor(Long id, String username);
+    void deleteTopicByModerator(Long id, String moderatorName);
 }
