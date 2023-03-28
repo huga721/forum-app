@@ -17,19 +17,26 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
     private Long id;
+
     private String content;
+
     private LocalDateTime createdAt;
+
     @ManyToOne()
     private Topic topic;
+
     @ManyToOne()
     @JoinColumn(name = "user_id")
     private User user;
+
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     private List<Like> likes;
+
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     private List<Report> reports;
 }

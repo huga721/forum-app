@@ -13,16 +13,20 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Like {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
     @ManyToOne()
     @JoinColumn(name = "topic_id")
     private Topic topic;
+
     @ManyToOne()
     @JoinColumn(name = "comment_id")
     private Comment comment;
