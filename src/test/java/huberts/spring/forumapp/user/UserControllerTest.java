@@ -26,45 +26,44 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class UserControllerTest extends ContainerIT {
 
-    public static final String USER_JWT = "userJwt";
-    public static final String MODERATOR_JWT = "moderatorJwt";
-    public static final String ADMIN_JWT = "adminJwt";
-    public static final String USER = "user";
-    
-    public static final String PASSWORD_NEW = "testPassword";
-    public static final String EMPTY = "";
+    private static final String USER_JWT = "userJwt";
+    private static final String MODERATOR_JWT = "moderatorJwt";
+    private static final String ADMIN_JWT = "adminJwt";
+    private static final String USER = "user";
+    private static final String PASSWORD_NEW = "testPassword";
+    private static final String EMPTY = "";
 
-    public static final String STAFF_ENDPOINT = "/staff";
-    public static final String USER_ENDPOINT = "/user";
-    public static final String USER_NOT_EXIST_ENDPOINT = "/userNotExist";
-    public static final String CURRENT_USER_PROFILE_ENDPOINT = "/profile";
-    public static final String CHANGE_PASSWORD_ENDPOINT = "/change-password";
-    public static final String DELETE_CURRENT_USER_ENDPOINT = "/delete";
-    public static final String GET_EVERY_USER_ENDPOINT = "/moderator/all";
-    public static final String BAN_USER_ENDPOINT = "/moderator/ban/userToBan";
-    public static final String BAN_USER_DOESNT_EXIST_ENDPOINT = "/moderator/ban/userDoesntExist";
-    public static final String BAN_USER_BANNED_ENDPOINT = "/moderator/ban/userToCheckBan";
-    public static final String UNBAN_USER_ENDPOINT = "/moderator/unban/userToUnban";
-    public static final String UNBAN_USER_DOESNT_EXIST_ENDPOINT = "/moderator/unban/userDoesntExist";
-    public static final String UNBAN_USER_UNBANNED_ENDPOINT = "/moderator/unban/userToCheckUnban";
-    public static final String CHANGE_USERS_PASSWORD_ENDPOINT = "/moderator/change-password/userToChangePassword";
-    public static final String CHANGE_USERS_PASSWORD_USER_DOESNT_EXIST_ENDPOINT = "/moderator/change-password/userDoesntExist";
-    public static final String DELETE_USER_ENDPOINT = "/admin/delete/userToDeleteByAdmin";
-    public static final String DELETE_USER_DOESNT_EXIST_ENDPOINT = "/admin/delete/userDoesntExist";
-    public static final String DELETE_USER_MODERATOR_ENDPOINT = "/admin/delete/moderatorJwt";
-    public static final String CHANGE_ROLE_ENDPOINT = "/admin/edit/userToChangeRole/role/ROLE_MODERATOR";
-    public static final String CHANGE_ROLE_DUPLICATE_ENDPOINT = "/admin/edit/userWithSameRole/role/ROLE_USER";
-    public static final String CHANGE_ROLE_USER_DOESNT_EXIST_ENDPOINT = "/admin/edit/userDoesntExist/role/ROLE_USER";
-    public static final String CHANGE_ROLE_DOESNT_EXIST_ENDPOINT = "/admin/edit/userToChangeRole/role/ROLE_INVALID";
+    private static final String STAFF_ENDPOINT = "/staff";
+    private static final String USER_ENDPOINT = "/user";
+    private static final String USER_NOT_EXIST_ENDPOINT = "/userNotExist";
+    private static final String CURRENT_USER_PROFILE_ENDPOINT = "/profile";
+    private static final String CHANGE_PASSWORD_ENDPOINT = "/change-password";
+    private static final String DELETE_CURRENT_USER_ENDPOINT = "/delete";
+    private static final String GET_EVERY_USER_ENDPOINT = "/moderator/all";
+    private static final String BAN_USER_ENDPOINT = "/moderator/ban/userToBan";
+    private static final String BAN_USER_DOESNT_EXIST_ENDPOINT = "/moderator/ban/userDoesntExist";
+    private static final String BAN_USER_BANNED_ENDPOINT = "/moderator/ban/userToCheckBan";
+    private static final String UNBAN_USER_ENDPOINT = "/moderator/unban/userToUnban";
+    private static final String UNBAN_USER_DOESNT_EXIST_ENDPOINT = "/moderator/unban/userDoesntExist";
+    private static final String UNBAN_USER_UNBANNED_ENDPOINT = "/moderator/unban/userToCheckUnban";
+    private static final String CHANGE_USERS_PASSWORD_ENDPOINT = "/moderator/change-password/userToChangePassword";
+    private static final String CHANGE_USERS_PASSWORD_USER_DOESNT_EXIST_ENDPOINT = "/moderator/change-password/userDoesntExist";
+    private static final String DELETE_USER_ENDPOINT = "/admin/delete/userToDeleteByAdmin";
+    private static final String DELETE_USER_DOESNT_EXIST_ENDPOINT = "/admin/delete/userDoesntExist";
+    private static final String DELETE_USER_MODERATOR_ENDPOINT = "/admin/delete/moderatorJwt";
+    private static final String CHANGE_ROLE_ENDPOINT = "/admin/edit/userToChangeRole/role/ROLE_MODERATOR";
+    private static final String CHANGE_ROLE_DUPLICATE_ENDPOINT = "/admin/edit/userWithSameRole/role/ROLE_USER";
+    private static final String CHANGE_ROLE_USER_DOESNT_EXIST_ENDPOINT = "/admin/edit/userDoesntExist/role/ROLE_USER";
+    private static final String CHANGE_ROLE_DOESNT_EXIST_ENDPOINT = "/admin/edit/userToChangeRole/role/ROLE_INVALID";
 
-    public static final String USERNAME_JSON_PATH = "$.username";
-    public static final String USERNAME_ARRAY_0_JSON_PATH = "$.[0].username";
-    public static final String USERNAME_ARRAY_1_JSON_PATH = "$.[1].username";
-    public static final String USERNAME_ARRAY_2_JSON_PATH = "$.[2].username";
-    public static final String BLOCKED_JSON_PATH = "$.blocked";
+    private static final String USERNAME_JSON_PATH = "$.username";
+    private static final String USERNAME_ARRAY_0_JSON_PATH = "$.[0].username";
+    private static final String USERNAME_ARRAY_1_JSON_PATH = "$.[1].username";
+    private static final String USERNAME_ARRAY_2_JSON_PATH = "$.[2].username";
+    private static final String BLOCKED_JSON_PATH = "$.blocked";
 
-    public static final String AUTHORIZATION = "Authorization";
-    public static final String INVALID_TOKEN = "wrong_token_123";
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String INVALID_TOKEN = "wrong_token_123";
 
     @Autowired
     private MockMvc mockMvc;

@@ -2,103 +2,127 @@ package huberts.spring.forumapp.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import huberts.spring.forumapp.user.User;
-import huberts.spring.forumapp.user.UserRepository;
+import huberts.spring.forumapp.ContainerIT;
+import huberts.spring.forumapp.exception.user.AccountBlockedException;
+import huberts.spring.forumapp.exception.user.UserDoesntExistException;
 import huberts.spring.forumapp.user.dto.LoginDTO;
 import huberts.spring.forumapp.user.dto.RegisterDTO;
-import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
-@Slf4j
-@TestPropertySource(locations = "classpath:application-test.properties")
-class SecurityControllerTest {
+class SecurityControllerTest extends ContainerIT {
+
+    private static final String USER_JWT = "userJwt";
+    private static final String PASSWORD = "encrypted_password";
+    private static final String USER_BANNED = "userBanned";
+    private static final String INVALID = "invalid";
+    private static final String NEW_USER = "newUser";
+    private static final String EMPTY = "";
+
+    private static final String LOGIN_ENDPOINT = "/login";
+    private static final String REGISTER_ENDPOINT = "/register";
+    private static final String NEW_USER_LOCATION_ENDPOINT = "/newUser";
+
+    private static final String USERNAME_JSON_PATH = "$.username";
+    private static final String TOKEN_JSON_PATH = "$.token";
+    private static final String LOCATION = "location";
 
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private UserRepository userRepository;
 
-    private User user;
-
-    @BeforeEach
-    void setUp() {
-        user = User.builder().id(1L).username("user").password("password").build();
-        userRepository.save(user);
-    }
-
-
-    @DisplayName("Login is success, HTTP status 200")
+    @DisplayName("Should login, HTTP status 200")
     @Test
-    void shouldLoginAndGetContent() throws Exception {
-        // given
-        LoginDTO login = new LoginDTO("user", "password");
+    void shouldLogin() throws Exception {
+        LoginDTO login = new LoginDTO(USER_JWT, PASSWORD);
+        String json = objectMapper.writeValueAsString(login);
 
-        // when & then
-        // Request to the login endpoint
-        mockMvc.perform(MockMvcRequestBuilders.post("/login")
-                        .contentType(MediaType.APPLICATION_JSON.getType())
-                        .content(toJson(login)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.token", Matchers.notNullValue()));
+        mockMvc.perform(post(LOGIN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath(TOKEN_JSON_PATH, Matchers.notNullValue()));
     }
 
-    @DisplayName("Login is failed, HTTP status 401")
+    //TODO: Fix it after answers in stackoverflow, if not then only assert HTTP status
+
+    @DisplayName("Should throw BadCredentialsException when password doesn't match, HTTP status 403")
+    @Test
+    void shouldThrowBadCredentialsException_WhenPasswordDoesntMatch() throws Exception {
+        LoginDTO login = new LoginDTO(USER_JWT, PASSWORD);
+        String json = objectMapper.writeValueAsString(login);
+
+        mockMvc.perform(post(LOGIN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().is(401))
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof BadCredentialsException));
+    }
+
+    //TODO: Fix it after answers in stackoverflow, if not then only assert HTTP status
+
+    @DisplayName("Should throw AccountBlockedException when user is banned, HTTP status 403")
+    @Test
+    void shouldThrowAccountBlockedException_WhenUserIsBanned() throws Exception {
+        LoginDTO login = new LoginDTO(USER_BANNED, PASSWORD);
+        String json = objectMapper.writeValueAsString(login);
+
+        mockMvc.perform(post(LOGIN_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().is(401))
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof AccountBlockedException));
+    }
+
+    //TODO: Fix it after answers in stackoverflow, if not then only assert HTTP status
+
+    @DisplayName("Should not login when user doesn't exist, HTTP status 401")
     @Test
     void shouldNotLogin() throws Exception {
-        // given
-        LoginDTO login = new LoginDTO("failed", "failed");
+        LoginDTO login = new LoginDTO(INVALID, PASSWORD);
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.post("/login")
+        mockMvc.perform(post(LOGIN_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON.getType())
                         .content(toJson(login)))
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+                .andExpect(status().is(401))
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof UserDoesntExistException));
     }
 
-    @DisplayName("Creating new user is success, HTTP status 201")
+    @DisplayName("Should create new user, HTTP status 201")
     @Test
     void shouldCreateNewUser() throws Exception {
-        // given
-        RegisterDTO credentials = new RegisterDTO("credentials", "credentials");
+        RegisterDTO credentials = new RegisterDTO(NEW_USER, PASSWORD);
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        mockMvc.perform(post(REGISTER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(toJson(credentials)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", is("credentials")))
-                .andExpect(MockMvcResultMatchers.header().string("location", "/credentials"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath(USERNAME_JSON_PATH, is(NEW_USER)))
+                .andExpect(header().string(LOCATION, NEW_USER_LOCATION_ENDPOINT));
     }
 
     @DisplayName("Creating new user is failed, HTTP status 400")
     @Test
     void shouldNotCreateNewUser() throws Exception {
         // given
-        RegisterDTO credentials = new RegisterDTO("", "");
+        RegisterDTO credentials = new RegisterDTO(EMPTY, EMPTY);
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        mockMvc.perform(post(REGISTER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(toJson(credentials)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     private String toJson(Object value) throws JsonProcessingException {

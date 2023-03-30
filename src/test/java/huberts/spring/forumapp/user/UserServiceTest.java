@@ -29,14 +29,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    public static final String ROLE_NAME_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_NAME_ADMIN = "ROLE_ADMIN";
     private static final String ROLE_NAME_MODERATOR = "ROLE_MODERATOR";
     private static final String ROLE_NAME_USER = "ROLE_USER";
-    public static final String USER = "user";
+    private static final String USER = "user";
     private static final String PASSWORD = "password";
     private static final String PASSWORD_TO_CHANGE = "passwordTest";
     private static final String PASSWORD_ENCODED = "encoded_password";
-    public static final String EMPTY = "";
+    private static final String EMPTY = "";
 
     @Mock
     private PasswordEncoder passwordEncoder;

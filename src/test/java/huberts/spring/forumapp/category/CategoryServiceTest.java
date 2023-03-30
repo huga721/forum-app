@@ -25,10 +25,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
 
-    public static final String TITLE = "test title of category";
-    public static final String TITLE_NEW = "title for list hehe";
-    public static final String DESCRIPTION = "test description of category";
-    public static final String DESCRIPTION_NEW = "description new for testing purposes";
+    private static final String TITLE = "test title of category";
+    private static final String TITLE_NEW = "title for list hehe";
+    private static final String DESCRIPTION = "test description of category";
+    private static final String DESCRIPTION_NEW = "description new for testing purposes";
 
     @Mock
     private CategoryRepository repository;
