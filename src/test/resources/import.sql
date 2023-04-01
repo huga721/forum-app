@@ -15,6 +15,11 @@ INSERT INTO users (id, username, password, blocked, role_name) VALUES (10, 'user
 INSERT INTO users (id, username, password, blocked, role_name) VALUES (11, 'userToDeleteByAdmin', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', false, 'ROLE_USER');
 INSERT INTO users (id, username, password, blocked, role_name) VALUES (12, 'userToChangeRole', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', false, 'ROLE_USER');
 INSERT INTO users (id, username, password, blocked, role_name) VALUES (13, 'userWithSameRole', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', false, 'ROLE_USER');
+INSERT INTO users (id, username, password, blocked, role_name) VALUES (14, 'userBanned', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', true, 'ROLE_USER');
 
-INSERT INTO users (id, username, password, blocked, role_name) VALUES (14, 'userBanned', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', true, 'ROLE_USER')
+INSERT INTO category (id, title, description) VALUES (1, 'test title', 'test description');
+INSERT INTO category (id, title, description) VALUES (2, 'second test title', 'second test description');
+INSERT INTO category (id, title, description) VALUES (3, 'category to change title', 'lorem ipsum ipsum lorem');
+INSERT INTO category (id, title, description) VALUES (4, 'category for throw test', 'throw it');
+INSERT INTO category (id, title, description) VALUES (5, 'category to delete', 'delete it');
 -- INSERT INTO topic (id, title, content) VALUES (1, 'userJwt', 'encrypted_password');
