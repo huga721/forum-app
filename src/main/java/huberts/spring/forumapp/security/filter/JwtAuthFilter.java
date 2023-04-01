@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import huberts.spring.forumapp.security.DetailsService;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -31,13 +34,18 @@ public class JwtAuthFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
-            UsernamePasswordAuthenticationToken authentication = getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                UsernamePasswordAuthenticationToken authentication = getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception ex) {
+                log.error("Exception occurred while authentication JWT", new Exception(ex.getMessage()));
+            }
         }
+        chain.doFilter(request, response);
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(String token) {
