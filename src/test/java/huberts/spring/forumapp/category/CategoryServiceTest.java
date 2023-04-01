@@ -6,7 +6,7 @@ import huberts.spring.forumapp.category.dto.CategoryDescriptionDTO;
 import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
 import huberts.spring.forumapp.exception.category.CategoryAlreadyExistException;
 import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
-import huberts.spring.forumapp.exception.category.CategoryExistException;
+import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
 import huberts.spring.forumapp.exception.category.CategoryTitleException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,7 +93,7 @@ class CategoryServiceTest {
         @DisplayName("Should throw CategoryExistException when category with given id doesn't exist")
         @Test
         void shouldThrowCategoryExistException_WhenCategoryWithGivenIdDoesntExist() {
-            assertThrows(CategoryExistException.class, () -> service.getCategoryById(1L));
+            assertThrows(CategoryDoesntExistException.class, () -> service.getCategoryById(1L));
         }
     }
 
@@ -145,7 +145,7 @@ class CategoryServiceTest {
         @DisplayName("Should throw CategoryExistException when title category to update doesn't exist")
         @Test
         void shouldThrowCategoryExistException_WhenTitleCategoryToUpdateDoesntExist() {
-            assertThrows(CategoryExistException.class, () -> service.updateTitle(1L, titleToUpdate));
+            assertThrows(CategoryDoesntExistException.class, () -> service.updateTitle(1L, titleToUpdate));
         }
 
         @DisplayName("Should throw CategoryTitleException when title to change is the same as actual title")
@@ -175,12 +175,8 @@ class CategoryServiceTest {
 
         @BeforeEach
         void setUp() {
-            descriptionToUpdate = CategoryDescriptionDTO.builder()
-                    .description(DESCRIPTION_NEW)
-                    .build();
-            descriptionToThrow = CategoryDescriptionDTO.builder()
-                    .description(DESCRIPTION)
-                    .build();
+            descriptionToUpdate = new CategoryDescriptionDTO(DESCRIPTION_NEW);
+            descriptionToThrow = new CategoryDescriptionDTO(DESCRIPTION);
         }
 
         @DisplayName("Should update description")
@@ -196,7 +192,7 @@ class CategoryServiceTest {
         @DisplayName("Should throw CategoryExistException when category doesn't exist")
         @Test
         void shouldThrowCategoryExistException_WhenCategoryDoesntExist() {
-            assertThrows(CategoryExistException.class, () -> service.updateDescription(1L, descriptionToUpdate));
+            assertThrows(CategoryDoesntExistException.class, () -> service.updateDescription(1L, descriptionToUpdate));
         }
 
         @DisplayName("Should throw CategoryDescriptionException when new description is the same as it is")
@@ -222,7 +218,7 @@ class CategoryServiceTest {
         @DisplayName("Should throw CategoryExistException when category doesn't exist")
         @Test
         void shouldThrowCategoryExistException_WhenCategoryDoesntExist() {
-            assertThrows(CategoryExistException.class, () -> service.deleteCategory(1L));
+            assertThrows(CategoryDoesntExistException.class, () -> service.deleteCategory(1L));
         }
     }
 }
