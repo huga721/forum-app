@@ -25,8 +25,8 @@ public class TopicMapper {
         return Topic.builder()
                 .title(topic.getTitle())
                 .content(topic.getContent())
-                .users(List.of(author))
-                .categories(List.of(category))
+                .user(author)
+                .category(category)
                 .createdAt(LocalDateTime.now())
                 .likes(emptyLikes)
                 .comments(emptyComments)
@@ -34,8 +34,8 @@ public class TopicMapper {
     }
 
     public static TopicDTO buildTopicDTO(Topic topic) {
-        String categoryName = topic.getCategories().get(0).getTitle();
-        String username = topic.getUsers().get(0).getUsername();
+        String categoryName = topic.getCategory().getTitle();
+        String username = topic.getUser().getUsername();
         return TopicDTO.builder()
                 .id(topic.getId())
                 .title(topic.getTitle())
@@ -55,8 +55,8 @@ public class TopicMapper {
                 .collect(Collectors.toList());
     }
 
-    private static ShortTopicDTO buildShortTopicDTO(Topic topic) {
-        String username = topic.getUsers().get(0).getUsername();
+    public static ShortTopicDTO buildShortTopicDTO(Topic topic) {
+        String username = topic.getUser().getUsername();
         return ShortTopicDTO.builder()
                 .id(topic.getId())
                 .author(username)
