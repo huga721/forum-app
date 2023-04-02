@@ -34,21 +34,13 @@ public class Topic {
 
     private LocalDateTime lastEdit;
 
-    @ManyToMany
-    @JoinTable(
-            name = "users_topic",
-            joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "users_id")
-    )
-    private List<User> users;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @ManyToMany()
-    @JoinTable(
-            name = "category_topic",
-            joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private List<Category> categories;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE)
     private List<Like> likes;
