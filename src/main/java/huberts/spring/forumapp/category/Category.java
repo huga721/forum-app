@@ -30,6 +30,6 @@ public class Category {
     @Size(max = 200)
     private String description;
 
-    @ManyToMany(mappedBy = "categories", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     private List<Topic> topics;
 }
