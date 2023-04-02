@@ -3,7 +3,7 @@ package huberts.spring.forumapp.comment;
 import huberts.spring.forumapp.comment.dto.CommentDTO;
 import huberts.spring.forumapp.comment.dto.CommentContentDTO;
 import huberts.spring.forumapp.exception.comment.CommentExistException;
-import huberts.spring.forumapp.exception.topic.TopicExistException;
+import huberts.spring.forumapp.exception.topic.TopicAlreadyExistException;
 import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicRepository;
 import huberts.spring.forumapp.user.User;
@@ -47,8 +47,8 @@ public class CommentService implements CommentServiceApi {
         log.info("Finding topic with id {}", id);
         return topicRepository.findById(id).orElseThrow(() -> {
             String errorMessage = String.format(TOPIC_ID_DOESNT_EXIST_EXCEPTION, id);
-            log.error(EXCEPTION_OCCURRED, new TopicExistException(errorMessage));
-            return new TopicExistException(errorMessage);
+            log.error(EXCEPTION_OCCURRED, new TopicAlreadyExistException(errorMessage));
+            return new TopicAlreadyExistException(errorMessage);
         });
     }
 
