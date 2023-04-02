@@ -3,7 +3,7 @@ package huberts.spring.forumapp.exception.handler;
 
 import huberts.spring.forumapp.exception.category.CategoryAlreadyExistException;
 import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
-import huberts.spring.forumapp.exception.category.CategoryExistException;
+import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
 import huberts.spring.forumapp.exception.category.CategoryTitleException;
 import huberts.spring.forumapp.exception.comment.CommentExistException;
 import huberts.spring.forumapp.exception.like.LikeExistException;
@@ -12,7 +12,8 @@ import huberts.spring.forumapp.exception.report.ReportRealiseException;
 import huberts.spring.forumapp.exception.role.RoleDoesntExistException;
 import huberts.spring.forumapp.exception.role.RoleException;
 import huberts.spring.forumapp.exception.topic.TopicContentException;
-import huberts.spring.forumapp.exception.topic.TopicExistException;
+import huberts.spring.forumapp.exception.topic.TopicAlreadyExistException;
+import huberts.spring.forumapp.exception.topic.TopicDoesntExistException;
 import huberts.spring.forumapp.exception.topic.TopicTitleException;
 import huberts.spring.forumapp.exception.user.*;
 import huberts.spring.forumapp.exception.warning.WarningExistException;
@@ -42,9 +43,9 @@ public class RestControllerHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(value = CategoryExistException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String categoryDoesntExistHandler(CategoryExistException e) {
+    @ExceptionHandler(value = CategoryDoesntExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String categoryDoesntExistHandler(CategoryDoesntExistException e) {
         return e.getMessage();
     }
 
@@ -90,9 +91,9 @@ public class RestControllerHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(value = TopicExistException.class)
+    @ExceptionHandler(value = TopicAlreadyExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String topicDoesntExist(TopicExistException e) {
+    public String topicDoesntExist(TopicAlreadyExistException e) {
         return e.getMessage();
     }
 
@@ -152,6 +153,12 @@ public class RestControllerHandler {
     @ExceptionHandler(value = UserAdminDeleteException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String userDeleteException(UserAdminDeleteException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = TopicDoesntExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String topicDoesntExistException(TopicDoesntExistException e) {
         return e.getMessage();
     }
 }
