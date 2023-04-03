@@ -14,6 +14,8 @@ public interface TopicServiceApi {
     TopicDTO updateTopicByAuthor(Long id, TopicEditDTO topicEditDTO, String username);
     TopicDTO updateTopicByModerator(Long id, TopicEditDTO topicEditDTO, String moderatorName);
     TopicDTO changeCategoryOfTopic(Long id, CategoryTitleDTO categoryTitleDTO, String moderatorName);
+    TopicDTO closeTopicByAuthor(Long id, CloseTopicDTO closeTopicDTO, String username);
+    TopicDTO closeTopicByModerator(Long id, CloseTopicDTO closeTopicDTO, String username);
 
     void deleteTopicByAuthor(Long id, String username);
     void deleteTopicByModerator(Long id, String moderatorName);
