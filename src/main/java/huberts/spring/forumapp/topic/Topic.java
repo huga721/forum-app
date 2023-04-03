@@ -34,6 +34,8 @@ public class Topic {
 
     private LocalDateTime lastEdit;
 
+    private boolean closed;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
