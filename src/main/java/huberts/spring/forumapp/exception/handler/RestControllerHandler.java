@@ -11,10 +11,7 @@ import huberts.spring.forumapp.exception.report.ReportExistException;
 import huberts.spring.forumapp.exception.report.ReportRealiseException;
 import huberts.spring.forumapp.exception.role.RoleDoesntExistException;
 import huberts.spring.forumapp.exception.role.RoleException;
-import huberts.spring.forumapp.exception.topic.TopicContentException;
-import huberts.spring.forumapp.exception.topic.TopicAlreadyExistException;
-import huberts.spring.forumapp.exception.topic.TopicDoesntExistException;
-import huberts.spring.forumapp.exception.topic.TopicTitleException;
+import huberts.spring.forumapp.exception.topic.*;
 import huberts.spring.forumapp.exception.user.*;
 import huberts.spring.forumapp.exception.warning.WarningExistException;
 import lombok.extern.slf4j.Slf4j;
@@ -159,6 +156,12 @@ public class RestControllerHandler {
     @ExceptionHandler(value = TopicDoesntExistException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String topicDoesntExistException(TopicDoesntExistException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = TopicIsClosedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String topicIsBlockedException (TopicIsClosedException e) {
         return e.getMessage();
     }
 }
