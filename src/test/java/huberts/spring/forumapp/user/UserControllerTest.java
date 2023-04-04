@@ -83,11 +83,11 @@ class UserControllerTest extends ContainerIT {
     @Nested
     class StaffEndpointTests {
 
-        @DisplayName("Should return list of users with moderator and admin role")
+        @DisplayName("Should return list of users with moderator and admin role, HTTP status 200")
         @Test
         void shouldReturnListOfUsersWithModeratorAndAdminRole() throws Exception {
             mockMvc.perform(get(STAFF_ENDPOINT))
-                    .andExpect(status().isOk())
+                    .andExpect(status().is(200))
                     .andExpect(jsonPath(USERNAME_ARRAY_0_JSON_PATH).value(ADMIN_JWT))
                     .andExpect(jsonPath(USERNAME_ARRAY_1_JSON_PATH).value(MODERATOR_JWT));
         }
@@ -446,14 +446,14 @@ class UserControllerTest extends ContainerIT {
     @Nested
     class AdminDeleteUsernameEndpointTests {
 
-        @DisplayName("Should delete user")
+        @DisplayName("Should delete user, HTTP status 200")
         @Test
         void shouldDeleteUser() throws Exception {
             String adminToken = JwtKey.getAdminJwt(mockMvc, objectMapper);
 
             mockMvc.perform(MockMvcRequestBuilders.delete(DELETE_USER_ENDPOINT)
                             .header(AUTHORIZATION, adminToken))
-                    .andExpect(status().isOk());
+                    .andExpect(status().is(200));
         }
 
         @DisplayName("Should throw UserDoesntExistException when user deleting user doesn't exist, HTTP status 400")
