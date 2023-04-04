@@ -16,7 +16,7 @@ public class TopicDTO {
     private String content;
     private String author;
     private String categoryName;
-    private boolean isClosed;
+    private boolean closed;
     private LocalDateTime createdTime;
     private LocalDateTime lastEdit;
     private List<LikeListDTO> likes;
