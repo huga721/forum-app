@@ -182,9 +182,9 @@ public class TopicService implements TopicServiceApi {
     }
 
     @Override
-    public TopicDTO closeTopicByAuthor(Long id, CloseTopicDTO closeTopicDTO, String username) {
+    public TopicDTO closeTopicByAuthor(Long id, CloseReasonDTO closeReasonDTO, String username) {
         log.info("Closing topic with id {} by topic author", id);
-        String closeReason = closeTopicDTO.getReason();
+        String closeReason = closeReasonDTO.getReason();
         CommentContentDTO commentContent = new CommentContentDTO(closeReason);
 
         User author = userRepository.findByUsername(username).get();
@@ -200,7 +200,7 @@ public class TopicService implements TopicServiceApi {
     }
 
     @Override
-    public TopicDTO closeTopicByModerator(Long id, CloseTopicDTO closeTopicDTO, String username) {
+    public TopicDTO closeTopicByModerator(Long id, CloseReasonDTO closeTopicDTO, String username) {
         log.info("Closing topic with id {} by moderator or admin", id);
         String closeReason = closeTopicDTO.getReason();
         CommentContentDTO commentContent = new CommentContentDTO(closeReason);

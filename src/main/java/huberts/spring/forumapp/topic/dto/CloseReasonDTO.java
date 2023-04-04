@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CloseTopicDTO {
+public class CloseReasonDTO {
     @NotBlank(message = "Please write reason of closing topic")
     private String reason;
 }
