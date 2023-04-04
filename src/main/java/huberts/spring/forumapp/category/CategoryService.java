@@ -4,9 +4,9 @@ import huberts.spring.forumapp.category.dto.CategoryDTO;
 import huberts.spring.forumapp.category.dto.CategoryCreateDTO;
 import huberts.spring.forumapp.category.dto.CategoryDescriptionDTO;
 import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
-import huberts.spring.forumapp.exception.category.CategoryAlreadyExistingException;
+import huberts.spring.forumapp.exception.category.CategoryAlreadyExistException;
 import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
-import huberts.spring.forumapp.exception.category.CategoryExistException;
+import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
 import huberts.spring.forumapp.exception.category.CategoryTitleException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,15 +36,15 @@ public class CategoryService implements CategoryServiceApi {
 
         if (repository.existsByTitle(title)) {
             String errorMessage = String.format(CATEGORY_ALREADY_EXISTS_EXCEPTION, title);
-            log.error(EXCEPTION_OCCURRED, new CategoryAlreadyExistingException(errorMessage));
-            throw new CategoryAlreadyExistingException(String.format(errorMessage));
+            log.error(EXCEPTION_OCCURRED, new CategoryAlreadyExistException(errorMessage));
+            throw new CategoryAlreadyExistException(String.format(errorMessage));
         }
 
         Category categoryBuilt = CategoryMapper.buildNewCategory(category);
-        Category categorySaved = repository.save(categoryBuilt);
+        repository.save(categoryBuilt);
 
         log.info("Category created");
-        return CategoryMapper.buildCategoryDTO(categorySaved);
+        return CategoryMapper.buildCategoryDTO(categoryBuilt);
     }
 
     @Override
@@ -55,12 +55,12 @@ public class CategoryService implements CategoryServiceApi {
     }
 
     private Category findCategory(Long id) {
-        log.info("Finding category with id id {}", id);
+        log.info("Finding category with id {}", id);
         return repository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = String.format(CATEGORY_DOESNT_EXIST_EXCEPTION, id);
-                    log.error(EXCEPTION_OCCURRED, new CategoryExistException(errorMessage));
-                    return new CategoryExistException(errorMessage);
+                    log.error(EXCEPTION_OCCURRED, new CategoryDoesntExistException(errorMessage));
+                    throw new CategoryDoesntExistException(errorMessage);
                 });
     }
 
