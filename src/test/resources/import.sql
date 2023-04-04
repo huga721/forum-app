@@ -22,4 +22,15 @@ INSERT INTO category (id, title, description) VALUES (2, 'second test title', 's
 INSERT INTO category (id, title, description) VALUES (3, 'category to change title', 'lorem ipsum ipsum lorem');
 INSERT INTO category (id, title, description) VALUES (4, 'category for throw test', 'throw it');
 INSERT INTO category (id, title, description) VALUES (5, 'category to delete', 'delete it');
+INSERT INTO category (id, title, description) VALUES (6, 'category for topic', 'nice category');
+
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (1, 'first test topic', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (2, 'second test topic', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (3, 'topic duplicate', 'random test content', 2,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (4, 'topic to delete by author', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (5, 'topic to delete by author but throw exception', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (6, 'topic to close by author', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (7, 'topic to edit by author', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (8, 'closed topic', 'random test content', 1,1, true);
+-- INSERT INTO topic (id, title, content, category_id, user_id) VALUES (3, 'test for topic with same title but in different category', 'random test content', 1,1);
 -- INSERT INTO topic (id, title, content) VALUES (1, 'userJwt', 'encrypted_password');
