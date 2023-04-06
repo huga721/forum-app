@@ -29,22 +29,21 @@ public class User {
     @Column(unique = true)
     private String username;
 
-    @NotNull
     private String password;
 
     private boolean blocked;
-
-    @OneToOne
-    @JoinColumn(referencedColumnName = "name", name = "role_name")
-    private Role role;
-
-    @ManyToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
-    private List<Topic> topics;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
     private LocalDateTime lastActivity;
+
+    @OneToOne
+    @JoinColumn(referencedColumnName = "name", name = "role_name")
+    private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Topic> topics;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Like> likes;
