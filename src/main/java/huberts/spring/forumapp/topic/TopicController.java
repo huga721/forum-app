@@ -27,9 +27,9 @@ public class TopicController {
         return ResponseEntity.ok(topics);
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<TopicDTO> getById(@PathVariable Long id) {
-        TopicDTO topic = service.getTopicById(id);
+    @GetMapping("/{topicId}")
+    ResponseEntity<TopicDTO> getById(@PathVariable Long topicId) {
+        TopicDTO topic = service.getTopicById(topicId);
         return ResponseEntity.ok(topic);
     }
 
@@ -42,45 +42,61 @@ public class TopicController {
     }
 
     @UserRole
-    @DeleteMapping("/delete/{id}")
-    ResponseEntity<Void> deleteTopicByAuthor(@PathVariable Long id, Authentication authenticatedUser) {
+    @DeleteMapping("/delete/{topicId}")
+    ResponseEntity<Void> deleteTopicByAuthor(@PathVariable Long topicId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        service.deleteTopicByAuthor(id, username);
+        service.deleteTopicByAuthor(topicId, username);
         return ResponseEntity.noContent().build();
     }
 
     @UserRole
-    @PatchMapping("/edit/{id}")
-    ResponseEntity<TopicDTO> changeContentOrTitleByAuthor(@RequestBody TopicEditDTO topicEditDTO, @PathVariable Long id,
-                                           Authentication authenticatedUser) {
+    @PatchMapping("/close-topic/{topicId}")
+    ResponseEntity<TopicDTO> closeTopicByAuthor(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeTopicDTO,
+                                                Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        TopicDTO topicChanged = service.updateTopicByAuthor(id, topicEditDTO, username);
+        return ResponseEntity.ok(service.closeTopicByAuthor(topicId, closeTopicDTO, username));
+    }
+
+    @UserRole
+    @PatchMapping("/edit/{topicId}")
+    ResponseEntity<TopicDTO> changeContentOrTitleByAuthor(@RequestBody TopicEditDTO topicEditDTO, @PathVariable Long topicId,
+                                                          Authentication authenticatedUser) {
+        String username = authenticatedUser.getName();
+        TopicDTO topicChanged = service.updateTopicByAuthor(topicId, topicEditDTO, username);
         return ResponseEntity.ok(topicChanged);
     }
 
     @ModeratorRole
-    @PatchMapping("/moderator/edit/{id}")
+    @PatchMapping("/moderator/edit/{topicId}")
     ResponseEntity<TopicDTO> changeContentOrTitleByModerator(@RequestBody TopicEditDTO topicEditDTO,
-                                                      @PathVariable Long id, Authentication authenticatedUser) {
+                                                             @PathVariable Long topicId, Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
-        TopicDTO topicChanged = service.updateTopicByModerator(id, topicEditDTO, moderatorName);
+        TopicDTO topicChanged = service.updateTopicByModerator(topicId, topicEditDTO, moderatorName);
         return ResponseEntity.ok(topicChanged);
     }
 
     @ModeratorRole
-    @PatchMapping("/moderator/change-category/{id}")
+    @PatchMapping("/moderator/change-category/{topicId}")
     ResponseEntity<TopicDTO> changeCategoryOfTopicByModerator(@RequestBody @Valid CategoryTitleDTO categoryTitleDTO,
-                                                              @PathVariable Long id, Authentication authenticatedUser) {
+                                                              @PathVariable Long topicId, Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
-        TopicDTO topicChanged = service.changeCategoryOfTopic(id, categoryTitleDTO, moderatorName);
+        TopicDTO topicChanged = service.changeCategoryOfTopic(topicId, categoryTitleDTO, moderatorName);
         return ResponseEntity.ok(topicChanged);
     }
 
     @ModeratorRole
-    @DeleteMapping("/moderator/delete/{id}")
-    ResponseEntity<Void> deleteTopicByModerator(@PathVariable Long id, Authentication authenticatedUser) {
+    @PatchMapping("/moderator/close-topic/{topicId}")
+    ResponseEntity<TopicDTO> closeTopicById(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeTopicDTO,
+                                            Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
-        service.deleteTopicByModerator(id, moderatorName);
+        return ResponseEntity.ok(service.closeTopicByModerator(topicId, closeTopicDTO, moderatorName));
+    }
+
+    @ModeratorRole
+    @DeleteMapping("/moderator/delete/{topicId}")
+    ResponseEntity<Void> deleteTopicByModerator(@PathVariable Long topicId, Authentication authenticatedUser) {
+        String moderatorName = authenticatedUser.getName();
+        service.deleteTopicByModerator(topicId, moderatorName);
         return ResponseEntity.noContent().build();
     }
 }

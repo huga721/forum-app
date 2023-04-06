@@ -22,9 +22,9 @@ public class WarningController {
     }
 
     @ModeratorRole
-    @GetMapping("/{id}")
-    ResponseEntity<WarningDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getWarningById(id));
+    @GetMapping("/{warningId}")
+    ResponseEntity<WarningDTO> getById(@PathVariable Long warningId) {
+        return ResponseEntity.ok(service.getWarningById(warningId));
     }
 
     @ModeratorRole

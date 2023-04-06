@@ -28,15 +28,15 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<CommentDTO> getCommentById(@PathVariable Long id) {
-        CommentDTO comment = service.getCommentById(id);
+    @GetMapping("/{commentId}")
+    ResponseEntity<CommentDTO> getCommentById(@PathVariable Long commentId) {
+        CommentDTO comment = service.getCommentById(commentId);
         return ResponseEntity.ok(comment);
     }
 
-    @GetMapping("/topic/{id}")
-    ResponseEntity<List<CommentDTO>> getAllCommentsOfTopic(@PathVariable Long id) {
-        List<CommentDTO> commentsOfTopic = service.getAllCommentsByTopicId(id);
+    @GetMapping("/topic/{commentId}")
+    ResponseEntity<List<CommentDTO>> getAllCommentsOfTopic(@PathVariable Long commentId) {
+        List<CommentDTO> commentsOfTopic = service.getAllCommentsByTopicId(commentId);
         return ResponseEntity.ok(commentsOfTopic);
     }
 
@@ -55,42 +55,42 @@ public class CommentController {
     }
 
     @UserRole
-    @PostMapping("/topic/{id}")
-    ResponseEntity<CommentDTO> saveNewComment(@PathVariable Long id, @RequestBody @Valid CommentContentDTO createCommentDTO,
+    @PostMapping("/topic/{commentId}")
+    ResponseEntity<CommentDTO> saveNewComment(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO createCommentDTO,
                                                 Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        CommentDTO commentCreated = service.createComment(id, createCommentDTO, username);
+        CommentDTO commentCreated = service.createComment(commentId, createCommentDTO, username);
         return ResponseEntity.created(URI.create("/comments")).body(commentCreated);
     }
 
     @UserRole
-    @DeleteMapping("/delete/{id}")
-    ResponseEntity<Void> deleteCommentByCurrentUser(@PathVariable Long id, Authentication authenticatedUser) {
+    @DeleteMapping("/delete/{commentId}")
+    ResponseEntity<Void> deleteCommentByCurrentUser(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        service.deleteCommentByAuthor(id, username);
+        service.deleteCommentByAuthor(commentId, username);
         return ResponseEntity.noContent().build();
     }
 
     @UserRole
-    @PatchMapping("/edit/{id}")
-    ResponseEntity<CommentDTO> editCommentByCurrentUser(@PathVariable Long id, @RequestBody @Valid CommentContentDTO contentDTO,
+    @PatchMapping("/edit/{commentId}")
+    ResponseEntity<CommentDTO> editCommentByCurrentUser(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO contentDTO,
                                                  Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        CommentDTO commentEdited = service.updateCommentByAuthor(id, contentDTO, username);
+        CommentDTO commentEdited = service.updateCommentByAuthor(commentId, contentDTO, username);
         return ResponseEntity.ok(commentEdited);
     }
 
     @ModeratorRole
-    @DeleteMapping("/moderator/delete/{id}")
-    ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        service.deleteCommentByModerator(id);
+    @DeleteMapping("/moderator/delete/{commentId}")
+    ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
+        service.deleteCommentByModerator(commentId);
         return ResponseEntity.noContent().build();
     }
 
     @ModeratorRole
-    @PatchMapping("/moderator/edit/{id}")
-    ResponseEntity<CommentDTO> editCommentByModerator(@PathVariable Long id, @RequestBody @Valid CommentContentDTO contentDTO) {
-        CommentDTO commentEdited = service.updateCommentByModerator(id, contentDTO);
+    @PatchMapping("/moderator/edit/{commentId}")
+    ResponseEntity<CommentDTO> editCommentByModerator(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO contentDTO) {
+        CommentDTO commentEdited = service.updateCommentByModerator(commentId, contentDTO);
         return ResponseEntity.ok(commentEdited);
     }
 }
