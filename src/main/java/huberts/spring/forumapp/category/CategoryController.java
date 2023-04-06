@@ -28,9 +28,9 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
-        CategoryDTO category = service.getCategoryById(id);
+    @GetMapping("/{categoryId}")
+    ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long categoryId) {
+        CategoryDTO category = service.getCategoryById(categoryId);
         return ResponseEntity.ok(category);
     }
 
@@ -42,23 +42,23 @@ public class CategoryController {
     }
 
     @AdminRole
-    @PatchMapping("/admin/edit/title/{id}")
-    ResponseEntity<CategoryDTO> editTitle(@PathVariable Long id, @RequestBody @Valid CategoryTitleDTO newTitle) {
-        CategoryDTO categoryEdited = service.updateTitle(id, newTitle);
+    @PatchMapping("/admin/edit/title/{categoryId}")
+    ResponseEntity<CategoryDTO> editTitle(@PathVariable Long categoryId, @RequestBody @Valid CategoryTitleDTO newTitle) {
+        CategoryDTO categoryEdited = service.updateTitle(categoryId, newTitle);
         return ResponseEntity.ok(categoryEdited);
     }
 
     @AdminRole
-    @PatchMapping("/admin/edit/description/{id}")
-    ResponseEntity<CategoryDTO> editDescription(@PathVariable Long id, @RequestBody @Valid CategoryDescriptionDTO description) {
-        CategoryDTO categoryEdited = service.updateDescription(id, description);
+    @PatchMapping("/admin/edit/description/{categoryId}")
+    ResponseEntity<CategoryDTO> editDescription(@PathVariable Long categoryId, @RequestBody @Valid CategoryDescriptionDTO description) {
+        CategoryDTO categoryEdited = service.updateDescription(categoryId, description);
         return ResponseEntity.ok(categoryEdited);
     }
 
     @AdminRole
-    @DeleteMapping("/admin/delete/{id}")
-    ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        service.deleteCategory(id);
+    @DeleteMapping("/admin/delete/{categoryId}")
+    ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
+        service.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
     }
 }
