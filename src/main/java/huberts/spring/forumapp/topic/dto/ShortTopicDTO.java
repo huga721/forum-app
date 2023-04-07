@@ -6,7 +6,10 @@ import lombok.Data;
 @Builder
 @Data
 public class ShortTopicDTO {
-    private String title;
-    private String content;
+    private Long id;
+    private String topicTitle;
+    private String topicContent;
     private String author;
+    private int likes;
+    private int comments;
 }
