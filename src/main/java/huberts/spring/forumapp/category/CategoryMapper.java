@@ -38,7 +38,7 @@ public class CategoryMapper {
                 .collect(Collectors.toList());
     }
 
-    public static List<ShortTopicDTO> returnShortTopicDTO(List<Topic> topics) {
+    private static List<ShortTopicDTO> returnShortTopicDTO(List<Topic> topics) {
         return TopicMapper.mapShortTopicDTOList(topics);
     }
 }
