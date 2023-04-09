@@ -2,9 +2,9 @@ package huberts.spring.forumapp.like;
 
 import huberts.spring.forumapp.comment.Comment;
 import huberts.spring.forumapp.comment.CommentRepository;
-import huberts.spring.forumapp.exception.comment.CommentExistException;
+import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
 import huberts.spring.forumapp.exception.like.LikeExistException;
-import huberts.spring.forumapp.exception.topic.TopicExistException;
+import huberts.spring.forumapp.exception.topic.TopicAlreadyExistException;
 import huberts.spring.forumapp.like.dto.LikeDTO;
 import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicRepository;
@@ -26,12 +26,12 @@ public class LikeService implements LikeServiceApi {
     private final TopicRepository topicRepository;
     private final CommentRepository commentRepository;
 
-    private final String TOPIC_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
-    private final String TOPIC_LIKE_EXIST_EXCEPTION = "Topic is already liked.";
-    private final String COMMENT_LIKE_EXIST_EXCEPTION = "Comment is already liked.";
-    private final String LIKE_DOESNT_EXIST_EXCEPTION = "Like with id \"%d\" doesn't exist.";
-    private final String COMMENT_DOESNT_EXIST_EXCEPTION = "Comment with id \"%d\" doesn't exist.";
-    private final String LIKE_DOESNT_EXIST_WITH_GIVEN_USER_EXCEPTION = "There is no like given by current user with id \"%d\".";
+    private static final String TOPIC_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
+    private static final String TOPIC_LIKE_EXIST_EXCEPTION = "Topic is already liked.";
+    private static final String COMMENT_LIKE_EXIST_EXCEPTION = "Comment is already liked.";
+    private static final String LIKE_DOESNT_EXIST_EXCEPTION = "Like with id \"%d\" doesn't exist.";
+    private static final String COMMENT_DOESNT_EXIST_EXCEPTION = "Comment with id \"%d\" doesn't exist.";
+    private static final String LIKE_DOESNT_EXIST_WITH_GIVEN_USER_EXCEPTION = "There is no like given by current user with id \"%d\".";
     private static final String EXCEPTION_OCCURRED = "An exception occurred!";
 
     @Override
@@ -41,8 +41,8 @@ public class LikeService implements LikeServiceApi {
         Topic topicToLike = topicRepository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = String.format(TOPIC_DOESNT_EXIST_EXCEPTION, id);
-                    log.error(EXCEPTION_OCCURRED, new TopicExistException(errorMessage));
-                    return new TopicExistException(errorMessage);
+                    log.error(EXCEPTION_OCCURRED, new TopicAlreadyExistException(errorMessage));
+                    return new TopicAlreadyExistException(errorMessage);
                 });
         User userCreated = userRepository.findByUsername(username).get();
 
@@ -65,8 +65,8 @@ public class LikeService implements LikeServiceApi {
         Comment commentToLike = commentRepository.findById(id)
                 .orElseThrow(() -> {
                     String errorMessage = String.format(COMMENT_DOESNT_EXIST_EXCEPTION, id);
-                    log.error(EXCEPTION_OCCURRED, new CommentExistException(errorMessage));
-                    return new CommentExistException(errorMessage);
+                    log.error(EXCEPTION_OCCURRED, new CommentDoesntExistException(errorMessage));
+                    return new CommentDoesntExistException(errorMessage);
                 });
         User userCreated = userRepository.findByUsername(username).get();
 

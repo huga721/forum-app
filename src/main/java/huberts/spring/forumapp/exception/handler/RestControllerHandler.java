@@ -5,7 +5,7 @@ import huberts.spring.forumapp.exception.category.CategoryAlreadyExistException;
 import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
 import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
 import huberts.spring.forumapp.exception.category.CategoryTitleException;
-import huberts.spring.forumapp.exception.comment.CommentExistException;
+import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
 import huberts.spring.forumapp.exception.like.LikeExistException;
 import huberts.spring.forumapp.exception.report.ReportExistException;
 import huberts.spring.forumapp.exception.report.ReportRealiseException;
@@ -112,9 +112,9 @@ public class RestControllerHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(value = CommentExistException.class)
+    @ExceptionHandler(value = CommentDoesntExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String commentExist(CommentExistException e) {
+    public String commentExist(CommentDoesntExistException e) {
         return e.getMessage();
     }
 
