@@ -32,5 +32,10 @@ INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (5, 
 INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (6, 'topic to close by author', 'random test content', 1,1, false);
 INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (7, 'topic to edit by author', 'random test content', 1,1, false);
 INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (8, 'closed topic', 'random test content', 1,1, true);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (9, 'topic to edit by moderator', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (10, 'topic to edit by moderator', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (11, 'topic to change category by moderator', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (12, 'topic to close by moderator', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (13, 'topic to delete by moderator', 'random test content', 1,1, false);
 -- INSERT INTO topic (id, title, content, category_id, user_id) VALUES (3, 'test for topic with same title but in different category', 'random test content', 1,1);
 -- INSERT INTO topic (id, title, content) VALUES (1, 'userJwt', 'encrypted_password');
