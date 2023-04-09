@@ -2,8 +2,10 @@ package huberts.spring.forumapp.comment;
 
 import huberts.spring.forumapp.comment.dto.CommentDTO;
 import huberts.spring.forumapp.comment.dto.CommentContentDTO;
-import huberts.spring.forumapp.exception.comment.CommentExistException;
-import huberts.spring.forumapp.exception.topic.TopicAlreadyExistException;
+import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
+import huberts.spring.forumapp.exception.topic.TopicDoesntExistException;
+import huberts.spring.forumapp.exception.topic.TopicIsClosedException;
+import huberts.spring.forumapp.exception.user.UserDoesntExistException;
 import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicRepository;
 import huberts.spring.forumapp.user.User;
@@ -21,34 +23,39 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentService implements CommentServiceApi {
 
+    private static final String TOPIC_ID_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
+    private static final String TOPIC_IS_CLOSED_EXCEPTION = "Topic with id \"%d\" is closed.";
+    private static final String COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION = "There is no comment created by current user with id \"%d\".";
+    private static final String COMMENT_DOESNT_EXIST_EXCEPTION = "Comment with id \"%d\" doesn't exist.";
+    private final static String USER_DOESNT_EXIST_EXCEPTION = "User with username \"%s\" doesn't exists.";
+    private static final String EXCEPTION_OCCURRED = "An exception occurred!";
+
     private final TopicRepository topicRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-
-    private static final String TOPIC_ID_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
-    private static final String COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION = "There is no comment created by current user with id \"%d\".";
-    private static final String COMMENT_DOESNT_EXIST_EXCEPTION = "Comment with id \"%d\" doesn't exist.";
-    private static final String EXCEPTION_OCCURRED = "An exception occurred!";
 
     @Override
     public CommentDTO createComment(Long id, CommentContentDTO commentDTO, String username) {
         log.info("Creating a comment for topic with id {}", id);
         Topic topicFound = findTopicById(id);
         User user = userRepository.findByUsername(username).get();
-
+        if (topicFound.isClosed()) {
+            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, id);
+            log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
+            throw new TopicIsClosedException(errorMessage);
+        }
         Comment comment = CommentMapper.buildNewComment(user, topicFound, commentDTO.getContent());
-        Comment savedComment = commentRepository.save(comment);
-
+        commentRepository.save(comment);
         log.info("Comment created");
-        return CommentMapper.buildCommentDTO(savedComment);
+        return CommentMapper.buildCommentDTO(comment);
     }
 
     private Topic findTopicById(Long id) {
         log.info("Finding topic with id {}", id);
         return topicRepository.findById(id).orElseThrow(() -> {
             String errorMessage = String.format(TOPIC_ID_DOESNT_EXIST_EXCEPTION, id);
-            log.error(EXCEPTION_OCCURRED, new TopicAlreadyExistException(errorMessage));
-            return new TopicAlreadyExistException(errorMessage);
+            log.error(EXCEPTION_OCCURRED, new TopicDoesntExistException(errorMessage));
+            return new TopicDoesntExistException(errorMessage);
         });
     }
 
@@ -63,8 +70,8 @@ public class CommentService implements CommentServiceApi {
         log.info("Finding comment with id {}", id);
         return commentRepository.findById(id).orElseThrow(() -> {
             String errorMessage = String.format(COMMENT_DOESNT_EXIST_EXCEPTION, id);
-            log.error(EXCEPTION_OCCURRED, new CommentExistException(errorMessage));
-            return new CommentExistException(errorMessage);
+            log.error(EXCEPTION_OCCURRED, new CommentDoesntExistException(errorMessage));
+            return new CommentDoesntExistException(errorMessage);
         });
     }
 
@@ -84,7 +91,11 @@ public class CommentService implements CommentServiceApi {
     @Override
     public List<CommentDTO> getAllCommentsByUsername(String username) {
         log.info("Getting all comments by username {}", username);
-        User user = userRepository.findByUsername(username).get();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            String errorMessage = String.format(USER_DOESNT_EXIST_EXCEPTION, username);
+            log.error(EXCEPTION_OCCURRED, new UserDoesntExistException(errorMessage));
+            return new UserDoesntExistException(errorMessage);
+        });
         return CommentMapper.mapToCommentDTO(commentRepository.findAllByUser(user));
     }
 
@@ -102,8 +113,8 @@ public class CommentService implements CommentServiceApi {
         log.info("Finding comment with id {} and username {}", id, user.getUsername());
         return commentRepository.findByUserAndId(user, id).orElseThrow(() -> {
             String errorMessage = String.format(COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION, id);
-            log.error(EXCEPTION_OCCURRED, new CommentExistException(errorMessage));
-            return new CommentExistException(errorMessage);
+            log.error(EXCEPTION_OCCURRED, new CommentDoesntExistException(errorMessage));
+            return new CommentDoesntExistException(errorMessage);
         });
     }
 
@@ -119,10 +130,8 @@ public class CommentService implements CommentServiceApi {
     @Override
     public void deleteCommentByAuthor(Long id, String username) {
         log.info("Deleting comment with id {} by username {}", id, username);
-
         User user = userRepository.findByUsername(username).get();
         Comment foundComment = findCommentByUserAndId(user, id);
-
         commentRepository.delete(foundComment);
         log.info("Comment deleted");
     }
