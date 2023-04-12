@@ -6,6 +6,7 @@ import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
 import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
 import huberts.spring.forumapp.exception.category.CategoryTitleException;
 import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
+import huberts.spring.forumapp.exception.user.UserIsNotAuthorException;
 import huberts.spring.forumapp.exception.like.LikeExistException;
 import huberts.spring.forumapp.exception.report.ReportExistException;
 import huberts.spring.forumapp.exception.report.ReportRealiseException;
@@ -53,7 +54,7 @@ public class RestControllerHandler {
     }
 
     @ExceptionHandler(value = UserDoesntExistException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String userDoesntExist(UserDoesntExistException e) {
         return e.getMessage();
     }
@@ -113,7 +114,7 @@ public class RestControllerHandler {
     }
 
     @ExceptionHandler(value = CommentDoesntExistException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String commentExist(CommentDoesntExistException e) {
         return e.getMessage();
     }
@@ -161,7 +162,13 @@ public class RestControllerHandler {
 
     @ExceptionHandler(value = TopicIsClosedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String topicIsBlockedException (TopicIsClosedException e) {
+    public String topicIsClosedException (TopicIsClosedException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = UserIsNotAuthorException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String userIsNotAuthorOfCommentException (UserIsNotAuthorException e) {
         return e.getMessage();
     }
 }
