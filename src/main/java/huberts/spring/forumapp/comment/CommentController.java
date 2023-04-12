@@ -55,11 +55,11 @@ public class CommentController {
     }
 
     @UserRole
-    @PostMapping("/topic/{commentId}")
-    ResponseEntity<CommentDTO> saveNewComment(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO createCommentDTO,
-                                                Authentication authenticatedUser) {
+    @PostMapping("/topic/{topicId}")
+    ResponseEntity<CommentDTO> saveNewComment(@PathVariable Long topicId, @RequestBody @Valid CommentContentDTO createCommentDTO,
+                                              Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        CommentDTO commentCreated = service.createComment(commentId, createCommentDTO, username);
+        CommentDTO commentCreated = service.createComment(topicId, createCommentDTO, username);
         return ResponseEntity.created(URI.create("/comments")).body(commentCreated);
     }
 
