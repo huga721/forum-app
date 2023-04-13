@@ -42,6 +42,6 @@ public class CommentMapper {
     }
 
     private static List<LikeListDTO> mapToLikeDTO(List<Like> likes) {
-        return LikeMapper.mapLikesToLikeDTO(likes);
+        return LikeMapper.mapLikesToLikeListDTO(likes);
     }
 }
