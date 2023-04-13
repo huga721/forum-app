@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,48 +24,48 @@ public class LikeController {
         return ResponseEntity.ok(likes);
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<LikeDTO> getLikeById(@PathVariable Long id) {
-        LikeDTO like = service.getLikeById(id);
+    @GetMapping("/{likeId}")
+    ResponseEntity<LikeDTO> getLikeById(@PathVariable Long likeId) {
+        LikeDTO like = service.getLikeById(likeId);
         return ResponseEntity.ok(like);
     }
 
     @UserRole
     @GetMapping("/user")
-    ResponseEntity<List<LikeDTO>> getAllLikesByCurrentUser(Authentication authenticatedUser) {
+    ResponseEntity<List<LikeDTO>> getAllLikesOfAuthenticatedUser(Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         List<LikeDTO> likes = service.getAllLikesByUsername(username);
         return ResponseEntity.ok(likes);
     }
 
     @UserRole
-    @PostMapping("/topic/{id}")
-    ResponseEntity<LikeDTO> saveNewTopicLike(@PathVariable Long id, Authentication authenticatedUser) {
+    @PostMapping("/topic/{topicId}")
+    ResponseEntity<LikeDTO> saveNewTopicLike(@PathVariable Long topicId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        LikeDTO likeCreated = service.createTopicLike(id, username);
-        return ResponseEntity.ok(likeCreated);
+        LikeDTO likeCreated = service.createTopicLike(topicId, username);
+        return ResponseEntity.created(URI.create("/likes")).body(likeCreated);
     }
 
     @UserRole
-    @PostMapping("/comment/{id}")
-    ResponseEntity<LikeDTO> saveNewCommentLike(@PathVariable Long id, Authentication authenticatedUser) {
+    @PostMapping("/comment/{commentId}")
+    ResponseEntity<LikeDTO> saveNewCommentLike(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        LikeDTO likeCreated = service.createCommentLike(id, username);
-        return ResponseEntity.ok(likeCreated);
+        LikeDTO likeCreated = service.createCommentLike(commentId, username);
+        return ResponseEntity.created(URI.create("/likes")).body(likeCreated);
     }
 
     @UserRole
-    @DeleteMapping("/delete/{id}")
-    ResponseEntity<Void> deleteLikeByCurrentUser(@PathVariable Long id, Authentication authenticatedUser) {
+    @DeleteMapping("/delete/{commentId}")
+    ResponseEntity<Void> deleteLikeByAuthor(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        service.deleteLikeByCurrentUser(id, username);
+        service.deleteLikeByAuthor(commentId, username);
         return ResponseEntity.noContent().build();
     }
 
     @ModeratorRole
-    @DeleteMapping("/moderator/delete/{id}")
-    ResponseEntity<Void> deleteLikeByModerator(@PathVariable Long id) {
-        service.deleteLikeByModerator(id);
+    @DeleteMapping("/moderator/delete/{commentId}")
+    ResponseEntity<Void> deleteLikeByModerator(@PathVariable Long commentId) {
+        service.deleteLikeByModerator(commentId);
         return ResponseEntity.noContent().build();
     }
 }
