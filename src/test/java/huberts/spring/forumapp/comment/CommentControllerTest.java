@@ -469,7 +469,7 @@ class CommentControllerTest extends ContainerIT {
         }
 
 
-        @DisplayName("Should not delete comment when requested by user, HTTP status 404")
+        @DisplayName("Should not delete comment when requested by user, HTTP status 403")
         @Test
         void shouldNotDeleteComment_WhenRequestedByUser() throws Exception {
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
