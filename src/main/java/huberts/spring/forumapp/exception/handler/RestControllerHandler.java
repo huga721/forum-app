@@ -6,8 +6,9 @@ import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
 import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
 import huberts.spring.forumapp.exception.category.CategoryTitleException;
 import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
+import huberts.spring.forumapp.exception.like.LikeAlreadyExistException;
 import huberts.spring.forumapp.exception.user.UserIsNotAuthorException;
-import huberts.spring.forumapp.exception.like.LikeExistException;
+import huberts.spring.forumapp.exception.like.LikeDoesntExistException;
 import huberts.spring.forumapp.exception.report.ReportExistException;
 import huberts.spring.forumapp.exception.report.ReportRealiseException;
 import huberts.spring.forumapp.exception.role.RoleDoesntExistException;
@@ -107,9 +108,9 @@ public class RestControllerHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(value = LikeExistException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String likeExist(LikeExistException e) {
+    @ExceptionHandler(value = LikeDoesntExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String likeExist(LikeDoesntExistException e) {
         return e.getMessage();
     }
 
@@ -169,6 +170,12 @@ public class RestControllerHandler {
     @ExceptionHandler(value = UserIsNotAuthorException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String userIsNotAuthorOfCommentException (UserIsNotAuthorException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = LikeAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String likeAlreadyExistException (LikeAlreadyExistException e) {
         return e.getMessage();
     }
 }
