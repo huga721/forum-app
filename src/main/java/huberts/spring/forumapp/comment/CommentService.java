@@ -3,6 +3,7 @@ package huberts.spring.forumapp.comment;
 import huberts.spring.forumapp.comment.dto.CommentDTO;
 import huberts.spring.forumapp.comment.dto.CommentContentDTO;
 import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
+import huberts.spring.forumapp.exception.user.UserIsNotAuthorException;
 import huberts.spring.forumapp.exception.topic.TopicDoesntExistException;
 import huberts.spring.forumapp.exception.topic.TopicIsClosedException;
 import huberts.spring.forumapp.exception.user.UserDoesntExistException;
@@ -25,7 +26,7 @@ public class CommentService implements CommentServiceApi {
 
     private static final String TOPIC_ID_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
     private static final String TOPIC_IS_CLOSED_EXCEPTION = "Topic with id \"%d\" is closed.";
-    private static final String COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION = "There is no comment created by current user with id \"%d\".";
+    private static final String USER_IS_NOT_AUTHOR_EXCEPTION = "User is not author of comment with id \"%d\".";
     private static final String COMMENT_DOESNT_EXIST_EXCEPTION = "Comment with id \"%d\" doesn't exist.";
     private final static String USER_DOESNT_EXIST_EXCEPTION = "User with username \"%s\" doesn't exists.";
     private static final String EXCEPTION_OCCURRED = "An exception occurred!";
@@ -104,24 +105,40 @@ public class CommentService implements CommentServiceApi {
         log.info("Updating content of comment with id {} by username {}", id, username);
         User user = userRepository.findByUsername(username).get();
         Comment foundComment = findCommentByUserAndId(user, id);
-        foundComment.setContent(commentContentDTO.getContent());
-        log.info("Comment updated");
-        return CommentMapper.buildCommentDTO(foundComment);
+        return updateContentAndGetDTO(id, commentContentDTO, foundComment);
+    }
+
+    private boolean isTopicClosed (Comment comment) {
+        return comment.getTopic().isClosed();
     }
 
     private Comment findCommentByUserAndId(User user, Long id) {
-        log.info("Finding comment with id {} and username {}", id, user.getUsername());
-        return commentRepository.findByUserAndId(user, id).orElseThrow(() -> {
-            String errorMessage = String.format(COMMENT_DOESNT_EXIST_WITH_CURRENT_USER_EXCEPTION, id);
-            log.error(EXCEPTION_OCCURRED, new CommentDoesntExistException(errorMessage));
-            return new CommentDoesntExistException(errorMessage);
-        });
+        log.info("Finding comment with id {} created by {}", id, user.getUsername());
+        if (commentRepository.existsById(id)) {
+            return commentRepository.findByUserAndId(user, id).orElseThrow(() -> {
+                String errorMessage = String.format(USER_IS_NOT_AUTHOR_EXCEPTION, id);
+                log.error(EXCEPTION_OCCURRED, new UserIsNotAuthorException(errorMessage));
+                throw new UserIsNotAuthorException(errorMessage);
+            });
+        }
+        String errorMessage = String.format(COMMENT_DOESNT_EXIST_EXCEPTION, id);
+        log.error(EXCEPTION_OCCURRED, new CommentDoesntExistException(errorMessage));
+        throw new CommentDoesntExistException(errorMessage);
     }
 
     @Override
     public CommentDTO updateCommentByModerator(Long id, CommentContentDTO commentContentDTO) {
         log.info("Updating content of comment with id {} by moderator or admin", id);
         Comment foundComment = findCommentById(id);
+        return updateContentAndGetDTO(id, commentContentDTO, foundComment);
+    }
+
+    private CommentDTO updateContentAndGetDTO(Long id, CommentContentDTO commentContentDTO, Comment foundComment) {
+        if (isTopicClosed(foundComment)) {
+            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, id);
+            log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
+            throw new TopicIsClosedException(errorMessage);
+        }
         foundComment.setContent(commentContentDTO.getContent());
         log.info("Comment updated");
         return CommentMapper.buildCommentDTO(foundComment);
@@ -132,6 +149,11 @@ public class CommentService implements CommentServiceApi {
         log.info("Deleting comment with id {} by username {}", id, username);
         User user = userRepository.findByUsername(username).get();
         Comment foundComment = findCommentByUserAndId(user, id);
+        if (isTopicClosed(foundComment)) {
+            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, id);
+            log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
+            throw new TopicIsClosedException(errorMessage);
+        }
         commentRepository.delete(foundComment);
         log.info("Comment deleted");
     }
@@ -140,6 +162,11 @@ public class CommentService implements CommentServiceApi {
     public void deleteCommentByModerator(Long id) {
         log.info("Deleting comment with id {} by moderator or admin", id);
         Comment foundComment = findCommentById(id);
+        if (isTopicClosed(foundComment)) {
+            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, id);
+            log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
+            throw new TopicIsClosedException(errorMessage);
+        }
         commentRepository.delete(foundComment);
         log.info("Comment deleted");
     }
