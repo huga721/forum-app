@@ -27,7 +27,7 @@ public class LikeMapper {
                 .build();
     }
 
-    public static LikeDTO buildLikeObjectDTO(Like like) {
+    public static LikeDTO buildLikeDTO(Like like) {
         String username = like.getUser().getUsername();
         return LikeDTO.builder()
                 .id(like.getId())
@@ -51,7 +51,7 @@ public class LikeMapper {
             return "Comment";
     }
 
-    public static LikeListDTO buildLikeDTO(Like like) {
+    public static LikeListDTO buildLikeListDTO(Like like) {
         String username = like.getUser().getUsername();
         return LikeListDTO.builder()
                 .id(like.getId())
@@ -59,15 +59,15 @@ public class LikeMapper {
                 .build();
     }
 
-    public static List<LikeDTO> mapLikesToLikeObjectDTO(List<Like> likes) {
+    public static List<LikeDTO> mapLikesToLikeDTO(List<Like> likes) {
         return likes.stream()
-                .map(LikeMapper::buildLikeObjectDTO)
+                .map(LikeMapper::buildLikeDTO)
                 .collect(Collectors.toList());
     }
 
-    public static List<LikeListDTO> mapLikesToLikeDTO(List<Like> likes) {
+    public static List<LikeListDTO> mapLikesToLikeListDTO(List<Like> likes) {
         return likes.stream()
-                .map(LikeMapper::buildLikeDTO)
+                .map(LikeMapper::buildLikeListDTO)
                 .collect(Collectors.toList());
     }
 }
