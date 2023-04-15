@@ -42,11 +42,11 @@ public class TopicMapper {
                 .title(topic.getTitle())
                 .content(topic.getContent())
                 .author(username)
-                .isClosed(topic.isClosed())
+                .closed(topic.isClosed())
                 .categoryName(categoryName)
                 .createdTime(topic.getCreatedAt())
                 .lastEdit(topic.getLastEdit())
-                .likes(LikeMapper.mapLikesToLikeDTO(topic.getLikes()))
+                .likes(LikeMapper.mapLikesToLikeListDTO(topic.getLikes()))
                 .comments(CommentMapper.mapToCommentDTO(topic.getComments()))
                 .build();
     }
