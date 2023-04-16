@@ -1,15 +1,13 @@
 package huberts.spring.forumapp.topic.dto;
 
 import lombok.Builder;
-import lombok.Data;
 
 @Builder
-@Data
-public class ShortTopicDTO {
-    private Long id;
-    private String topicTitle;
-    private String topicContent;
-    private String author;
-    private int likes;
-    private int comments;
+public record ShortTopicDTO(
+        Long id,
+        String topicTitle,
+        String topicContent,
+        String author,
+        Integer likes,
+        Integer comments) {
 }

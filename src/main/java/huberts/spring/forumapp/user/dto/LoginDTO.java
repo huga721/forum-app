@@ -1,11 +1,9 @@
 package huberts.spring.forumapp.user.dto;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
-@Data
-@AllArgsConstructor
-public class LoginDTO {
-    private String username;
-    private String password;
+public record LoginDTO(
+        String username,
+        String password) {
 }
