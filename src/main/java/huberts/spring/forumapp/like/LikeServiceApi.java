@@ -5,13 +5,13 @@ import huberts.spring.forumapp.like.dto.LikeDTO;
 import java.util.List;
 
 public interface LikeServiceApi {
-    LikeDTO createTopicLike(Long id, String username);
-    LikeDTO createCommentLike(Long id, String username);
+    LikeDTO createTopicLike(Long likeId, String username);
+    LikeDTO createCommentLike(Long likeId, String username);
 
-    LikeDTO getLikeById(Long id);
+    LikeDTO getLikeById(Long likeId);
     List<LikeDTO> getAllLikes();
     List<LikeDTO> getAllLikesByUsername(String username);
 
-    void deleteLikeByCurrentUser(Long id, String username);
-    void deleteLikeByModerator(Long id);
+    void deleteLikeByAuthor(Long likeId, String username);
+    void deleteLikeByModerator(Long likeId);
 }

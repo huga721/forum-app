@@ -1,20 +1,17 @@
 package huberts.spring.forumapp.category;
 
-import huberts.spring.forumapp.category.dto.CategoryDTO;
-import huberts.spring.forumapp.category.dto.CategoryCreateDTO;
-import huberts.spring.forumapp.category.dto.CategoryDescriptionDTO;
-import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
+import huberts.spring.forumapp.category.dto.*;
 
 import java.util.List;
 
 public interface CategoryServiceApi {
-    CategoryDTO createCategory(CategoryCreateDTO category);
+    CategoryDTO createCategory(CreateCategoryDTO createCategoryDTO);
 
-    CategoryDTO getCategoryById(Long id);
+    CategoryDTO getCategoryById(Long categoryId);
     List<CategoryDTO> getAllCategories();
 
-    CategoryDTO updateTitle(Long id, CategoryTitleDTO newCategoryTitle);
-    CategoryDTO updateDescription(Long id, CategoryDescriptionDTO newDescription);
+    CategoryDTO updateTitle(Long categoryId, UpdateCategoryTitleDTO updateCategoryTitleDTO);
+    CategoryDTO updateDescription(Long categoryId, UpdateCategoryDescriptionDTO updateCategoryDescriptionDTO);
 
-    void deleteCategory(Long id);
+    void deleteCategory(Long categoryId);
 }

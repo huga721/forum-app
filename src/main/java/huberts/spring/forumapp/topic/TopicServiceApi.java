@@ -1,22 +1,22 @@
 package huberts.spring.forumapp.topic;
 
-import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
+import huberts.spring.forumapp.category.dto.UpdateTopicCategoryDTO;
 import huberts.spring.forumapp.topic.dto.*;
 
 import java.util.List;
 
 public interface TopicServiceApi {
-    TopicDTO createTopic(TopicCreateDTO topic, String username);
+    TopicDTO createTopic(CreateTopicDTO createTopicDTO, String username);
 
-    TopicDTO getTopicById(Long id);
+    TopicDTO getTopicById(Long topicId);
     List<TopicDTO> getAllTopics();
 
-    TopicDTO updateTopicByAuthor(Long id, TopicEditDTO topicEditDTO, String username);
-    TopicDTO updateTopicByModerator(Long id, TopicEditDTO topicEditDTO, String moderatorName);
-    TopicDTO changeCategoryOfTopic(Long id, CategoryTitleDTO categoryTitleDTO, String moderatorName);
-    TopicDTO closeTopicByAuthor(Long id, CloseReasonDTO closeTopicDTO, String username);
-    TopicDTO closeTopicByModerator(Long id, CloseReasonDTO closeTopicDTO, String username);
+    TopicDTO updateTopicByAuthor(Long topicId, UpdateTopicDTO updateTopicDTO, String username);
+    TopicDTO updateTopicByModerator(Long topicId, UpdateTopicDTO updateTopicDTO, String moderatorName);
+    TopicDTO changeCategoryOfTopic(Long topicId, UpdateTopicCategoryDTO updateTopicCategoryDTO, String moderatorName);
+    TopicDTO closeTopicByAuthor(Long topicId, CloseReasonDTO closeReasonDTO, String username);
+    TopicDTO closeTopicByModerator(Long topicId, CloseReasonDTO closeReasonDTO, String moderatorName);
 
-    void deleteTopicByAuthor(Long id, String username);
-    void deleteTopicByModerator(Long id, String moderatorName);
+    void deleteTopicByAuthor(Long topicId, String username);
+    void deleteTopicByModerator(Long topicId, String moderatorName);
 }
