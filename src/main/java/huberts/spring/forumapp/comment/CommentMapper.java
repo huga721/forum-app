@@ -8,7 +8,6 @@ import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.user.User;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,10 +16,10 @@ public class CommentMapper {
 
     public static Comment buildNewComment(User user, Topic topic, String content) {
         return Comment.builder()
-                .createdAt(LocalDateTime.now())
                 .content(content)
                 .user(user)
                 .topic(topic)
+                .reports(List.of())
                 .likes(List.of())
                 .build();
     }
@@ -30,6 +29,8 @@ public class CommentMapper {
                 .id(comment.getId())
                 .author(comment.getUser().getUsername())
                 .createdAt(comment.getCreatedAt())
+                .reportsReceived(comment.getReports().size())
+                .lastEdit(comment.getLastEdit())
                 .content(comment.getContent())
                 .likes(mapToLikeDTO(comment.getLikes()))
                 .build();
