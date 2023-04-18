@@ -5,88 +5,99 @@ import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import huberts.spring.forumapp.security.annotation.UserRole;
 import huberts.spring.forumapp.user.dto.PasswordDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
+import huberts.spring.forumapp.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
+@Validated
 @RestController
 @RequiredArgsConstructor
 public class UserController {
+    private final UserService service;
 
-    private final UserService userService;
-
-    @GetMapping("/stuff")
-    ResponseEntity<List<UserDTO>> getStuffMembers() {
-        return ResponseEntity.ok(userService.findAllStaffUsers());
+    @GetMapping("/staff")
+    ResponseEntity<List<UserDTO>> getStaffMembers() {
+        List<UserDTO> staffMembers = service.getAllModeratorAndAdminUsers();
+        return ResponseEntity.ok(staffMembers);
     }
 
     @GetMapping("/{username}")
     ResponseEntity<UserDTO> getUser(@PathVariable String username) {
-        return ResponseEntity.ok(userService.findUserDTO(username));
+        UserDTO user = service.getUserByUsername(username);
+        return ResponseEntity.ok(user);
     }
 
     @UserRole
-    @GetMapping("/user/profile")
-    ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
-        String username = authentication.getName();
-        return ResponseEntity.ok(userService.currentUser(username));
+    @GetMapping("/profile")
+    ResponseEntity<UserDTO> getCurrentUser(Authentication authenticatedUser) {
+        String username = authenticatedUser.getName();
+        UserDTO user = service.getUserByUsername(username);
+        return ResponseEntity.ok(user);
     }
 
     @UserRole
-    @PatchMapping("/user/change-password")
-    ResponseEntity<UserDTO> changePassword(Authentication authentication, @RequestBody PasswordDTO password) {
-        String username = authentication.getName();
-        return ResponseEntity.ok(userService.changePassword(password, username));
+    @PatchMapping("/change-password")
+    ResponseEntity<UserDTO> changePassword(@Valid @RequestBody PasswordDTO password,
+                                           Authentication authenticatedUser) {
+        String username = authenticatedUser.getName();
+        UserDTO user = service.changePassword(password, username);
+        return ResponseEntity.ok(user);
     }
 
     @UserRole
-    @DeleteMapping("/user/delete-account")
-    ResponseEntity<Void> deleteAccount(Authentication authentication) {
-        String username = authentication.getName();
-        userService.deleteUserByUsername(username);
+    @DeleteMapping("/delete")
+    ResponseEntity<Void> deleteAccount(Authentication authenticatedUser) {
+        String username = authenticatedUser.getName();
+        service.deleteUserByUsername(username);
         return ResponseEntity.ok().build();
     }
 
     @ModeratorRole
-    @GetMapping("/moderator/get-all")
+    @GetMapping("/moderator/all")
     ResponseEntity<List<UserDTO>> getAllUsers() {
-        return ResponseEntity.ok(userService.findAllUsers());
+        List<UserDTO> users = service.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @ModeratorRole
-    @PatchMapping("/moderator/users/{username}/ban")
+    @PatchMapping("/moderator/ban/{username}")
     ResponseEntity<UserDTO> banUser(@PathVariable String username) {
-        return ResponseEntity.ok(userService.banUser(username));
+        UserDTO user = service.banUser(username);
+        return ResponseEntity.ok(user);
     }
 
     @ModeratorRole
-    @PatchMapping("/moderator/users/{username}/unban")
+    @PatchMapping("/moderator/unban/{username}")
     ResponseEntity<UserDTO> unbanUser(@PathVariable String username) {
-        return ResponseEntity.ok(userService.unbanUser(username));
+        UserDTO user = service.unbanUser(username);
+        return ResponseEntity.ok(user);
     }
 
     @ModeratorRole
-    @PatchMapping("/moderator/users/{username}/password")
-    ResponseEntity<UserDTO> changeUserPassword(@PathVariable String username, @RequestBody PasswordDTO password) {
-        return ResponseEntity.ok(userService.changePassword(password, username));
+    @PatchMapping("/moderator/change-password/{username}")
+    ResponseEntity<UserDTO> changeUserPassword(@PathVariable String username,
+                                               @Valid @RequestBody PasswordDTO password) {
+        UserDTO user = service.changePassword(password, username);
+        return ResponseEntity.ok(user);
     }
 
     @AdminRole
-    @DeleteMapping("/admin/users/{username}/delete")
+    @DeleteMapping("/admin/delete/{username}")
     ResponseEntity<Void> deleteUserByUsername(@PathVariable String username) {
-        userService.deleteUserByUsername(username);
+        service.deleteUserByUsername(username);
         return ResponseEntity.ok().build();
     }
 
     @AdminRole
-    @PatchMapping("/admin/users/{username}/change-role/{roleName}")
+    @PatchMapping("/admin/edit/{username}/role/{roleName}")
     ResponseEntity<UserDTO> changeRole(@PathVariable String username, @PathVariable String roleName) {
-        return ResponseEntity.ok(userService.changeRole(username, roleName));
+        UserDTO user = service.changeRole(username, roleName);
+        return ResponseEntity.ok(user);
     }
 }
-
