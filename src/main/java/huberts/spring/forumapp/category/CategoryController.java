@@ -1,9 +1,6 @@
 package huberts.spring.forumapp.category;
 
-import huberts.spring.forumapp.category.dto.CategoryDTO;
-import huberts.spring.forumapp.category.dto.CategoryCreateDTO;
-import huberts.spring.forumapp.category.dto.CategoryDescriptionDTO;
-import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
+import huberts.spring.forumapp.category.dto.*;
 import huberts.spring.forumapp.security.annotation.AdminRole;
 import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import jakarta.validation.Valid;
@@ -36,22 +33,24 @@ public class CategoryController {
 
     @ModeratorRole
     @PostMapping("/moderator/create")
-    ResponseEntity<CategoryDTO> saveNewCategory(@RequestBody @Valid CategoryCreateDTO create) {
-        CategoryDTO categoryCreated = service.createCategory(create);
+    ResponseEntity<CategoryDTO> saveNewCategory(@RequestBody @Valid CreateCategoryDTO createCategoryDTO) {
+        CategoryDTO categoryCreated = service.createCategory(createCategoryDTO);
         return ResponseEntity.created(URI.create("/categories")).body(categoryCreated);
     }
 
     @AdminRole
     @PatchMapping("/admin/edit/title/{categoryId}")
-    ResponseEntity<CategoryDTO> editTitle(@PathVariable Long categoryId, @RequestBody @Valid CategoryTitleDTO newTitle) {
-        CategoryDTO categoryEdited = service.updateTitle(categoryId, newTitle);
+    ResponseEntity<CategoryDTO> editTitle(@PathVariable Long categoryId,
+                                          @RequestBody @Valid UpdateCategoryTitleDTO updateCategoryTitleDTO) {
+        CategoryDTO categoryEdited = service.updateTitle(categoryId, updateCategoryTitleDTO);
         return ResponseEntity.ok(categoryEdited);
     }
 
     @AdminRole
     @PatchMapping("/admin/edit/description/{categoryId}")
-    ResponseEntity<CategoryDTO> editDescription(@PathVariable Long categoryId, @RequestBody @Valid CategoryDescriptionDTO description) {
-        CategoryDTO categoryEdited = service.updateDescription(categoryId, description);
+    ResponseEntity<CategoryDTO> editDescription(@PathVariable Long categoryId,
+                                                @RequestBody @Valid UpdateCategoryDescriptionDTO updateCategoryDescriptionDTO) {
+        CategoryDTO categoryEdited = service.updateDescription(categoryId, updateCategoryDescriptionDTO);
         return ResponseEntity.ok(categoryEdited);
     }
 
