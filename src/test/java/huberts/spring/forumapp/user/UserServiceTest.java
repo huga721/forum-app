@@ -177,8 +177,8 @@ class UserServiceTest {
             List<UserDTO> result = userService.getAllModeratorAndAdminUsers();
 
             assertEquals(users.size() - 1, result.size());
-            assertEquals(ROLE_NAME_ADMIN, result.get(0).getRole());
-            assertEquals(ROLE_NAME_MODERATOR, result.get(1).getRole());
+            assertEquals(ROLE_NAME_ADMIN, result.get(0).role());
+            assertEquals(ROLE_NAME_MODERATOR, result.get(1).role());
             verify(userRepository, times(1)).findAll();
         }
     }
@@ -195,7 +195,7 @@ class UserServiceTest {
             UserDTO userDTO = userService.changeRole(USER, ROLE_NAME_ADMIN);
 
             assertNotNull(userDTO);
-            assertEquals(userDTO.getRole(), ROLE_NAME_ADMIN);
+            assertEquals(userDTO.role(), ROLE_NAME_ADMIN);
             verify(userRepository, times(1)).findByUsername(USER);
         }
 
@@ -261,7 +261,7 @@ class UserServiceTest {
             UserDTO result = userService.banUser(USER);
 
             assertNotNull(result);
-            assertTrue(result.isBlocked());
+            assertTrue(result.blocked());
         }
 
         @DisplayName("Should throw UserBlockException when user is already banned")
@@ -293,7 +293,7 @@ class UserServiceTest {
             UserDTO result = userService.unbanUser(USER);
 
             assertNotNull(result);
-            assertFalse(result.isBlocked());
+            assertFalse(result.blocked());
         }
 
         @DisplayName("Should throw UserBlockException when user is not banned")

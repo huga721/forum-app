@@ -73,8 +73,8 @@ class CommentServiceTest {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             CommentDTO commentCreated = service.createComment(1L, commentContent, USERNAME);
 
-            assertEquals(commentCreated.getAuthor(), USERNAME);
-            assertEquals(commentCreated.getContent(), COMMENT_CONTENT);
+            assertEquals(commentCreated.author(), USERNAME);
+            assertEquals(commentCreated.content(), COMMENT_CONTENT);
         }
 
         @DisplayName("Should throw TopicDoesntExistException when topic with given id doesn't exist")
@@ -104,7 +104,7 @@ class CommentServiceTest {
         void shouldReturnComment() {
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
             CommentDTO commentFound = service.getCommentById(1L);
-            assertEquals(commentFound.getContent(), comment.getContent());
+            assertEquals(commentFound.content(), comment.getContent());
         }
 
         @DisplayName("Should throw CommentDoesntExistException when comment doesn't exist")
@@ -123,7 +123,7 @@ class CommentServiceTest {
         void ShouldReturnAllComments() {
             when(commentRepository.findAll()).thenReturn(List.of(comment));
             List<CommentDTO> comments = service.getAllComments();
-            assertEquals(comments.get(0).getContent(), comment.getContent());
+            assertEquals(comments.get(0).content(), comment.getContent());
         }
     }
 
@@ -137,7 +137,7 @@ class CommentServiceTest {
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
             when(commentRepository.findAllByTopic(any(Topic.class))).thenReturn(List.of(comment));
             List<CommentDTO> comments = service.getAllCommentsByTopicId(1L);
-            assertEquals(comments.get(0).getContent(), comment.getContent());
+            assertEquals(comments.get(0).content(), comment.getContent());
         }
 
         @DisplayName("Should throw TopicDoesntExistException when topic with given id doesnt exist")
@@ -157,7 +157,7 @@ class CommentServiceTest {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(commentRepository.findAllByUser(any(User.class))).thenReturn(List.of(comment));
             List<CommentDTO> comments = service.getAllCommentsByUsername(USERNAME);
-            assertEquals(comments.get(0).getContent(), comment.getContent());
+            assertEquals(comments.get(0).content(), comment.getContent());
         }
 
         @DisplayName("Should throw UserDoesntExistException when user doesn't exist")
@@ -178,7 +178,7 @@ class CommentServiceTest {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(commentRepository.findByUserAndId(any(User.class), any(Long.class))).thenReturn(Optional.of(comment));
             CommentDTO commentUpdated = service.updateCommentByAuthor(1L, content, USERNAME);
-            assertEquals(commentUpdated.getContent(), COMMENT_CONTENT_UPDATED);
+            assertEquals(commentUpdated.content(), COMMENT_CONTENT_UPDATED);
         }
 
         @DisplayName("Should throw CommentDoesntExistException when comment doesn't exist")
@@ -199,15 +199,15 @@ class CommentServiceTest {
         void shouldUpdateComment() {
             CommentContentDTO content = new CommentContentDTO(COMMENT_CONTENT_UPDATED);
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-            CommentDTO commentUpdated = service.updateCommentByModerator(1L, content);
-            assertEquals(commentUpdated.getContent(), COMMENT_CONTENT_UPDATED);
+            CommentDTO commentUpdated = service.updateCommentByModerator(1L, content, USERNAME);
+            assertEquals(commentUpdated.content(), COMMENT_CONTENT_UPDATED);
         }
 
         @DisplayName("Should throw CommentDoesntExistException when comment doesn't exist")
         @Test
         void shouldThrowCommentDoesntExistException_WhenCommentDoesntExist() {
             CommentContentDTO content = new CommentContentDTO(COMMENT_CONTENT_UPDATED);
-            assertThrows(CommentDoesntExistException.class, () -> service.updateCommentByModerator(1L, content));
+            assertThrows(CommentDoesntExistException.class, () -> service.updateCommentByModerator(1L, content, USERNAME));
         }
     }
 
@@ -240,14 +240,15 @@ class CommentServiceTest {
         @Test
         void shouldDeleteComment() {
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-            service.deleteCommentByModerator(1L);
+            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            service.deleteCommentByModerator(1L, USERNAME);
             verify(commentRepository, times(1)).delete(comment);
         }
 
         @DisplayName("Should throw CommentDoesntExistException when comment doesn't exist")
         @Test
         void shouldThrowCommentDoesntExistException_WhenCommentDoesntExist() {
-            assertThrows(CommentDoesntExistException.class, () -> service.deleteCommentByModerator(1L));
+            assertThrows(CommentDoesntExistException.class, () -> service.deleteCommentByModerator(1L, USERNAME));
         }
     }
 }

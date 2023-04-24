@@ -32,7 +32,7 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
             LoginDTO login = mapper.readValue(inputStream, LoginDTO.class);
 
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    login.getUsername(), login.getPassword());
+                    login.username(), login.password());
 
             setDetails(request, token);
 

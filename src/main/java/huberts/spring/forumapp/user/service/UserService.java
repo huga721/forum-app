@@ -48,8 +48,8 @@ public class UserService implements UserServiceApi {
 
     @Override
     public UserDTO createUser(RegisterDTO credentials) {
-        String username = credentials.getUsername();
-        String password = passwordEncoder.encode(credentials.getPassword());
+        String username = credentials.username();
+        String password = passwordEncoder.encode(credentials.password());
         log.info("Creating user with nickname {}", username);
 
         if (userRepository.existsByUsername(username)) {
@@ -104,7 +104,7 @@ public class UserService implements UserServiceApi {
         return UserMapper.mapFromList(userRepository.findAll())
                 .stream()
                 .filter(user ->
-                        user.getRole().equals("ROLE_ADMIN") || user.getRole().equals("ROLE_MODERATOR"))
+                        user.role().equals("ROLE_ADMIN") || user.role().equals("ROLE_MODERATOR"))
                 .collect(Collectors.toList());
     }
 
@@ -127,7 +127,7 @@ public class UserService implements UserServiceApi {
     @Override
     public UserDTO changePassword(PasswordDTO newPassword, String username) {
         log.info("Changing password for user with username {}", username);
-        String password = newPassword.getPassword();
+        String password = newPassword.password();
         String encodedPassword = passwordEncoder.encode(password);
 
         User user = findUserByUsername(username);

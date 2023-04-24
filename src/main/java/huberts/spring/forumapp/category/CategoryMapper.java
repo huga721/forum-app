@@ -1,6 +1,6 @@
 package huberts.spring.forumapp.category;
 
-import huberts.spring.forumapp.category.dto.CategoryCreateDTO;
+import huberts.spring.forumapp.category.dto.CreateCategoryDTO;
 import huberts.spring.forumapp.category.dto.CategoryDTO;
 import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicMapper;
@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
 @Component
 public class CategoryMapper {
 
-    public static Category buildNewCategory(CategoryCreateDTO create) {
+    public static Category buildNewCategory(CreateCategoryDTO createCategoryDTO) {
         List<Topic> emptyList = new ArrayList<>();
         return Category.builder()
-                .title(create.getTitle())
-                .description(create.getDescription())
+                .title(createCategoryDTO.title())
+                .description(createCategoryDTO.description())
                 .topics(emptyList)
                 .build();
     }
