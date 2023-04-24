@@ -9,7 +9,7 @@ import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
 import huberts.spring.forumapp.exception.like.LikeAlreadyExistException;
 import huberts.spring.forumapp.exception.user.UserIsNotAuthorException;
 import huberts.spring.forumapp.exception.like.LikeDoesntExistException;
-import huberts.spring.forumapp.exception.report.ReportExistException;
+import huberts.spring.forumapp.exception.report.ReportDoesntExistException;
 import huberts.spring.forumapp.exception.report.ReportRealiseException;
 import huberts.spring.forumapp.exception.role.RoleDoesntExistException;
 import huberts.spring.forumapp.exception.role.RoleException;
@@ -131,9 +131,9 @@ public class RestControllerHandler {
         return "An exception occurred during validation of method arguments: " + errorMessage;
     }
 
-    @ExceptionHandler(value = ReportExistException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String reportExist(ReportExistException e) {
+    @ExceptionHandler(value = ReportDoesntExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String reportExist(ReportDoesntExistException e) {
         return e.getMessage();
     }
 
