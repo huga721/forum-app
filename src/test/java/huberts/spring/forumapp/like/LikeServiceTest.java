@@ -87,9 +87,9 @@ class LikeServiceTest {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(likeRepository.existsByTopicAndUser(any(Topic.class), any(User.class))).thenReturn(false);
             LikeDTO likeCreated = service.createTopicLike(1L, USERNAME);
-            assertEquals(likeCreated.getWho(), USERNAME);
-            assertEquals(likeCreated.getLikedObjectId(), 1L);
-            assertEquals(likeCreated.getLikedObject(), STRING_TOPIC);
+            assertEquals(likeCreated.who(), USERNAME);
+            assertEquals(likeCreated.likedObjectId(), 1L);
+            assertEquals(likeCreated.likedObject(), STRING_TOPIC);
         }
 
         @DisplayName("Should throw TopicDoesntExistException when topic with given id doesn't exist")
@@ -128,9 +128,9 @@ class LikeServiceTest {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(likeRepository.existsByCommentAndUser(any(Comment.class), any(User.class))).thenReturn(false);
             LikeDTO likeCreated = service.createCommentLike(1L, USERNAME);
-            assertEquals(likeCreated.getWho(), USERNAME);
-            assertEquals(likeCreated.getLikedObjectId(), 1L);
-            assertEquals(likeCreated.getLikedObject(), STRING_COMMENT);
+            assertEquals(likeCreated.who(), USERNAME);
+            assertEquals(likeCreated.likedObjectId(), 1L);
+            assertEquals(likeCreated.likedObject(), STRING_COMMENT);
         }
 
         @DisplayName("Should throw CommentDoesntExistException when comment with given id doesn't exist")
@@ -167,7 +167,7 @@ class LikeServiceTest {
         void shouldGetLike() {
             when(likeRepository.findById(any(Long.class))).thenReturn(Optional.of(like));
             LikeDTO likeFound = service.getLikeById(1L);
-            assertEquals(likeFound.getWho(), USERNAME);
+            assertEquals(likeFound.who(), USERNAME);
         }
 
         @DisplayName("Should throw LikeDoesntExist when like with given id doesn't exist")
@@ -187,7 +187,7 @@ class LikeServiceTest {
             when(likeRepository.findAll()).thenReturn(List.of(like, like));
             List<LikeDTO> likesFound = service.getAllLikes();
             assertEquals(likesFound.size(), 2);
-            assertEquals(likesFound.get(0).getWho(), USERNAME);
+            assertEquals(likesFound.get(0).who(), USERNAME);
         }
     }
 
@@ -202,7 +202,7 @@ class LikeServiceTest {
             when(likeRepository.findAllByUser(any(User.class))).thenReturn(List.of(like, like));
             List<LikeDTO> likesFound = service.getAllLikesByUsername(USERNAME);
             assertEquals(likesFound.size(), 2);
-            assertEquals(likesFound.get(0).getWho(), USERNAME);
+            assertEquals(likesFound.get(0).who(), USERNAME);
         }
     }
 
