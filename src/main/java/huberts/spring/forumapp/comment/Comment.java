@@ -6,6 +6,8 @@ import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comment {
@@ -25,7 +28,10 @@ public class Comment {
 
     private String content;
 
+    @CreatedDate
     private LocalDateTime createdAt;
+
+    private LocalDateTime lastEdit;
 
     @ManyToOne()
     private Topic topic;
