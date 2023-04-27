@@ -6,16 +6,16 @@ import huberts.spring.forumapp.report.dto.ReportReasonDTO;
 import java.util.List;
 
 public interface ReportServiceApi {
-    ReportDTO createCommentReport(Long id, ReportReasonDTO reasonDTO, String username);
-    ReportDTO createTopicReport(Long id, ReportReasonDTO reasonDTO, String username);
+    ReportDTO createCommentReport(Long commentId, ReportReasonDTO reportReasonDTO, String username);
+    ReportDTO createTopicReport(Long topicId, ReportReasonDTO reportReasonDTO, String username);
 
-    ReportDTO getReportById(Long id);
+    ReportDTO getReportById(Long reportId);
     List<ReportDTO> getAllReports();
     List<ReportDTO> getAllNotSeenReports();
 
-    ReportDTO markReportAsSeen(Long id);
+    ReportDTO markReportAsSeen(Long reportId);
 
-    void executeReportAndWarnTopicAuthor(Long id);
-    void executeReportAndWarnCommentAuthor(Long id);
-    void deleteReport(Long id);
+    void executeReportAndWarnTopicAuthor(Long topicId);
+    void executeReportAndWarnCommentAuthor(Long commentId);
+    void deleteReport(Long reportId);
 }
