@@ -23,20 +23,20 @@ public class ReportController {
     private final ReportService service;
 
     @UserRole
-    @PostMapping("/topic/{id}")
-    ResponseEntity<ReportDTO> saveNewTopicReport(@PathVariable Long id, @RequestBody @Valid ReportReasonDTO reportReasonDTO,
+    @PostMapping("/topic/{topicId}")
+    ResponseEntity<ReportDTO> saveNewTopicReport(@PathVariable Long topicId, @RequestBody @Valid ReportReasonDTO reportReasonDTO,
                                                  Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        ReportDTO reportCreated = service.createTopicReport(id, reportReasonDTO, username);
+        ReportDTO reportCreated = service.createTopicReport(topicId, reportReasonDTO, username);
         return ResponseEntity.created(URI.create("/reports")).body(reportCreated);
     }
 
     @UserRole
-    @PostMapping("/comment/{id}")
-    ResponseEntity<ReportDTO> saveNewCommentReport(@PathVariable Long id, @RequestBody @Valid ReportReasonDTO reportReasonDTO,
+    @PostMapping("/comment/{commentId}")
+    ResponseEntity<ReportDTO> saveNewCommentReport(@PathVariable Long commentId, @RequestBody @Valid ReportReasonDTO reportReasonDTO,
                                                    Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        ReportDTO reportCreated = service.createCommentReport(id, reportReasonDTO, username);
+        ReportDTO reportCreated = service.createCommentReport(commentId, reportReasonDTO, username);
         return ResponseEntity.created(URI.create("/reports")).body(reportCreated);
     }
 
@@ -48,9 +48,9 @@ public class ReportController {
     }
 
     @ModeratorRole
-    @GetMapping("/{id}")
-    ResponseEntity<ReportDTO> getReportById(@PathVariable Long id) {
-        ReportDTO report = service.getReportById(id);
+    @GetMapping("/{reportId}")
+    ResponseEntity<ReportDTO> getReportById(@PathVariable Long reportId) {
+        ReportDTO report = service.getReportById(reportId);
         return ResponseEntity.ok(report);
     }
 
@@ -62,30 +62,30 @@ public class ReportController {
     }
 
     @ModeratorRole
-    @PutMapping("/mark-as-seen/{id}")
-    ResponseEntity<ReportDTO> updateReportAsSeen(@PathVariable Long id) {
-        ReportDTO report = service.markReportAsSeen(id);
+    @PutMapping("/mark-as-seen/{reportId}")
+    ResponseEntity<ReportDTO> updateReportAsSeen(@PathVariable Long reportId) {
+        ReportDTO report = service.markReportAsSeen(reportId);
         return ResponseEntity.ok(report);
     }
 
     @ModeratorRole
-    @DeleteMapping("/execute/topic/{id}")
-    ResponseEntity<Void> executeTopicReports(@PathVariable Long id) {
-        service.executeReportAndWarnTopicAuthor(id);
+    @DeleteMapping("/execute/topic/{topicId}")
+    ResponseEntity<Void> executeTopicReports(@PathVariable Long topicId) {
+        service.executeReportAndWarnTopicAuthor(topicId);
         return ResponseEntity.noContent().build();
     }
 
     @ModeratorRole
-    @DeleteMapping("/execute/comment/{id}")
-    ResponseEntity<Void> executeCommentReports(@PathVariable Long id) {
-        service.executeReportAndWarnCommentAuthor(id);
+    @DeleteMapping("/execute/comment/{commentId}")
+    ResponseEntity<Void> executeCommentReports(@PathVariable Long commentId) {
+        service.executeReportAndWarnCommentAuthor(commentId);
         return ResponseEntity.noContent().build();
     }
 
     @ModeratorRole
-    @DeleteMapping("/delete/{id}")
-    ResponseEntity<Void> deleteReport(@PathVariable Long id) {
-        service.deleteReport(id);
+    @DeleteMapping("/delete/{reportId}")
+    ResponseEntity<Void> deleteReport(@PathVariable Long reportId) {
+        service.deleteReport(reportId);
         return ResponseEntity.noContent().build();
     }
 }
