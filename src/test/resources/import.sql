@@ -37,6 +37,7 @@ INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (10,
 INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (11, 'topic to change category by moderator', 'random test content', 1,1, false);
 INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (12, 'topic to close by moderator', 'random test content', 1,1, false);
 INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (13, 'topic to delete by moderator', 'random test content', 1,1, false);
+INSERT INTO topic (id, title, content, category_id, user_id, closed) VALUES (14, 'topic to delete because of reports', 'random test content', 1,1, false);
 
 INSERT INTO comment (id, content, topic_id, user_id) VALUES (1, 'test content of comment', 1, 1);
 INSERT INTO comment (id, content, topic_id, user_id) VALUES (2, 'test content of comment', 1, 1);
@@ -45,8 +46,30 @@ INSERT INTO comment (id, content, topic_id, user_id) VALUES (4, 'comment to edit
 INSERT INTO comment (id, content, topic_id, user_id) VALUES (5, 'comment but topic is closed', 8, 1);
 INSERT INTO comment (id, content, topic_id, user_id) VALUES (6, 'comment to delete by moderator', 1, 3);
 INSERT INTO comment (id, content, topic_id, user_id) VALUES (7, 'comment to edit by moderator', 1, 3);
+INSERT INTO comment (id, content, topic_id, user_id) VALUES (8, 'comment to delete because of reports', 1, 3);
 
 INSERT INTO likes (id, comment_id, user_id) VALUES (1, 1,1);
 INSERT INTO likes (id, topic_id, user_id) VALUES (2,1, 1);
+INSERT INTO likes (id, topic_id, user_id) VALUES (3,1, 1);
+INSERT INTO likes (id, topic_id, user_id) VALUES (4,1, 4);
+INSERT INTO likes (id, comment_id, user_id) VALUES (5,5, 1);
+INSERT INTO likes (id, comment_id, user_id) VALUES (6,1, 4);
+
+INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (1, 'test reason of report', true, 1, 'user');
+INSERT INTO report (id, reason, seen, topic_id, user_report) VALUES (2, 'test reason of report', false, 1, 'user');
+INSERT INTO report (id, reason, seen, topic_id, user_report) VALUES (3, 'test reason of report', false, 2, 'user');
+INSERT INTO report (id, reason, seen, topic_id, user_report) VALUES (4, 'reason to mark as seen', false, 2, 'user');
+INSERT INTO report (id, reason, seen, topic_id, user_report) VALUES (5, 'report of topic with id 14', false, 14, 'user');
+INSERT INTO report (id, reason, seen, topic_id, user_report) VALUES (6, 'report of topic with id 14', false, 14, 'user');
+INSERT INTO report (id, reason, seen, topic_id, user_report) VALUES (7, 'report of topic with id 14', false, 14, 'user');
+INSERT INTO report (id, reason, seen, topic_id, user_report) VALUES (8, 'report of topic with id 14', false, 14, 'user');
+INSERT INTO report (id, reason, seen, topic_id, user_report) VALUES (9, 'report of topic with id 14', false, 14, 'user');
+INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (10, 'report of comment with id 8', false, 8, 'user');
+INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (11, 'report of comment with id 8', false, 8, 'user');
+INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (12, 'report of comment with id 8', false, 8, 'user');
+INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (13, 'report of comment with id 8', false, 8, 'user');
+INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (14, 'report of comment with id 8', false, 8,'user');
+INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (15, 'report to delete', false, 2, 'user');
+
 -- INSERT INTO topic (id, title, content, category_id, user_id) VALUES (3, 'test for topic with same title but in different category', 'random test content', 1,1);
 -- INSERT INTO topic (id, title, content) VALUES (1, 'userJwt', 'encrypted_password');
