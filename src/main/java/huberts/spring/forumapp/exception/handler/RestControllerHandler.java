@@ -15,7 +15,7 @@ import huberts.spring.forumapp.exception.role.RoleDoesntExistException;
 import huberts.spring.forumapp.exception.role.RoleException;
 import huberts.spring.forumapp.exception.topic.*;
 import huberts.spring.forumapp.exception.user.*;
-import huberts.spring.forumapp.exception.warning.WarningExistException;
+import huberts.spring.forumapp.exception.warning.WarningDoesntExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.MethodParameter;
@@ -143,9 +143,9 @@ public class RestControllerHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(value = WarningExistException.class)
+    @ExceptionHandler(value = WarningDoesntExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String cantRealiseReports(WarningExistException e) {
+    public String cantRealiseReports(WarningDoesntExistException e) {
         return e.getMessage();
     }
 

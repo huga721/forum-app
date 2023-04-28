@@ -42,6 +42,8 @@ public class UserMapper {
                 .topics(mapToTopicDTO(user.getTopics()))
                 .warningPoints(user.getWarnings().size() * 20)
                 .blocked(user.isBlocked())
+                .createdTime(user.getCreatedAt())
+                .lastActivity(user.getLastActivity())
                 .build();
     }
 
