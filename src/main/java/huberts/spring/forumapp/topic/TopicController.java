@@ -1,6 +1,6 @@
 package huberts.spring.forumapp.topic;
 
-import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
+import huberts.spring.forumapp.category.dto.UpdateTopicCategoryDTO;
 import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import huberts.spring.forumapp.security.annotation.UserRole;
 import huberts.spring.forumapp.topic.dto.*;
@@ -35,7 +35,7 @@ public class TopicController {
 
     @UserRole
     @PostMapping("/create")
-    ResponseEntity<TopicDTO> saveNewTopic(@RequestBody @Valid TopicCreateDTO create, Authentication authenticatedUser) {
+    ResponseEntity<TopicDTO> saveNewTopic(@RequestBody @Valid CreateTopicDTO create, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         TopicDTO topicCreated = service.createTopic(create, username);
         return ResponseEntity.created(URI.create("/topics")).body(topicCreated);
@@ -59,7 +59,7 @@ public class TopicController {
 
     @UserRole
     @PatchMapping("/edit/{topicId}")
-    ResponseEntity<TopicDTO> changeContentOrTitleByAuthor(@RequestBody TopicEditDTO topicEditDTO, @PathVariable Long topicId,
+    ResponseEntity<TopicDTO> changeContentOrTitleByAuthor(@RequestBody UpdateTopicDTO topicEditDTO, @PathVariable Long topicId,
                                                           Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         TopicDTO topicChanged = service.updateTopicByAuthor(topicId, topicEditDTO, username);
@@ -68,7 +68,7 @@ public class TopicController {
 
     @ModeratorRole
     @PatchMapping("/moderator/edit/{topicId}")
-    ResponseEntity<TopicDTO> changeContentOrTitleByModerator(@RequestBody TopicEditDTO topicEditDTO,
+    ResponseEntity<TopicDTO> changeContentOrTitleByModerator(@RequestBody UpdateTopicDTO topicEditDTO,
                                                              @PathVariable Long topicId, Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
         TopicDTO topicChanged = service.updateTopicByModerator(topicId, topicEditDTO, moderatorName);
@@ -77,7 +77,7 @@ public class TopicController {
 
     @ModeratorRole
     @PatchMapping("/moderator/change-category/{topicId}")
-    ResponseEntity<TopicDTO> changeCategoryOfTopicByModerator(@RequestBody @Valid CategoryTitleDTO categoryTitleDTO,
+    ResponseEntity<TopicDTO> changeCategoryOfTopicByModerator(@RequestBody @Valid UpdateTopicCategoryDTO categoryTitleDTO,
                                                               @PathVariable Long topicId, Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
         TopicDTO topicChanged = service.changeCategoryOfTopic(topicId, categoryTitleDTO, moderatorName);
