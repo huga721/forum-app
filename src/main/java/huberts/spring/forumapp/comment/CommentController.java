@@ -82,15 +82,19 @@ public class CommentController {
 
     @ModeratorRole
     @DeleteMapping("/moderator/delete/{commentId}")
-    ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
-        service.deleteCommentByModerator(commentId);
+    ResponseEntity<Void> deleteComment(@PathVariable Long commentId, Authentication authenticatedUser) {
+        String username = authenticatedUser.getName();
+        service.deleteCommentByModerator(commentId, username);
         return ResponseEntity.noContent().build();
     }
 
     @ModeratorRole
     @PatchMapping("/moderator/edit/{commentId}")
-    ResponseEntity<CommentDTO> editCommentByModerator(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO contentDTO) {
-        CommentDTO commentEdited = service.updateCommentByModerator(commentId, contentDTO);
+    ResponseEntity<CommentDTO> editCommentByModerator(@PathVariable Long commentId,
+                                                      @RequestBody @Valid CommentContentDTO contentDTO,
+                                                      Authentication authenticatedUser) {
+        String username = authenticatedUser.getName();
+        CommentDTO commentEdited = service.updateCommentByModerator(commentId, contentDTO, username);
         return ResponseEntity.ok(commentEdited);
     }
 }

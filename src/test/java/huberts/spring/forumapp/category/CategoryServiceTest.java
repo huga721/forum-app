@@ -1,9 +1,6 @@
 package huberts.spring.forumapp.category;
 
-import huberts.spring.forumapp.category.dto.CategoryCreateDTO;
-import huberts.spring.forumapp.category.dto.CategoryDTO;
-import huberts.spring.forumapp.category.dto.CategoryDescriptionDTO;
-import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
+import huberts.spring.forumapp.category.dto.*;
 import huberts.spring.forumapp.exception.category.CategoryAlreadyExistException;
 import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
 import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
@@ -50,16 +47,10 @@ class CategoryServiceTest {
     @Nested
     class CreateCategoryTests {
 
-        private CategoryCreateDTO createCategoryDTO;
-
-        @BeforeEach
-        void setUp() {
-            createCategoryDTO = new CategoryCreateDTO(TITLE, DESCRIPTION);
-        }
-
         @DisplayName("Should create category")
         @Test
         void shouldCreateCategory() {
+            CreateCategoryDTO createCategoryDTO = new CreateCategoryDTO(TITLE, DESCRIPTION);
             when(repository.existsByTitle(any(String.class))).thenReturn(false);
             when(repository.save(any(Category.class))).thenReturn(category);
             CategoryDTO category = service.createCategory(createCategoryDTO);
@@ -71,6 +62,7 @@ class CategoryServiceTest {
         @DisplayName("Should throw CategoryAlreadyExistingException when category exists")
         @Test
         void shouldThrowCategoryAlreadyExistException_WhenCategoryExists() {
+            CreateCategoryDTO createCategoryDTO = new CreateCategoryDTO(TITLE, DESCRIPTION);
             when(repository.existsByTitle(any(String.class))).thenReturn(true);
             assertThrows(CategoryAlreadyExistException.class, () -> service.createCategory(createCategoryDTO));
         }
@@ -101,16 +93,10 @@ class CategoryServiceTest {
     @Nested
     class GetAllCategoriesTests {
 
-        private static List<Category> categories;
-
-        @BeforeEach
-        void setUp() {
-            categories = List.of(category);
-        }
-
         @DisplayName("Should return list of categories")
         @Test
         void shouldReturnListOfCategories() {
+            List<Category> categories = List.of(category);
             given(repository.findAll()).willReturn(categories);
             List<CategoryDTO> categoriesResult = service.getAllCategories();
 
@@ -123,42 +109,37 @@ class CategoryServiceTest {
     @Nested
     class UpdateTitleTests {
 
-        private CategoryTitleDTO titleToUpdate;
-        private CategoryTitleDTO titleToThrow;
-
-        @BeforeEach
-        void setUp() {
-            titleToUpdate = new CategoryTitleDTO(TITLE_NEW);
-            titleToThrow = new CategoryTitleDTO(TITLE);
-        }
-
         @DisplayName("Should change title")
         @Test
         void shouldChangeTitle() {
+            NewCategoryTitleDTO titleToUpdate = new NewCategoryTitleDTO(TITLE_NEW);
+
             when(repository.findById(any(Long.class))).thenReturn(Optional.of(category));
             when(repository.existsByTitle(any(String.class))).thenReturn(false);
             CategoryDTO result = service.updateTitle(1L, titleToUpdate);
 
-            assertEquals(result.getTitle(), titleToUpdate.getCategoryTitle());
+            assertEquals(result.title(), titleToUpdate.title());
         }
 
         @DisplayName("Should throw CategoryExistException when title category to update doesn't exist")
         @Test
         void shouldThrowCategoryExistException_WhenTitleCategoryToUpdateDoesntExist() {
+            NewCategoryTitleDTO titleToUpdate = new NewCategoryTitleDTO(TITLE_NEW);
             assertThrows(CategoryDoesntExistException.class, () -> service.updateTitle(1L, titleToUpdate));
         }
 
         @DisplayName("Should throw CategoryTitleException when title to change is the same as actual title")
         @Test
         void shouldThrowCategoryTitleException_WhenTitleToChangeIsTheSameAsActualTitle() {
+            NewCategoryTitleDTO titleToThrow = new NewCategoryTitleDTO(TITLE);
             when(repository.findById(any(Long.class))).thenReturn(Optional.of(category));
-
             assertThrows(CategoryTitleException.class, () -> service.updateTitle(1L, titleToThrow));
         }
 
         @DisplayName("Should throw CategoryTitleException when category with title to update exist")
         @Test
         void shouldThrowCategoryTitleException_WhenCategoryWithTitleToUpdateExist() {
+            NewCategoryTitleDTO titleToUpdate = new NewCategoryTitleDTO(TITLE_NEW);
             when(repository.findById(any(Long.class))).thenReturn(Optional.of(category));
             when(repository.existsByTitle(any(String.class))).thenReturn(true);
 
@@ -170,34 +151,29 @@ class CategoryServiceTest {
     @Nested
     class UpdateDescriptionTests {
 
-        private CategoryDescriptionDTO descriptionToUpdate;
-        private CategoryDescriptionDTO descriptionToThrow;
-
-        @BeforeEach
-        void setUp() {
-            descriptionToUpdate = new CategoryDescriptionDTO(DESCRIPTION_NEW);
-            descriptionToThrow = new CategoryDescriptionDTO(DESCRIPTION);
-        }
-
         @DisplayName("Should update description")
         @Test
         void shouldUpdateDescription() {
+            NewCategoryDescriptionDTO descriptionToUpdate = new NewCategoryDescriptionDTO(DESCRIPTION_NEW);
+
             when(repository.findById(any(Long.class))).thenReturn(Optional.of(category));
             CategoryDTO result = service.updateDescription(1L, descriptionToUpdate);
 
             assertNotNull(result);
-            assertEquals(category.getDescription(), descriptionToUpdate.getDescription());
+            assertEquals(category.getDescription(), descriptionToUpdate.description());
         }
 
         @DisplayName("Should throw CategoryExistException when category doesn't exist")
         @Test
         void shouldThrowCategoryExistException_WhenCategoryDoesntExist() {
+            NewCategoryDescriptionDTO descriptionToUpdate = new NewCategoryDescriptionDTO(DESCRIPTION_NEW);
             assertThrows(CategoryDoesntExistException.class, () -> service.updateDescription(1L, descriptionToUpdate));
         }
 
         @DisplayName("Should throw CategoryDescriptionException when new description is the same as it is")
         @Test
         void shouldThrowCategoryDescriptionException_WhenNewDescriptionIsTheSameAsItIs() {
+            NewCategoryDescriptionDTO descriptionToThrow = new NewCategoryDescriptionDTO(DESCRIPTION);
             when(repository.findById(any(Long.class))).thenReturn(Optional.of(category));
             assertThrows(CategoryDescriptionException.class, () -> service.updateDescription(1L, descriptionToThrow));
         }
