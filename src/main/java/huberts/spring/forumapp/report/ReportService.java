@@ -4,14 +4,16 @@ import huberts.spring.forumapp.comment.Comment;
 import huberts.spring.forumapp.comment.CommentRepository;
 import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
 import huberts.spring.forumapp.exception.report.ReportDoesntExistException;
+import huberts.spring.forumapp.exception.report.ReportRealiseException;
 import huberts.spring.forumapp.exception.topic.TopicDoesntExistException;
+import huberts.spring.forumapp.exception.topic.TopicIsClosedException;
 import huberts.spring.forumapp.report.dto.ReportDTO;
 import huberts.spring.forumapp.report.dto.ReportReasonDTO;
 import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicRepository;
 import huberts.spring.forumapp.user.User;
 import huberts.spring.forumapp.user.UserRepository;
-import huberts.spring.forumapp.utility.UtilityService;
+import huberts.spring.forumapp.common.UtilityService;
 import huberts.spring.forumapp.warning.WarningService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,8 @@ public class ReportService implements ReportServiceApi {
 
     private static final String COMMENT_DOESNT_EXIST_EXCEPTION = "Comment with id \"%d\" doesn't exist.";
     private static final String TOPIC_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
+    private static final String TOPIC_IS_CLOSED_EXCEPTION = "Topic with id \"%d\" is closed.";
+    private static final String REPORT_REALISE_EXIST_EXCEPTION = "Can't realise reports because there are less than 5 reports.";
     private static final String REPORT_DOESNT_EXIST_EXCEPTION = "Report with id \"%d\" doesn't exist.";
     private static final String EXCEPTION_OCCURRED = "An exception occurred!";
 
@@ -42,13 +46,21 @@ public class ReportService implements ReportServiceApi {
         User user = findUserByUsername(username);
         Comment commentFound = findCommentById(commentId);
 
-        utilityService.validateTopicClosed(commentFound.getTopic());
+        validateTopicClosed(commentFound.getTopic());
         utilityService.updateUserLastActivity(username);
         log.info("Report created");
-        return buildAndSaveReport(user, reportReasonDTO, commentFound);
+        return buildAndSaveCommentReport(user, reportReasonDTO, commentFound);
     }
 
-    private ReportDTO buildAndSaveReport(User user, ReportReasonDTO reportReasonDTO, Comment comment) {
+    private void validateTopicClosed(Topic topic) {
+        if (topic.isClosed()) {
+            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, topic.getId());
+            log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
+            throw new TopicIsClosedException(errorMessage);
+        }
+    }
+
+    private ReportDTO buildAndSaveCommentReport(User user, ReportReasonDTO reportReasonDTO, Comment comment) {
         Report reportBuilt = ReportMapper.buildReport(user, reportReasonDTO.reason(), comment);
         reportRepository.save(reportBuilt);
         return ReportMapper.buildReportTopicDTO(reportBuilt);
@@ -74,13 +86,13 @@ public class ReportService implements ReportServiceApi {
         User user = findUserByUsername(username);
         Topic topicFound = findTopicById(topicId);
 
-        utilityService.validateTopicClosed(topicFound);
+        validateTopicClosed(topicFound);
         utilityService.updateUserLastActivity(username);
         log.info("Report created");
-        return buildAndSaveReport(user, reportReasonDTO, topicFound);
+        return buildAndSaveTopicReport(user, reportReasonDTO, topicFound);
     }
 
-    private ReportDTO buildAndSaveReport(User user, ReportReasonDTO reportReasonDTO, Topic topic) {
+    private ReportDTO buildAndSaveTopicReport(User user, ReportReasonDTO reportReasonDTO, Topic topic) {
         Report reportBuilt = ReportMapper.buildReport(user, reportReasonDTO.reason(), topic);
         reportRepository.save(reportBuilt);
         return ReportMapper.buildReportTopicDTO(reportBuilt);
@@ -139,12 +151,19 @@ public class ReportService implements ReportServiceApi {
         Topic topicFound = findTopicById(topicId);
         String author = topicFound.getUser().getUsername();
 
-        utilityService.validateTopicClosed(topicFound);
-        utilityService.validateReports(topicFound.getReports());
+        validateTopicClosed(topicFound);
+        validateReports(topicFound.getReports());
 
         topicRepository.delete(topicFound);
         warningService.giveWarning(author);
         log.info("Deleted all reports");
+    }
+
+    private void validateReports(List<Report> reports) {
+        if (reports.size() < 5) {
+            log.error(EXCEPTION_OCCURRED, new ReportRealiseException(REPORT_REALISE_EXIST_EXCEPTION));
+            throw new ReportRealiseException(REPORT_REALISE_EXIST_EXCEPTION);
+        }
     }
 
     @Override
@@ -153,8 +172,8 @@ public class ReportService implements ReportServiceApi {
         Comment commentFound = findCommentById(commentId);
         String author = commentFound.getUser().getUsername();
 
-        utilityService.validateTopicClosed(commentFound.getTopic());
-        utilityService.validateReports(commentFound.getReports());
+        validateTopicClosed(commentFound.getTopic());
+        validateReports(commentFound.getReports());
 
         commentRepository.delete(commentFound);
         warningService.giveWarning(author);
