@@ -10,8 +10,8 @@ public interface CategoryServiceApi {
     CategoryDTO getCategoryById(Long categoryId);
     List<CategoryDTO> getAllCategories();
 
-    CategoryDTO updateTitle(Long categoryId, UpdateCategoryTitleDTO updateCategoryTitleDTO);
-    CategoryDTO updateDescription(Long categoryId, UpdateCategoryDescriptionDTO updateCategoryDescriptionDTO);
+    CategoryDTO updateTitle(Long categoryId, NewCategoryTitleDTO updateCategoryTitleDTO);
+    CategoryDTO updateDescription(Long categoryId, NewCategoryDescriptionDTO updateCategoryDescriptionDTO);
 
     void deleteCategory(Long categoryId);
 }
