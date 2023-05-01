@@ -2,6 +2,7 @@ package huberts.spring.forumapp.report;
 
 import huberts.spring.forumapp.comment.Comment;
 import huberts.spring.forumapp.comment.CommentRepository;
+import huberts.spring.forumapp.common.UtilityService;
 import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
 import huberts.spring.forumapp.exception.report.ReportDoesntExistException;
 import huberts.spring.forumapp.exception.report.ReportRealiseException;
@@ -13,7 +14,6 @@ import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicRepository;
 import huberts.spring.forumapp.user.User;
 import huberts.spring.forumapp.user.UserRepository;
-import huberts.spring.forumapp.utility.UtilityService;
 import huberts.spring.forumapp.warning.WarningRepository;
 import huberts.spring.forumapp.warning.WarningService;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,13 +49,13 @@ class ReportServiceTest {
     @Mock
     private ReportRepository reportRepository;
     @Mock
-    private UtilityService utilityService;
-    @Mock
     private UserRepository userRepository;
     @Mock
     private WarningService warningService;
     @Mock
     private WarningRepository warningRepository;
+    @Mock
+    private UtilityService utilityService;
     @InjectMocks
     private ReportService service;
 
@@ -104,7 +104,6 @@ class ReportServiceTest {
 
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-            doCallRealMethod().when(utilityService).validateTopicClosed(any(Topic.class));
 
             ReportDTO reportCreated = service.createCommentReport(1L, reportReason, USERNAME);
             assertEquals(reportCreated.reason(), REPORT_REASON);
@@ -120,7 +119,6 @@ class ReportServiceTest {
 
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-            doCallRealMethod().when(utilityService).validateTopicClosed(any(Topic.class));
 
             assertThrows(TopicIsClosedException.class, () -> service.createCommentReport(1L, reportReason, USERNAME));
         }
@@ -142,10 +140,11 @@ class ReportServiceTest {
         @Test
         void shouldCreateReportForTopic() {
             ReportReasonDTO reportReason = new ReportReasonDTO(REPORT_REASON);
+
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
-            doCallRealMethod().when(utilityService).validateTopicClosed(any(Topic.class));
             ReportDTO reportCreated = service.createTopicReport(1L, reportReason, USERNAME);
+
             assertEquals(reportCreated.reason(), REPORT_REASON);
             assertEquals(reportCreated.reportedObject(), STRING_TOPIC);
             assertEquals(reportCreated.whoReported(), USERNAME);
@@ -156,9 +155,10 @@ class ReportServiceTest {
         void shouldThrowTopicIsClosedException_WhenTopicToReportIsClosed() {
             topic.setClosed(true);
             ReportReasonDTO reportReason = new ReportReasonDTO(REPORT_REASON);
+
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
-            doCallRealMethod().when(utilityService).validateTopicClosed(any(Topic.class));
+
             assertThrows(TopicIsClosedException.class, () -> service.createTopicReport(1L, reportReason, USERNAME));
         }
 
@@ -167,7 +167,6 @@ class ReportServiceTest {
         void shouldThrowTopicDoesntExistException_WhenTopicDoesntExist() {
             ReportReasonDTO reportReason = new ReportReasonDTO(REPORT_REASON);
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            doCallRealMethod().when(utilityService).validateTopicClosed(any(Topic.class));
             assertThrows(TopicDoesntExistException.class, () -> service.createTopicReport(1L, reportReason, USERNAME));
 
         }
@@ -280,10 +279,10 @@ class ReportServiceTest {
         @Test
         void shouldDeleteTopicThatAndWarnUser_WhenTopicHaveMoreThan5Reports() {
             topic.setReports(List.of(report, report, report, report, report));
+
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
-            doCallRealMethod().when(utilityService).validateTopicClosed(topic);
-            doCallRealMethod().when(utilityService).validateReports(topic.getReports());
             service.executeReportAndWarnTopicAuthor(1L);
+
             verify(topicRepository, times(1)).delete(topic);
             verify(warningService, times(1)).giveWarning(USERNAME);
         }
@@ -292,9 +291,9 @@ class ReportServiceTest {
         @Test
         void shouldThrowReportRealiseException_WhenTopicHasLessThan5Reports() {
             topic.setReports(List.of(report));
+
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
-            doCallRealMethod().when(utilityService).validateTopicClosed(topic);
-            doCallRealMethod().when(utilityService).validateReports(topic.getReports());
+
             assertThrows(ReportRealiseException.class, () -> service.executeReportAndWarnTopicAuthor(1L));
         }
 
@@ -303,8 +302,9 @@ class ReportServiceTest {
         void shouldThrowTopicIsClosedException_WhenTopicToExecuteReportsIsClosed() {
             topic.setClosed(true);
             topic.setReports(List.of(report, report, report, report, report));
+
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
-            doCallRealMethod().when(utilityService).validateTopicClosed(topic);
+
             assertThrows(TopicIsClosedException.class, () -> service.executeReportAndWarnTopicAuthor(1L));
         }
 
@@ -323,10 +323,10 @@ class ReportServiceTest {
         @Test
         void shouldDeleteCommentAndWarnUser_WhenTopicOfCommentHaveModeThan5Reports() {
             comment.setReports(List.of(report, report, report, report, report));
+
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-            doCallRealMethod().when(utilityService).validateTopicClosed(comment.getTopic());
-            doCallRealMethod().when(utilityService).validateReports(comment.getReports());
             service.executeReportAndWarnCommentAuthor(1L);
+
             verify(commentRepository, times(1)).delete(comment);
             verify(warningService, times(1)).giveWarning(USERNAME);
         }
@@ -336,8 +336,6 @@ class ReportServiceTest {
         void shouldThrowReportRealiseException_WhenCommentHasLessThan5Reports() {
             comment.setReports(List.of(report));
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-            doCallRealMethod().when(utilityService).validateTopicClosed(comment.getTopic());
-            doCallRealMethod().when(utilityService).validateReports(comment.getReports());
             assertThrows(ReportRealiseException.class, () -> service.executeReportAndWarnCommentAuthor(1L));
         }
 
@@ -346,8 +344,9 @@ class ReportServiceTest {
         void shouldThrowTopicIsClosedException_WhenTopicWhereIsCommentToExecuteReportsIsClosed() {
             topic.setClosed(true);
             topic.setReports(List.of(report, report, report, report, report));
+
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-            doCallRealMethod().when(utilityService).validateTopicClosed(topic);
+
             assertThrows(TopicIsClosedException.class, () -> service.executeReportAndWarnCommentAuthor(1L));
         }
 
