@@ -1,5 +1,5 @@
 <div align="center">
-  <h4 align="center">FORUM APP</h3>
+  <h1 align="center">FORUM APP</h3>
   <br />
 </div>
 
