@@ -1,11 +1,26 @@
-# Forum-app
+<div align="center">
+  <h4 align="center">FORUM APP</h3>
+  <br />
+</div>
 
-Guest:
-/getStaff - returns list of every admin and moderator | Method is finished
+# About the project
+Forum App is a REST API created using the Spring Boot framework with an MVC architecture. The API provides endpoints for creating and managing users, categories, topics, comments, likes, reports, and user warnings. The project implements custom exceptions, logs, and business logic, and is secured with JWT authentication, also endpoints are secured and they required authorization from the user.
 
-User:
+# Stack
+The following technologies were used to build the Forum App REST API:
+* Java 17
+* Maven
+* MySQL
+* SpringDoc OpenApi
+* Lombok
+* Spring Boot
+* Spring Data JPA
+* Spring Security
+* Jwt
+* Junit
+* Mockito
+* Test Containers
+* Spring Web MVC
 
+# Endpoints
 
-Moderator:
-
-Admin:
