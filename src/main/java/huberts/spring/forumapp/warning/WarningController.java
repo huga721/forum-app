@@ -17,20 +17,23 @@ public class WarningController {
 
     @ModeratorRole
     @GetMapping()
-    ResponseEntity<List<WarningDTO>> getAll() {
-        return ResponseEntity.ok(service.getAllWarnings());
+    ResponseEntity<List<WarningDTO>> getAllWarnings() {
+        List<WarningDTO> warnings = service.getAllWarnings();
+        return ResponseEntity.ok(warnings);
     }
 
     @ModeratorRole
     @GetMapping("/{warningId}")
-    ResponseEntity<WarningDTO> getById(@PathVariable Long warningId) {
-        return ResponseEntity.ok(service.getWarningById(warningId));
+    ResponseEntity<WarningDTO> getWarningById(@PathVariable Long warningId) {
+        WarningDTO warning = service.getWarningById(warningId);
+        return ResponseEntity.ok(warning);
     }
 
     @ModeratorRole
     @PostMapping("/{username}")
-    ResponseEntity<WarningDTO> giveWarning(@PathVariable String username) {
-        return ResponseEntity.ok(service.giveWarning(username));
+    ResponseEntity<WarningDTO> createWarning(@PathVariable String username) {
+        WarningDTO warning = service.createWarning(username);
+        return ResponseEntity.ok(warning);
     }
 
     @ModeratorRole
