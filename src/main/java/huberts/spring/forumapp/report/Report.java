@@ -5,6 +5,8 @@ import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Report {
 
     @Id
@@ -34,5 +37,6 @@ public class Report {
     @ManyToOne
     private Comment comment;
 
+    @CreatedDate
     private LocalDateTime createdAt;
 }
