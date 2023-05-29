@@ -24,7 +24,7 @@ public class ReportController {
 
     @UserRole
     @PostMapping("/topic/{topicId}")
-    ResponseEntity<ReportDTO> saveNewTopicReport(@PathVariable Long topicId, @RequestBody @Valid ReportReasonDTO reportReasonDTO,
+    ResponseEntity<ReportDTO> createTopicReport(@PathVariable Long topicId, @RequestBody @Valid ReportReasonDTO reportReasonDTO,
                                                  Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         ReportDTO reportCreated = service.createTopicReport(topicId, reportReasonDTO, username);
@@ -33,7 +33,7 @@ public class ReportController {
 
     @UserRole
     @PostMapping("/comment/{commentId}")
-    ResponseEntity<ReportDTO> saveNewCommentReport(@PathVariable Long commentId, @RequestBody @Valid ReportReasonDTO reportReasonDTO,
+    ResponseEntity<ReportDTO> createCommentReport(@PathVariable Long commentId, @RequestBody @Valid ReportReasonDTO reportReasonDTO,
                                                    Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         ReportDTO reportCreated = service.createCommentReport(commentId, reportReasonDTO, username);
@@ -64,20 +64,20 @@ public class ReportController {
     @ModeratorRole
     @PutMapping("/mark-as-seen/{reportId}")
     ResponseEntity<ReportDTO> updateReportAsSeen(@PathVariable Long reportId) {
-        ReportDTO report = service.markReportAsSeen(reportId);
+        ReportDTO report = service.updateReportAsSeen(reportId);
         return ResponseEntity.ok(report);
     }
 
     @ModeratorRole
     @DeleteMapping("/execute/topic/{topicId}")
-    ResponseEntity<Void> executeTopicReports(@PathVariable Long topicId) {
+    ResponseEntity<Void> executeReportAndWarnTopicAuthor(@PathVariable Long topicId) {
         service.executeReportAndWarnTopicAuthor(topicId);
         return ResponseEntity.noContent().build();
     }
 
     @ModeratorRole
     @DeleteMapping("/execute/comment/{commentId}")
-    ResponseEntity<Void> executeCommentReports(@PathVariable Long commentId) {
+    ResponseEntity<Void> executeReportAndWarnCommentAuthor(@PathVariable Long commentId) {
         service.executeReportAndWarnCommentAuthor(commentId);
         return ResponseEntity.noContent().build();
     }

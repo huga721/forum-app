@@ -40,7 +40,7 @@ public class LikeController {
 
     @UserRole
     @PostMapping("/topic/{topicId}")
-    ResponseEntity<LikeDTO> saveNewTopicLike(@PathVariable Long topicId, Authentication authenticatedUser) {
+    ResponseEntity<LikeDTO> createTopicLike(@PathVariable Long topicId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         LikeDTO likeCreated = service.createTopicLike(topicId, username);
         return ResponseEntity.created(URI.create("/likes")).body(likeCreated);
@@ -48,7 +48,7 @@ public class LikeController {
 
     @UserRole
     @PostMapping("/comment/{commentId}")
-    ResponseEntity<LikeDTO> saveNewCommentLike(@PathVariable Long commentId, Authentication authenticatedUser) {
+    ResponseEntity<LikeDTO> createCommentLike(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         LikeDTO likeCreated = service.createCommentLike(commentId, username);
         return ResponseEntity.created(URI.create("/likes")).body(likeCreated);

@@ -1,7 +1,7 @@
 package huberts.spring.forumapp.security;
 
 import huberts.spring.forumapp.user.User;
-import huberts.spring.forumapp.user.service.UserService;
+import huberts.spring.forumapp.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class DetailsService implements UserDetailsService {
+
     private final UserService userService;
 
     @Override

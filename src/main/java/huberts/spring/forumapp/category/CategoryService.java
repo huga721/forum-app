@@ -42,7 +42,6 @@ public class CategoryService implements CategoryServiceApi {
         Category categoryBuilt = CategoryMapper.buildNewCategory(createCategoryDTO);
         repository.save(categoryBuilt);
         return CategoryMapper.buildCategoryDTO(categoryBuilt);
-
     }
 
     @Override
@@ -58,7 +57,7 @@ public class CategoryService implements CategoryServiceApi {
                 .orElseThrow(() -> {
                     String errorMessage = String.format(CATEGORY_DOESNT_EXIST_EXCEPTION, categoryId);
                     log.error(EXCEPTION_OCCURRED, new CategoryDoesntExistException(errorMessage));
-                    throw new CategoryDoesntExistException(errorMessage);
+                    return new CategoryDoesntExistException(errorMessage);
                 });
     }
 

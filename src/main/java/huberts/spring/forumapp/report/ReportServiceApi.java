@@ -13,7 +13,7 @@ public interface ReportServiceApi {
     List<ReportDTO> getAllReports();
     List<ReportDTO> getAllNotSeenReports();
 
-    ReportDTO markReportAsSeen(Long reportId);
+    ReportDTO updateReportAsSeen(Long reportId);
 
     void executeReportAndWarnTopicAuthor(Long topicId);
     void executeReportAndWarnCommentAuthor(Long commentId);

@@ -5,8 +5,8 @@ import huberts.spring.forumapp.comment.Comment;
 import huberts.spring.forumapp.comment.CommentMapper;
 import huberts.spring.forumapp.like.Like;
 import huberts.spring.forumapp.like.LikeMapper;
+import huberts.spring.forumapp.topic.dto.CreateTopicDTO;
 import huberts.spring.forumapp.topic.dto.ShortTopicDTO;
-import huberts.spring.forumapp.topic.dto.TopicCreateDTO;
 import huberts.spring.forumapp.topic.dto.TopicDTO;
 import huberts.spring.forumapp.user.User;
 import org.springframework.stereotype.Component;
@@ -19,16 +19,15 @@ import java.util.stream.Collectors;
 @Component
 public class TopicMapper {
 
-    public static Topic buildNewTopic(TopicCreateDTO topic, Category category, User author) {
+    public static Topic buildNewTopic(CreateTopicDTO topic, Category category, User author) {
         List<Like> emptyLikes = new ArrayList<>();
         List<Comment> emptyComments = new ArrayList<>();
         return Topic.builder()
-                .title(topic.getTitle())
-                .content(topic.getContent())
+                .title(topic.title())
+                .content(topic.content())
                 .user(author)
                 .category(category)
                 .closed(false)
-                .createdAt(LocalDateTime.now())
                 .likes(emptyLikes)
                 .comments(emptyComments)
                 .build();

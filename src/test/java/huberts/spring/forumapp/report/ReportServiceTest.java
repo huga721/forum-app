@@ -2,7 +2,6 @@ package huberts.spring.forumapp.report;
 
 import huberts.spring.forumapp.comment.Comment;
 import huberts.spring.forumapp.comment.CommentRepository;
-import huberts.spring.forumapp.common.UtilityService;
 import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
 import huberts.spring.forumapp.exception.report.ReportDoesntExistException;
 import huberts.spring.forumapp.exception.report.ReportRealiseException;
@@ -54,8 +53,6 @@ class ReportServiceTest {
     private WarningService warningService;
     @Mock
     private WarningRepository warningRepository;
-    @Mock
-    private UtilityService utilityService;
     @InjectMocks
     private ReportService service;
 
@@ -201,6 +198,7 @@ class ReportServiceTest {
         void shouldReturnAllReports() {
             when(reportRepository.findAll()).thenReturn(List.of(report, report));
             List<ReportDTO> reports = service.getAllReports();
+
             assertEquals(reports.size(), 2);
             assertEquals(reports.get(0).whoReported(), USERNAME);
         }
@@ -224,8 +222,10 @@ class ReportServiceTest {
             Report seenReport = Report.builder()
                     .seen(true)
                     .build();
+
             when(reportRepository.findAll()).thenReturn(List.of(seenReport, report, seenReport));
             List<ReportDTO> reports = service.getAllNotSeenReports();
+
             assertEquals(reports.size(), 1);
             assertFalse(reports.get(0).seen());
         }
@@ -251,7 +251,7 @@ class ReportServiceTest {
         void shouldSetFieldSeenToTrue() {
             report.setSeen(false);
             when(reportRepository.findById(any(Long.class))).thenReturn(Optional.of(report));
-            ReportDTO report = service.markReportAsSeen(1L);
+            ReportDTO report = service.updateReportAsSeen(1L);
             assertTrue(report.seen());
         }
 
@@ -260,14 +260,14 @@ class ReportServiceTest {
         void shouldDoNothing_WhenReportFieldSeenIsAlreadyTrue() {
             report.setSeen(true);
             when(reportRepository.findById(any(Long.class))).thenReturn(Optional.of(report));
-            ReportDTO report = service.markReportAsSeen(1L);
+            ReportDTO report = service.updateReportAsSeen(1L);
             assertTrue(report.seen());
         }
 
         @DisplayName("Should throw ReportDoesntExistException when report with given id doesn't exist")
         @Test
         void shouldThrowReportDoesntExistException_WhenReportWithGivenIdDoesntExist() {
-            assertThrows(ReportDoesntExistException.class, () -> service.markReportAsSeen(1L));
+            assertThrows(ReportDoesntExistException.class, () -> service.updateReportAsSeen(1L));
         }
     }
 
@@ -284,7 +284,7 @@ class ReportServiceTest {
             service.executeReportAndWarnTopicAuthor(1L);
 
             verify(topicRepository, times(1)).delete(topic);
-            verify(warningService, times(1)).giveWarning(USERNAME);
+            verify(warningService, times(1)).createWarning(USERNAME);
         }
 
         @DisplayName("Should throw ReportRealiseException when topic has less than 5 reports")
@@ -328,7 +328,7 @@ class ReportServiceTest {
             service.executeReportAndWarnCommentAuthor(1L);
 
             verify(commentRepository, times(1)).delete(comment);
-            verify(warningService, times(1)).giveWarning(USERNAME);
+            verify(warningService, times(1)).createWarning(USERNAME);
         }
 
         @DisplayName("Should throw ReportRealiseException when comment has less than 5 reports")
