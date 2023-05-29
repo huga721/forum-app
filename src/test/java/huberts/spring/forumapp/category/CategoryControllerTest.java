@@ -192,9 +192,9 @@ class CategoryControllerTest extends ContainerIT {
         }
     }
 
-    @DisplayName("patch /admin/edit/title/{categoryId} endpoint")
+    @DisplayName("patch /categories/admin/edit/title/{categoryId} endpoint")
     @Nested
-    class ModeratorBanUsernameTests {
+    class CategoriesAdminEditTitleCategoryIdTest {
 
         @DisplayName("Should change title")
         @Test
