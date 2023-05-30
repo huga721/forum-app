@@ -65,7 +65,7 @@ public class LikeMapper {
                 .collect(Collectors.toList());
     }
 
-    public static List<LikeListDTO> mapLikesToLikeListDTO(List<Like> likes) {
+    public static List<LikeListDTO> mapLikeListToLikeListDTO(List<Like> likes) {
         return likes.stream()
                 .map(LikeMapper::buildLikeListDTO)
                 .collect(Collectors.toList());

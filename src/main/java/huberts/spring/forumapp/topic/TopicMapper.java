@@ -11,7 +11,6 @@ import huberts.spring.forumapp.topic.dto.TopicDTO;
 import huberts.spring.forumapp.user.User;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class TopicMapper {
 
-    public static Topic buildNewTopic(CreateTopicDTO topic, Category category, User author) {
+    public static Topic buildTopic(CreateTopicDTO topic, Category category, User author) {
         List<Like> emptyLikes = new ArrayList<>();
         List<Comment> emptyComments = new ArrayList<>();
         return Topic.builder()
@@ -45,12 +44,12 @@ public class TopicMapper {
                 .categoryName(categoryName)
                 .createdTime(topic.getCreatedAt())
                 .lastEdit(topic.getLastEdit())
-                .likes(LikeMapper.mapLikesToLikeListDTO(topic.getLikes()))
-                .comments(CommentMapper.mapToCommentDTO(topic.getComments()))
+                .likes(LikeMapper.mapLikeListToLikeListDTO(topic.getLikes()))
+                .comments(CommentMapper.mapCommentListToCommentDTOList(topic.getComments()))
                 .build();
     }
 
-    public static List<TopicDTO> mapFromListTopic(List<Topic> topics) {
+    public static List<TopicDTO> mapTopicListToTopicDTOList(List<Topic> topics) {
         return topics.stream()
                 .map(TopicMapper::buildTopicDTO)
                 .collect(Collectors.toList());
@@ -68,7 +67,7 @@ public class TopicMapper {
                 .build();
     }
 
-    public static List<ShortTopicDTO> mapShortTopicDTOList(List<Topic> topics) {
+    public static List<ShortTopicDTO> mapTopicListToShortTopicDTOList(List<Topic> topics) {
         return topics.stream()
                 .map(TopicMapper::buildShortTopicDTO)
                 .collect(Collectors.toList());

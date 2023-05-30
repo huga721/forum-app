@@ -33,7 +33,7 @@ public class WarningMapper {
             return "Not banned";
     }
 
-    public static List<WarningDTO> mapWarningsToWarningsDTO(List<Warning> warnings) {
+    public static List<WarningDTO> mapWarningListToWarningDTOList(List<Warning> warnings) {
         return warnings.stream()
                 .map(WarningMapper::buildWarningDTO)
                 .collect(Collectors.toList());

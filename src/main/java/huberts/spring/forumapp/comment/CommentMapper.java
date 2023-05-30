@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public class CommentMapper {
 
-    public static Comment buildNewComment(User user, Topic topic, String content) {
+    public static Comment buildComment(User user, Topic topic, String content) {
         return Comment.builder()
                 .content(content)
                 .user(user)
@@ -32,17 +32,17 @@ public class CommentMapper {
                 .reportsReceived(comment.getReports().size())
                 .lastEdit(comment.getLastEdit())
                 .content(comment.getContent())
-                .likes(mapToLikeDTO(comment.getLikes()))
+                .likes(mapLikeListToLikeListDTO(comment.getLikes()))
                 .build();
     }
 
-    public static List<CommentDTO> mapToCommentDTO(List<Comment> comments){
+    public static List<CommentDTO> mapCommentListToCommentDTOList(List<Comment> comments){
         return comments.stream()
                 .map(CommentMapper::buildCommentDTO)
                 .collect(Collectors.toList());
     }
 
-    private static List<LikeListDTO> mapToLikeDTO(List<Like> likes) {
-        return LikeMapper.mapLikesToLikeListDTO(likes);
+    private static List<LikeListDTO> mapLikeListToLikeListDTO(List<Like> likes) {
+        return LikeMapper.mapLikeListToLikeListDTO(likes);
     }
 }

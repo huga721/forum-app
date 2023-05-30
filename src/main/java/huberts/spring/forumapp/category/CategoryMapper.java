@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public class CategoryMapper {
 
-    public static Category buildNewCategory(CreateCategoryDTO createCategoryDTO) {
+    public static Category buildCategory(CreateCategoryDTO createCategoryDTO) {
         List<Topic> emptyList = new ArrayList<>();
         return Category.builder()
                 .title(createCategoryDTO.title())
@@ -28,17 +28,17 @@ public class CategoryMapper {
         return CategoryDTO.builder()
                 .title(category.getTitle())
                 .description(category.getDescription())
-                .topics(returnShortTopicDTO(topics))
+                .topics(mapTopicListToShortTopicDTOList(topics))
                 .build();
     }
 
-    public static List<CategoryDTO> mapFromListCategory(List<Category> categories) {
+    public static List<CategoryDTO> mapCategoryListToCategoryDTOList(List<Category> categories) {
         return categories.stream()
                 .map(CategoryMapper::buildCategoryDTO)
                 .collect(Collectors.toList());
     }
 
-    private static List<ShortTopicDTO> returnShortTopicDTO(List<Topic> topics) {
-        return TopicMapper.mapShortTopicDTOList(topics);
+    private static List<ShortTopicDTO> mapTopicListToShortTopicDTOList(List<Topic> topics) {
+        return TopicMapper.mapTopicListToShortTopicDTOList(topics);
     }
 }

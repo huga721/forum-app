@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Component
 public class UserMapper {
 
@@ -29,17 +28,11 @@ public class UserMapper {
                 .build();
     }
 
-    public static List<UserDTO> mapFromList (List<User> users) {
-        return users.stream()
-                .map(UserMapper::buildUserDTO)
-                .collect(Collectors.toList());
-    }
-
     public static UserDTO buildUserDTO(User user) {
         return UserDTO.builder()
                 .username(user.getUsername())
                 .role(user.getRole().getName())
-                .topics(mapToTopicDTO(user.getTopics()))
+                .topics(mapTopicListToShortTopicDTOList(user.getTopics()))
                 .warningPoints(user.getWarnings().size() * 20)
                 .blocked(user.isBlocked())
                 .createdTime(user.getCreatedAt())
@@ -47,7 +40,13 @@ public class UserMapper {
                 .build();
     }
 
-    private static List<ShortTopicDTO> mapToTopicDTO(List<Topic> topics) {
-        return TopicMapper.mapShortTopicDTOList(topics);
+    public static List<UserDTO> mapUserListToUserDTOList(List<User> users) {
+        return users.stream()
+                .map(UserMapper::buildUserDTO)
+                .collect(Collectors.toList());
+    }
+
+    private static List<ShortTopicDTO> mapTopicListToShortTopicDTOList(List<Topic> topics) {
+        return TopicMapper.mapTopicListToShortTopicDTOList(topics);
     }
 }
