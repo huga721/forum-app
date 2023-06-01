@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import huberts.spring.forumapp.ContainerIT;
 import huberts.spring.forumapp.category.dto.CreateCategoryDTO;
 import huberts.spring.forumapp.category.dto.NewCategoryDescriptionDTO;
-import huberts.spring.forumapp.category.dto.UpdateTopicCategoryDTO;
+import huberts.spring.forumapp.category.dto.NewCategoryTitleDTO;
 import huberts.spring.forumapp.exception.category.CategoryAlreadyExistException;
 import huberts.spring.forumapp.exception.category.CategoryDescriptionException;
 import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
@@ -199,7 +199,7 @@ class CategoryControllerTest extends ContainerIT {
         @DisplayName("Should change title")
         @Test
         void shouldChangeTitle() throws Exception {
-            UpdateTopicCategoryDTO titleDTO = new UpdateTopicCategoryDTO(TITLE_TO_CHANGE);
+            NewCategoryTitleDTO titleDTO = new NewCategoryTitleDTO(TITLE_TO_CHANGE);
             String titleJson = objectMapper.writeValueAsString(titleDTO);
             String adminToken = JwtKey.getAdminJwt(mockMvc, objectMapper);
 
@@ -214,7 +214,7 @@ class CategoryControllerTest extends ContainerIT {
         @DisplayName("Should throw CategoryTitleException when given title is the same as title by given id, HTTP status 400")
         @Test
         void shouldThrowCategoryTitleException_WhenGivenTitleIsTheSameAsTitleByGivenId() throws Exception {
-            UpdateTopicCategoryDTO titleDTO = new UpdateTopicCategoryDTO(TITLE_1);
+            NewCategoryTitleDTO titleDTO = new NewCategoryTitleDTO(TITLE_1);
             String titleJson = objectMapper.writeValueAsString(titleDTO);
             String adminToken = JwtKey.getAdminJwt(mockMvc, objectMapper);
 
@@ -229,7 +229,7 @@ class CategoryControllerTest extends ContainerIT {
         @DisplayName("Should throw CategoryDoesntExistException when category doesn't exist by id, HTTP status 404")
         @Test
         void shouldThrowCategoryDoesntExistException_WhenCategoryDoesntExistById() throws Exception {
-            UpdateTopicCategoryDTO titleDTO = new UpdateTopicCategoryDTO(NEW_TITLE);
+            NewCategoryTitleDTO titleDTO = new NewCategoryTitleDTO(NEW_TITLE);
             String titleJson = objectMapper.writeValueAsString(titleDTO);
             String adminToken = JwtKey.getAdminJwt(mockMvc, objectMapper);
 
@@ -244,7 +244,7 @@ class CategoryControllerTest extends ContainerIT {
         @DisplayName("Should throw CategoryTitleException when category with given title already exists, HTTP status 400")
         @Test
         void shouldThrowCategoryTitleException_WhenCategoryWithGivenTitleAlreadyExists() throws Exception {
-            UpdateTopicCategoryDTO titleDTO = new UpdateTopicCategoryDTO(TITLE_1);
+            NewCategoryTitleDTO titleDTO = new NewCategoryTitleDTO(TITLE_1);
             String titleJson = objectMapper.writeValueAsString(titleDTO);
             String adminToken = JwtKey.getAdminJwt(mockMvc, objectMapper);
 
@@ -259,7 +259,7 @@ class CategoryControllerTest extends ContainerIT {
         @DisplayName("Should throw MethodArgumentNotValidException when title is empty, HTTP status 400")
         @Test
         void shouldThrowMethodArgumentNotValidException_WhenTitleIsEmpty() throws Exception {
-            UpdateTopicCategoryDTO titleDTO = new UpdateTopicCategoryDTO(EMPTY);
+            NewCategoryTitleDTO titleDTO = new NewCategoryTitleDTO(EMPTY);
             String titleJson = objectMapper.writeValueAsString(titleDTO);
             String adminToken = JwtKey.getAdminJwt(mockMvc, objectMapper);
 
@@ -274,7 +274,7 @@ class CategoryControllerTest extends ContainerIT {
         @DisplayName("Should not change title when JWT is wrong, HTTP status 401")
         @Test
         void shouldNotChangeTitle_WhenJWTIsWrong() throws Exception {
-            UpdateTopicCategoryDTO titleDTO = new UpdateTopicCategoryDTO(NEW_TITLE);
+            NewCategoryTitleDTO titleDTO = new NewCategoryTitleDTO(NEW_TITLE);
             String titleJson = objectMapper.writeValueAsString(titleDTO);
 
             mockMvc.perform(patch(CHANGE_TITLE_ENDPOINT)
@@ -287,7 +287,7 @@ class CategoryControllerTest extends ContainerIT {
         @DisplayName("Should not change title when requested by moderator, HTTP status 403")
         @Test
         void shouldNotChangeTitle_WhenRequestedByModerator() throws Exception {
-            UpdateTopicCategoryDTO titleDTO = new UpdateTopicCategoryDTO(NEW_TITLE);
+            NewCategoryTitleDTO titleDTO = new NewCategoryTitleDTO(NEW_TITLE);
             String titleJson = objectMapper.writeValueAsString(titleDTO);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
 
@@ -299,7 +299,7 @@ class CategoryControllerTest extends ContainerIT {
         }
     }
 
-    @DisplayName("get /categories/admin/edit/description/{categoryId} endpoint")
+    @DisplayName("patch /categories/admin/edit/description/{categoryId} endpoint")
     @Nested
     class CategoriesAdminEditDescriptionCategoryIdTests {
 
