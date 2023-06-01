@@ -39,7 +39,7 @@ public class CategoryService implements CategoryServiceApi {
     }
 
     private CategoryDTO buildAndSaveCategory(CreateCategoryDTO createCategoryDTO) {
-        Category categoryBuilt = CategoryMapper.buildNewCategory(createCategoryDTO);
+        Category categoryBuilt = CategoryMapper.buildCategory(createCategoryDTO);
         repository.save(categoryBuilt);
         return CategoryMapper.buildCategoryDTO(categoryBuilt);
     }
@@ -64,7 +64,7 @@ public class CategoryService implements CategoryServiceApi {
     @Override
     public List<CategoryDTO> getAllCategories() {
         log.info("Getting all categories");
-        return CategoryMapper.mapFromListCategory(repository.findAll());
+        return CategoryMapper.mapCategoryListToCategoryDTOList(repository.findAll());
     }
 
     @Override

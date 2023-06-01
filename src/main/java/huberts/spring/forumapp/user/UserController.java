@@ -5,7 +5,6 @@ import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import huberts.spring.forumapp.security.annotation.UserRole;
 import huberts.spring.forumapp.user.dto.PasswordDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
-import huberts.spring.forumapp.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +21,13 @@ public class UserController {
     private final UserService service;
 
     @GetMapping("/staff")
-    ResponseEntity<List<UserDTO>> getStaffMembers() {
+    ResponseEntity<List<UserDTO>> getAllModeratorAndAdminUsers() {
         List<UserDTO> staffMembers = service.getAllModeratorAndAdminUsers();
         return ResponseEntity.ok(staffMembers);
     }
 
     @GetMapping("/{username}")
-    ResponseEntity<UserDTO> getUser(@PathVariable String username) {
+    ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
         UserDTO user = service.getUserByUsername(username);
         return ResponseEntity.ok(user);
     }
@@ -52,7 +51,7 @@ public class UserController {
 
     @UserRole
     @DeleteMapping("/delete")
-    ResponseEntity<Void> deleteAccount(Authentication authenticatedUser) {
+    ResponseEntity<Void> deleteUserByUsername(Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         service.deleteUserByUsername(username);
         return ResponseEntity.ok().build();
@@ -81,7 +80,7 @@ public class UserController {
 
     @ModeratorRole
     @PatchMapping("/moderator/change-password/{username}")
-    ResponseEntity<UserDTO> changeUserPassword(@PathVariable String username,
+    ResponseEntity<UserDTO> changePassword(@PathVariable String username,
                                                @Valid @RequestBody PasswordDTO password) {
         UserDTO user = service.changePassword(password, username);
         return ResponseEntity.ok(user);

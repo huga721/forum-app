@@ -1,8 +1,8 @@
 package huberts.spring.forumapp.security;
 
-import huberts.spring.forumapp.user.service.UserService;
+import huberts.spring.forumapp.user.UserService;
 import huberts.spring.forumapp.user.dto.LoginDTO;
-import huberts.spring.forumapp.user.dto.RegisterDTO;
+import huberts.spring.forumapp.user.dto.CredentialsDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,9 @@ public class SecurityController {
     private final UserService userService;
 
     @PostMapping("/register")
-    ResponseEntity<UserDTO> registerUser (@RequestBody @Valid RegisterDTO register) {
-        return ResponseEntity.created(URI.create("/" + register.getUsername())).body(userService.createUser(register));
+    ResponseEntity<UserDTO> registerUser (@RequestBody @Valid CredentialsDTO credentialsDTO) {
+        UserDTO user = userService.createUser(credentialsDTO);
+        return ResponseEntity.created(URI.create("/" + credentialsDTO.username())).body(user);
     }
     @PostMapping("/login")
     ResponseEntity<Void> loginUser (@RequestBody LoginDTO credentials) {

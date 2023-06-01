@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/topics")
 @RequiredArgsConstructor
 public class TopicController {
+
     private final TopicService service;
 
     @GetMapping()
@@ -28,16 +29,16 @@ public class TopicController {
     }
 
     @GetMapping("/{topicId}")
-    ResponseEntity<TopicDTO> getById(@PathVariable Long topicId) {
+    ResponseEntity<TopicDTO> getTopicById(@PathVariable Long topicId) {
         TopicDTO topic = service.getTopicById(topicId);
         return ResponseEntity.ok(topic);
     }
 
     @UserRole
     @PostMapping("/create")
-    ResponseEntity<TopicDTO> saveNewTopic(@RequestBody @Valid CreateTopicDTO create, Authentication authenticatedUser) {
+    ResponseEntity<TopicDTO> createTopic(@RequestBody @Valid CreateTopicDTO createTopicDTO, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        TopicDTO topicCreated = service.createTopic(create, username);
+        TopicDTO topicCreated = service.createTopic(createTopicDTO, username);
         return ResponseEntity.created(URI.create("/topics")).body(topicCreated);
     }
 
@@ -51,45 +52,47 @@ public class TopicController {
 
     @UserRole
     @PatchMapping("/close-topic/{topicId}")
-    ResponseEntity<TopicDTO> closeTopicByAuthor(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeTopicDTO,
+    ResponseEntity<TopicDTO> closeTopicByAuthor(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeReasonDTO,
                                                 Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        return ResponseEntity.ok(service.closeTopicByAuthor(topicId, closeTopicDTO, username));
+        TopicDTO topicClosed = service.closeTopicByAuthor(topicId, closeReasonDTO, username);
+        return ResponseEntity.ok(topicClosed);
     }
 
     @UserRole
     @PatchMapping("/edit/{topicId}")
-    ResponseEntity<TopicDTO> changeContentOrTitleByAuthor(@RequestBody UpdateTopicDTO topicEditDTO, @PathVariable Long topicId,
+    ResponseEntity<TopicDTO> updateTopicByAuthor(@RequestBody UpdateTopicDTO updateTopicDTO, @PathVariable Long topicId,
                                                           Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        TopicDTO topicChanged = service.updateTopicByAuthor(topicId, topicEditDTO, username);
+        TopicDTO topicChanged = service.updateTopicByAuthor(topicId, updateTopicDTO, username);
         return ResponseEntity.ok(topicChanged);
     }
 
     @ModeratorRole
     @PatchMapping("/moderator/edit/{topicId}")
-    ResponseEntity<TopicDTO> changeContentOrTitleByModerator(@RequestBody UpdateTopicDTO topicEditDTO,
+    ResponseEntity<TopicDTO> updateTopicByModerator(@RequestBody UpdateTopicDTO updateTopicDTO,
                                                              @PathVariable Long topicId, Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
-        TopicDTO topicChanged = service.updateTopicByModerator(topicId, topicEditDTO, moderatorName);
+        TopicDTO topicChanged = service.updateTopicByModerator(topicId, updateTopicDTO, moderatorName);
         return ResponseEntity.ok(topicChanged);
     }
 
     @ModeratorRole
     @PatchMapping("/moderator/change-category/{topicId}")
-    ResponseEntity<TopicDTO> changeCategoryOfTopicByModerator(@RequestBody @Valid UpdateTopicCategoryDTO categoryTitleDTO,
+    ResponseEntity<TopicDTO> changeCategoryOfTopic(@RequestBody @Valid UpdateTopicCategoryDTO updateTopicCategoryDTO,
                                                               @PathVariable Long topicId, Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
-        TopicDTO topicChanged = service.changeCategoryOfTopic(topicId, categoryTitleDTO, moderatorName);
+        TopicDTO topicChanged = service.changeCategoryOfTopic(topicId, updateTopicCategoryDTO, moderatorName);
         return ResponseEntity.ok(topicChanged);
     }
 
     @ModeratorRole
     @PatchMapping("/moderator/close-topic/{topicId}")
-    ResponseEntity<TopicDTO> closeTopicById(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeTopicDTO,
+    ResponseEntity<TopicDTO> closeTopicByModerator(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeReasonDTO,
                                             Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
-        return ResponseEntity.ok(service.closeTopicByModerator(topicId, closeTopicDTO, moderatorName));
+        TopicDTO topicClosed = service.closeTopicByModerator(topicId, closeReasonDTO, moderatorName);
+        return ResponseEntity.ok(topicClosed);
     }
 
     @ModeratorRole

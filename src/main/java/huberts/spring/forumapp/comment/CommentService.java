@@ -50,7 +50,7 @@ public class CommentService implements CommentServiceApi {
     }
 
     private CommentDTO buildAndSaveComment(User user, Topic topic, CommentContentDTO commentContentDTO) {
-        Comment comment = CommentMapper.buildNewComment(user, topic, commentContentDTO.content());
+        Comment comment = CommentMapper.buildComment(user, topic, commentContentDTO.content());
         commentRepository.save(comment);
         return CommentMapper.buildCommentDTO(comment);
     }
@@ -91,14 +91,14 @@ public class CommentService implements CommentServiceApi {
     @Override
     public List<CommentDTO> getAllComments() {
         log.info("Getting all comments");
-        return CommentMapper.mapToCommentDTO(commentRepository.findAll());
+        return CommentMapper.mapCommentListToCommentDTOList(commentRepository.findAll());
     }
 
     @Override
     public List<CommentDTO> getAllCommentsByTopicId(Long commentId) {
         log.info("Getting all comments by topic with id {}", commentId);
         Topic topicFound = findTopicById(commentId);
-        return CommentMapper.mapToCommentDTO(commentRepository.findAllByTopic(topicFound));
+        return CommentMapper.mapCommentListToCommentDTOList(commentRepository.findAllByTopic(topicFound));
     }
 
     @Override
@@ -109,7 +109,7 @@ public class CommentService implements CommentServiceApi {
             log.error(EXCEPTION_OCCURRED, new UserDoesntExistException(errorMessage));
             return new UserDoesntExistException(errorMessage);
         });
-        return CommentMapper.mapToCommentDTO(commentRepository.findAllByUser(user));
+        return CommentMapper.mapCommentListToCommentDTOList(commentRepository.findAllByUser(user));
     }
 
     @Override

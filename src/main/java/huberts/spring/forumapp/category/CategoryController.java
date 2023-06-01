@@ -33,14 +33,14 @@ public class CategoryController {
 
     @ModeratorRole
     @PostMapping("/moderator/create")
-    ResponseEntity<CategoryDTO> saveNewCategory(@RequestBody @Valid CreateCategoryDTO createCategoryDTO) {
+    ResponseEntity<CategoryDTO> createCategory(@RequestBody @Valid CreateCategoryDTO createCategoryDTO) {
         CategoryDTO categoryCreated = service.createCategory(createCategoryDTO);
         return ResponseEntity.created(URI.create("/categories")).body(categoryCreated);
     }
 
     @AdminRole
     @PatchMapping("/admin/edit/title/{categoryId}")
-    ResponseEntity<CategoryDTO> editTitle(@PathVariable Long categoryId,
+    ResponseEntity<CategoryDTO> updateTitle(@PathVariable Long categoryId,
                                           @RequestBody @Valid NewCategoryTitleDTO updateCategoryTitleDTO) {
         CategoryDTO categoryEdited = service.updateTitle(categoryId, updateCategoryTitleDTO);
         return ResponseEntity.ok(categoryEdited);
@@ -48,7 +48,7 @@ public class CategoryController {
 
     @AdminRole
     @PatchMapping("/admin/edit/description/{categoryId}")
-    ResponseEntity<CategoryDTO> editDescription(@PathVariable Long categoryId,
+    ResponseEntity<CategoryDTO> updateDescription(@PathVariable Long categoryId,
                                                 @RequestBody @Valid NewCategoryDescriptionDTO updateCategoryDescriptionDTO) {
         CategoryDTO categoryEdited = service.updateDescription(categoryId, updateCategoryDescriptionDTO);
         return ResponseEntity.ok(categoryEdited);

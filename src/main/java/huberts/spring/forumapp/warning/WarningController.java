@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,7 @@ public class WarningController {
     @PostMapping("/{username}")
     ResponseEntity<WarningDTO> createWarning(@PathVariable String username) {
         WarningDTO warning = service.createWarning(username);
-        return ResponseEntity.ok(warning);
+        return ResponseEntity.created(URI.create("/warnings")).body(warning);
     }
 
     @ModeratorRole

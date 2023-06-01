@@ -32,7 +32,7 @@ public class LikeController {
 
     @UserRole
     @GetMapping("/user")
-    ResponseEntity<List<LikeDTO>> getAllLikesOfAuthenticatedUser(Authentication authenticatedUser) {
+    ResponseEntity<List<LikeDTO>> getAllLikesByUsername(Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         List<LikeDTO> likes = service.getAllLikesByUsername(username);
         return ResponseEntity.ok(likes);

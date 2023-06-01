@@ -35,7 +35,7 @@ public class CommentController {
     }
 
     @GetMapping("/topic/{commentId}")
-    ResponseEntity<List<CommentDTO>> getAllCommentsOfTopic(@PathVariable Long commentId) {
+    ResponseEntity<List<CommentDTO>> getAllCommentsByTopicId(@PathVariable Long commentId) {
         List<CommentDTO> commentsOfTopic = service.getAllCommentsByTopicId(commentId);
         return ResponseEntity.ok(commentsOfTopic);
     }
@@ -48,7 +48,7 @@ public class CommentController {
 
     @UserRole
     @GetMapping("/user")
-    ResponseEntity<List<CommentDTO>> getAllCurrentUserComments(Authentication authenticatedUser) {
+    ResponseEntity<List<CommentDTO>> getAllCommentsByUsername(Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         List<CommentDTO> commentsOfCurrentUser = service.getAllCommentsByUsername(username);
         return ResponseEntity.ok(commentsOfCurrentUser);
@@ -56,7 +56,7 @@ public class CommentController {
 
     @UserRole
     @PostMapping("/topic/{topicId}")
-    ResponseEntity<CommentDTO> saveNewComment(@PathVariable Long topicId, @RequestBody @Valid CommentContentDTO createCommentDTO,
+    ResponseEntity<CommentDTO> createComment(@PathVariable Long topicId, @RequestBody @Valid CommentContentDTO createCommentDTO,
                                               Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         CommentDTO commentCreated = service.createComment(topicId, createCommentDTO, username);
@@ -65,7 +65,7 @@ public class CommentController {
 
     @UserRole
     @DeleteMapping("/delete/{commentId}")
-    ResponseEntity<Void> deleteCommentByCurrentUser(@PathVariable Long commentId, Authentication authenticatedUser) {
+    ResponseEntity<Void> deleteCommentByAuthor(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         service.deleteCommentByAuthor(commentId, username);
         return ResponseEntity.noContent().build();
@@ -73,7 +73,7 @@ public class CommentController {
 
     @UserRole
     @PatchMapping("/edit/{commentId}")
-    ResponseEntity<CommentDTO> editCommentByCurrentUser(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO contentDTO,
+    ResponseEntity<CommentDTO> updateCommentByAuthor(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO contentDTO,
                                                  Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         CommentDTO commentEdited = service.updateCommentByAuthor(commentId, contentDTO, username);
@@ -82,7 +82,7 @@ public class CommentController {
 
     @ModeratorRole
     @DeleteMapping("/moderator/delete/{commentId}")
-    ResponseEntity<Void> deleteComment(@PathVariable Long commentId, Authentication authenticatedUser) {
+    ResponseEntity<Void> deleteCommentByModerator(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         service.deleteCommentByModerator(commentId, username);
         return ResponseEntity.noContent().build();
@@ -90,7 +90,7 @@ public class CommentController {
 
     @ModeratorRole
     @PatchMapping("/moderator/edit/{commentId}")
-    ResponseEntity<CommentDTO> editCommentByModerator(@PathVariable Long commentId,
+    ResponseEntity<CommentDTO> updateCommentByModerator(@PathVariable Long commentId,
                                                       @RequestBody @Valid CommentContentDTO contentDTO,
                                                       Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
