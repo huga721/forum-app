@@ -85,7 +85,7 @@ class CommentControllerTest extends ContainerIT {
         }
     }
 
-    @DisplayName("get /{commentId} endpoint")
+    @DisplayName("get /comments/{commentId} endpoint")
     @Nested
     class CommentIdTests {
 
@@ -347,6 +347,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_AUTHOR_ENDPOINT)
                             .header(AUTHORIZATION, userToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -361,6 +362,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_AUTHOR_DOESNT_EXIST_ENDPOINT)
                             .header(AUTHORIZATION, userToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -375,6 +377,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_AUTHOR_ENDPOINT)
                             .header(AUTHORIZATION, moderatorToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -389,6 +392,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_AUTHOR_TOPIC_IS_CLOSED_ENDPOINT)
                             .header(AUTHORIZATION, userToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -403,6 +407,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(EMPTY_STRING);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_AUTHOR_ENDPOINT)
                             .header(AUTHORIZATION, userToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -416,6 +421,7 @@ class CommentControllerTest extends ContainerIT {
         void shouldNotEditComment_WhenJWTIsWrong() throws Exception {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_AUTHOR_ENDPOINT)
                             .header(AUTHORIZATION, INVALID_TOKEN)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -428,6 +434,7 @@ class CommentControllerTest extends ContainerIT {
         void shouldNotEditComment_WhenNoAuthorization() throws Exception {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_AUTHOR_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(commentContentJson))
@@ -504,6 +511,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_MODERATOR_ENDPOINT)
                             .header(AUTHORIZATION, moderatorToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -532,6 +540,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_MODERATOR_TOPIC_IS_CLOSED_ENDPOINT)
                             .header(AUTHORIZATION, moderatorToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -546,6 +555,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(EMPTY_STRING);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_MODERATOR_ENDPOINT)
                             .header(AUTHORIZATION, moderatorToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -560,6 +570,7 @@ class CommentControllerTest extends ContainerIT {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_MODERATOR_ENDPOINT)
                             .header(AUTHORIZATION, userToken)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -572,6 +583,7 @@ class CommentControllerTest extends ContainerIT {
         void shouldNotEditComment_WhenJWTIsWrong() throws Exception {
             CommentContentDTO commentContent = new CommentContentDTO(EMPTY_STRING);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_MODERATOR_ENDPOINT)
                             .header(AUTHORIZATION, INVALID_TOKEN)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -584,6 +596,7 @@ class CommentControllerTest extends ContainerIT {
         void shouldNotEditComment_WhenNoAuthorization() throws Exception {
             CommentContentDTO commentContent = new CommentContentDTO(NEW_COMMENT_CONTENT);
             String commentContentJson = objectMapper.writeValueAsString(commentContent);
+
             mockMvc.perform(patch(EDIT_COMMENT_BY_MODERATOR_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(commentContentJson))
