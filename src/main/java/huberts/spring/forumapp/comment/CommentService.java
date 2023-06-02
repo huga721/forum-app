@@ -38,9 +38,9 @@ public class CommentService implements CommentServiceApi {
     private final UtilityService utilityService;
 
     @Override
-    public CommentDTO createComment(Long commentId, CommentContentDTO commentContentDTO, String username) {
-        log.info("Creating a comment for topic with id {}", commentId);
-        Topic topicFound = findTopicById(commentId);
+    public CommentDTO createComment(Long topicId, CommentContentDTO commentContentDTO, String username) {
+        log.info("Creating a comment for topic with id {}", topicId);
+        Topic topicFound = findTopicById(topicId);
         User user = userRepository.findByUsername(username).get();
 
         validateTopicClosed(topicFound);
@@ -95,9 +95,9 @@ public class CommentService implements CommentServiceApi {
     }
 
     @Override
-    public List<CommentDTO> getAllCommentsByTopicId(Long commentId) {
-        log.info("Getting all comments by topic with id {}", commentId);
-        Topic topicFound = findTopicById(commentId);
+    public List<CommentDTO> getAllCommentsByTopicId(Long topicId) {
+        log.info("Getting all comments by topic with id {}", topicId);
+        Topic topicFound = findTopicById(topicId);
         return CommentMapper.mapCommentListToCommentDTOList(commentRepository.findAllByTopic(topicFound));
     }
 
