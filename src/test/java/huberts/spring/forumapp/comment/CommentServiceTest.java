@@ -6,10 +6,12 @@ import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
 import huberts.spring.forumapp.exception.topic.TopicDoesntExistException;
 import huberts.spring.forumapp.exception.topic.TopicIsClosedException;
 import huberts.spring.forumapp.exception.user.UserDoesntExistException;
+import huberts.spring.forumapp.exception.user.UserIsNotAuthorException;
 import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicRepository;
 import huberts.spring.forumapp.user.User;
 import huberts.spring.forumapp.user.UserRepository;
+import huberts.spring.forumapp.utility.UtilityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,6 +43,8 @@ class CommentServiceTest {
     private CommentRepository commentRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UtilityService utilityService;
     @InjectMocks
     private CommentService service;
 
@@ -56,8 +60,10 @@ class CommentServiceTest {
         user = User.builder()
                 .username(USERNAME).build();
         comment = Comment.builder()
+                .topic(topic)
                 .content(CONTENT)
                 .likes(List.of())
+                .reports(List.of())
                 .user(user).build();
     }
 
@@ -125,6 +131,14 @@ class CommentServiceTest {
             List<CommentDTO> comments = service.getAllComments();
             assertEquals(comments.get(0).content(), comment.getContent());
         }
+
+        @DisplayName("Should return empty list of comments")
+        @Test
+        void shouldReturnEmptyListOfComments() {
+            when(commentRepository.findAll()).thenReturn(List.of());
+            List<CommentDTO> comments = service.getAllComments();
+            assertEquals(0, comments.size());
+        }
     }
 
     @DisplayName("getAllCommentsByTopicId method")
@@ -176,9 +190,30 @@ class CommentServiceTest {
         void shouldUpdateComment() {
             CommentContentDTO content = new CommentContentDTO(COMMENT_CONTENT_UPDATED);
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(commentRepository.existsById(any(Long.class))).thenReturn(true);
             when(commentRepository.findByUserAndId(any(User.class), any(Long.class))).thenReturn(Optional.of(comment));
             CommentDTO commentUpdated = service.updateCommentByAuthor(1L, content, USERNAME);
             assertEquals(commentUpdated.content(), COMMENT_CONTENT_UPDATED);
+        }
+
+        @DisplayName("Should throw TopicIsClosedException when topic where is comment is closed")
+        @Test
+        void shouldThrowTopicIsClosedException_WhenTopicWhereIsCommentIsClosed() {
+            topic.setClosed(true);
+            CommentContentDTO content = new CommentContentDTO(COMMENT_CONTENT_UPDATED);
+            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(commentRepository.existsById(any(Long.class))).thenReturn(true);
+            when(commentRepository.findByUserAndId(any(User.class), any(Long.class))).thenReturn(Optional.of(comment));
+            assertThrows(TopicIsClosedException.class, () -> service.updateCommentByAuthor(1L, content, USERNAME));
+        }
+
+        @DisplayName("Should throw UserIsNotAuthorException when user is not author of comment")
+        @Test
+        void shouldThrowUserIsNotAuthorException_WhenUserIsNotAuthorOfComment() {
+            CommentContentDTO content = new CommentContentDTO(COMMENT_CONTENT_UPDATED);
+            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(commentRepository.existsById(any(Long.class))).thenReturn(true);
+            assertThrows(UserIsNotAuthorException.class, () -> service.updateCommentByAuthor(1L, content, USERNAME));
         }
 
         @DisplayName("Should throw CommentDoesntExistException when comment doesn't exist")
@@ -203,6 +238,15 @@ class CommentServiceTest {
             assertEquals(commentUpdated.content(), COMMENT_CONTENT_UPDATED);
         }
 
+        @DisplayName("Should throw TopicIsClosedException when topic where is comment is closed")
+        @Test
+        void shouldThrowTopicIsClosedException_WhenTopicWhereIsCommentIsClosed() {
+            topic.setClosed(true);
+            CommentContentDTO content = new CommentContentDTO(COMMENT_CONTENT_UPDATED);
+            when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
+            assertThrows(TopicIsClosedException.class, () -> service.updateCommentByModerator(1L, content, USERNAME));
+        }
+
         @DisplayName("Should throw CommentDoesntExistException when comment doesn't exist")
         @Test
         void shouldThrowCommentDoesntExistException_WhenCommentDoesntExist() {
@@ -219,9 +263,20 @@ class CommentServiceTest {
         @Test
         void shouldDeleteComment() {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(commentRepository.existsById(any(Long.class))).thenReturn(true);
             when(commentRepository.findByUserAndId(any(User.class), any(Long.class))).thenReturn(Optional.of(comment));
             service.deleteCommentByAuthor(1L, USERNAME);
             verify(commentRepository, times(1)).delete(comment);
+        }
+
+        @DisplayName("Should throw TopicIsClosedException when topic where comment is placed is closed")
+        @Test
+        void shouldThrowTopicIsClosedException_WhenTopicWhereCommentIsPlacedIsClosed() {
+            topic.setClosed(true);
+            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(commentRepository.existsById(any(Long.class))).thenReturn(true);
+            when(commentRepository.findByUserAndId(any(User.class), any(Long.class))).thenReturn(Optional.of(comment));
+            assertThrows(TopicIsClosedException.class, () -> service.deleteCommentByAuthor(1L, USERNAME));
         }
 
         @DisplayName("Should throw CommentDoesntExistException when comment doesn't exist")
@@ -229,6 +284,14 @@ class CommentServiceTest {
         void shouldThrowCommentDoesntExistException_WhenCommentDoesntExist() {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             assertThrows(CommentDoesntExistException.class, () -> service.deleteCommentByAuthor(1L, USERNAME));
+        }
+
+        @DisplayName("Should throw UserIsNotAuthorException when user is not author of comment")
+        @Test
+        void shouldThrowUserIsNotAuthorException_WhenUserIsNotAuthorOfComment() {
+            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(commentRepository.existsById(any(Long.class))).thenReturn(true);
+            assertThrows(UserIsNotAuthorException.class, () -> service.deleteCommentByAuthor(1L, USERNAME));
         }
     }
 
@@ -240,9 +303,16 @@ class CommentServiceTest {
         @Test
         void shouldDeleteComment() {
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             service.deleteCommentByModerator(1L, USERNAME);
             verify(commentRepository, times(1)).delete(comment);
+        }
+
+        @DisplayName("Should throw TopicIsClosedException when topic where is comment to delete is closed")
+        @Test
+        void shouldThrowTopicIsClosedException_WhenTopicWhereIsCommentToDeleteIsClosed() {
+            topic.setClosed(true);
+            when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
+            assertThrows(TopicIsClosedException.class, () -> service.deleteCommentByModerator(1L, USERNAME));
         }
 
         @DisplayName("Should throw CommentDoesntExistException when comment doesn't exist")
