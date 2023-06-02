@@ -16,6 +16,8 @@ INSERT INTO users (id, username, password, blocked, role_name) VALUES (11, 'user
 INSERT INTO users (id, username, password, blocked, role_name) VALUES (12, 'userToChangeRole', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', false, 'ROLE_USER');
 INSERT INTO users (id, username, password, blocked, role_name) VALUES (13, 'userWithSameRole', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', false, 'ROLE_USER');
 INSERT INTO users (id, username, password, blocked, role_name) VALUES (14, 'userBanned', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', true, 'ROLE_USER');
+INSERT INTO users (id, username, password, blocked, role_name) VALUES (15, 'userToWarn', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', false, 'ROLE_USER');
+INSERT INTO users (id, username, password, blocked, role_name) VALUES (16, 'userToWarnBlock', '$2a$12$pXbWi0cGMnzxOddlT6RIGOYYGt9/IAdLU9Gkzeyvc13tudavD2RV2', false, 'ROLE_USER');
 
 INSERT INTO category (id, title, description) VALUES (1, 'test title', 'test description');
 INSERT INTO category (id, title, description) VALUES (2, 'second test title', 'second test description');
@@ -71,5 +73,11 @@ INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (13, 'repo
 INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (14, 'report of comment with id 8', false, 8,'user');
 INSERT INTO report (id, reason, seen, comment_id, user_report) VALUES (15, 'report to delete', false, 2, 'user');
 
--- INSERT INTO topic (id, title, content, category_id, user_id) VALUES (3, 'test for topic with same title but in different category', 'random test content', 1,1);
--- INSERT INTO topic (id, title, content) VALUES (1, 'userJwt', 'encrypted_password');
+
+INSERT INTO warning (id, user_id) VALUES (1, 15);
+INSERT INTO warning (id, user_id) VALUES (2, 15);
+INSERT INTO warning (id, user_id) VALUES (3, 16);
+INSERT INTO warning (id, user_id) VALUES (4, 16);
+INSERT INTO warning (id, user_id) VALUES (5, 16);
+INSERT INTO warning (id, user_id) VALUES (6, 16);
+INSERT INTO warning (id, user_id) VALUES (7, 15);
