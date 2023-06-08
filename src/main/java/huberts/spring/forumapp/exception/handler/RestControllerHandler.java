@@ -144,7 +144,7 @@ public class RestControllerHandler {
     }
 
     @ExceptionHandler(value = WarningDoesntExistException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String cantRealiseReports(WarningDoesntExistException e) {
         return e.getMessage();
     }
