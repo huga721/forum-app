@@ -41,16 +41,16 @@ public class CategoryController {
     @AdminRole
     @PatchMapping("/admin/edit/title/{categoryId}")
     ResponseEntity<CategoryDTO> updateTitle(@PathVariable Long categoryId,
-                                          @RequestBody @Valid NewCategoryTitleDTO updateCategoryTitleDTO) {
-        CategoryDTO categoryEdited = service.updateTitle(categoryId, updateCategoryTitleDTO);
+                                          @RequestBody @Valid NewCategoryTitleDTO newCategoryTitleDTO) {
+        CategoryDTO categoryEdited = service.updateTitle(categoryId, newCategoryTitleDTO);
         return ResponseEntity.ok(categoryEdited);
     }
 
     @AdminRole
     @PatchMapping("/admin/edit/description/{categoryId}")
     ResponseEntity<CategoryDTO> updateDescription(@PathVariable Long categoryId,
-                                                @RequestBody @Valid NewCategoryDescriptionDTO updateCategoryDescriptionDTO) {
-        CategoryDTO categoryEdited = service.updateDescription(categoryId, updateCategoryDescriptionDTO);
+                                                @RequestBody @Valid NewCategoryDescriptionDTO newCategoryDescriptionDTO) {
+        CategoryDTO categoryEdited = service.updateDescription(categoryId, newCategoryDescriptionDTO);
         return ResponseEntity.ok(categoryEdited);
     }
 
