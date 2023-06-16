@@ -2,15 +2,15 @@ package huberts.spring.forumapp.topic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import huberts.spring.forumapp.ContainerIT;
-import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
+import huberts.spring.forumapp.category.dto.UpdateTopicCategoryDTO;
 import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
 import huberts.spring.forumapp.exception.topic.TopicAlreadyExistException;
 import huberts.spring.forumapp.exception.topic.TopicDoesntExistException;
 import huberts.spring.forumapp.exception.topic.TopicIsClosedException;
 import huberts.spring.forumapp.jwt.JwtKey;
 import huberts.spring.forumapp.topic.dto.CloseReasonDTO;
-import huberts.spring.forumapp.topic.dto.TopicCreateDTO;
-import huberts.spring.forumapp.topic.dto.TopicEditDTO;
+import huberts.spring.forumapp.topic.dto.CreateTopicDTO;
+import huberts.spring.forumapp.topic.dto.UpdateTopicDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -125,7 +125,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should create topic, HTTP status 201")
         @Test
         void shouldCreateTopic() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE);
+            CreateTopicDTO createDTO = new CreateTopicDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE);
             String createJson = objectMapper.writeValueAsString(createDTO);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
 
@@ -141,7 +141,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should create topic with same title but in other category, HTTP status 201")
         @Test
         void shouldCreateTopicWithSameTitleButInOtherCategory() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE_SECOND);
+            CreateTopicDTO createDTO = new CreateTopicDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE_SECOND);
             String createJson = objectMapper.writeValueAsString(createDTO);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
 
@@ -157,7 +157,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw TopicAlreadyExistException when creating topic with same title in category , HTTP status 400")
         @Test
         void shouldThrowTopicAlreadyExistException_WhenCreatingTopicWithSameTitleInCategory() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(TOPIC_TITLE_DUPLICATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE_SECOND);
+            CreateTopicDTO createDTO = new CreateTopicDTO(TOPIC_TITLE_DUPLICATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE_SECOND);
             String createJson = objectMapper.writeValueAsString(createDTO);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(post(CREATE_TOPIC_ENDPOINT)
@@ -171,7 +171,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw CategoryDoesntExistException when category to create topic in doesn't exist, HTTP status 404")
         @Test
         void shouldThrowCategoryDoesntExistException_WhenCategoryToCreateTopicInDoesntExist() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_NOT_FOUND);
+            CreateTopicDTO createDTO = new CreateTopicDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_NOT_FOUND);
             String createJson = objectMapper.writeValueAsString(createDTO);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(post(CREATE_TOPIC_ENDPOINT)
@@ -185,7 +185,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw MethodArgumentNotValidException when title is empty, HTTP status 400")
         @Test
         void shouldThrowMethodArgumentNotValidException_WhenTitleIsEmpty() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(EMPTY_STRING, TOPIC_CONTENT_CREATE, CATEGORY_NOT_FOUND);
+            CreateTopicDTO createDTO = new CreateTopicDTO(EMPTY_STRING, TOPIC_CONTENT_CREATE, CATEGORY_NOT_FOUND);
             String createJson = objectMapper.writeValueAsString(createDTO);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(post(CREATE_TOPIC_ENDPOINT)
@@ -199,7 +199,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw MethodArgumentNotValidException when content is empty, HTTP status 400")
         @Test
         void shouldThrowMethodArgumentNotValidException_WhenContentIsEmpty() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(TOPIC_TITLE_CREATE, EMPTY_STRING, CATEGORY_NOT_FOUND);
+            CreateTopicDTO createDTO = new CreateTopicDTO(TOPIC_TITLE_CREATE, EMPTY_STRING, CATEGORY_NOT_FOUND);
             String createJson = objectMapper.writeValueAsString(createDTO);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(post(CREATE_TOPIC_ENDPOINT)
@@ -213,7 +213,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw MethodArgumentNotValidException when category is empty, HTTP status 400")
         @Test
         void shouldThrowMethodArgumentNotValidException_WhenCategoryIsEmpty() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, EMPTY_STRING);
+            CreateTopicDTO createDTO = new CreateTopicDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, EMPTY_STRING);
             String createJson = objectMapper.writeValueAsString(createDTO);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(post(CREATE_TOPIC_ENDPOINT)
@@ -227,7 +227,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not create topic when JWT is wrong, HTTP status 401")
         @Test
         void shouldNotCreateTopic_WhenJWTIsWrong() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE);
+            CreateTopicDTO createDTO = new CreateTopicDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE);
             String createJson = objectMapper.writeValueAsString(createDTO);
             mockMvc.perform(post(CREATE_TOPIC_ENDPOINT)
                             .header(AUTHORIZATION, INVALID_TOKEN)
@@ -239,7 +239,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not create topic when no authorization, HTTP status 401")
         @Test
         void shouldNotCreateTopic_WhenNoAuthorization() throws Exception {
-            TopicCreateDTO createDTO = new TopicCreateDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE);
+            CreateTopicDTO createDTO = new CreateTopicDTO(TOPIC_TITLE_CREATE, TOPIC_CONTENT_CREATE, CATEGORY_TITLE);
             String createJson = objectMapper.writeValueAsString(createDTO);
             mockMvc.perform(post(CREATE_TOPIC_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -389,7 +389,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should edit topic")
         @Test
         void shouldEditTopic() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_AUTHOR_ENDPOINT)
@@ -404,7 +404,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not edit topic with empty request body")
         @Test
         void shouldNotEditTopicWithEmptyRequestBody() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(EMPTY_STRING, EMPTY_STRING);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(EMPTY_STRING, EMPTY_STRING);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_AUTHOR_ENDPOINT)
@@ -417,7 +417,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw TopicDoesntExistException when user is not owner of the topic")
         @Test
         void shouldThrowTopicDoesntExistException_WhenUserIsNotOwnerOfTheTopic() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_AUTHOR_WRONG_AUTHOR_ENDPOINT)
@@ -431,7 +431,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw TopicDoesntExistException when topic with given ID doesn't exist, HTTP status 404")
         @Test
         void shouldThrowTopicDoesntExistException_WhenTopicWithGivenIdDoesntExist() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_AUTHOR_ID_DOESNT_EXIST_ENDPOINT)
@@ -445,7 +445,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw TopicIsClosedException when topic is closed, HTTP status 400")
         @Test
         void shouldThrowTopicIsClosedException_WhenTopicIsClosed() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_AUTHOR_IS_CLOSED_ENDPOINT)
@@ -459,7 +459,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not edit topic when JWT is wrong, HTTP status 401")
         @Test
         void shouldNotEditTopic_WhenJWTIsWrong() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             mockMvc.perform(patch(EDIT_TOPIC_BY_AUTHOR_ENDPOINT)
                             .header(AUTHORIZATION, INVALID_TOKEN)
@@ -471,7 +471,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not edit topic when no authorization, HTTP status 401")
         @Test
         void shouldNotEditTopic_WhenNoAuthorization() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             mockMvc.perform(patch(EDIT_TOPIC_BY_AUTHOR_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -487,7 +487,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should edit topic, HTTP status 200")
         @Test
         void shouldEditTopic() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_MODERATOR_ENDPOINT)
@@ -502,7 +502,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw TopicDoesntExistException when topic doesn't exist, HTTP status 404")
         @Test
         void shouldThrowTopicDoesntExistException_WhenTopicDoesntExist() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT)
@@ -516,7 +516,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw TopicIsClosedException when topic is closed, HTTP status 400")
         @Test
         void shouldThrowTopicIsClosedException_WhenTopicIsClosed() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_MODERATOR_IS_CLOSED_ENDPOINT)
@@ -530,7 +530,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not edit topic with empty request body")
         @Test
         void shouldNotEditTopicWithEmptyRequestBody() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(EMPTY_STRING, EMPTY_STRING);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(EMPTY_STRING, EMPTY_STRING);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_MODERATOR_ENDPOINT)
@@ -545,7 +545,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not edit topic when requested by user, HTTP status 403")
         @Test
         void shouldNotEditTopic_WhenRequestedByUser() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(EDIT_TOPIC_BY_MODERATOR_ENDPOINT)
@@ -558,7 +558,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not edit topic when JWT is wrong, HTTP status 401")
         @Test
         void shouldNotDeleteTopic_WhenJWTIsWrong() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             mockMvc.perform(patch(EDIT_TOPIC_BY_MODERATOR_ENDPOINT)
                             .header(AUTHORIZATION, INVALID_TOKEN)
@@ -570,7 +570,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not edit topic when no authorization, HTTP status 401")
         @Test
         void shouldNotDeleteTopic_WhenNoAuthorization() throws Exception {
-            TopicEditDTO editBody = new TopicEditDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
+            UpdateTopicDTO editBody = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
             String editBodyJson = objectMapper.writeValueAsString(editBody);
             mockMvc.perform(patch(EDIT_TOPIC_BY_MODERATOR_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -586,7 +586,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should change category")
         @Test
         void shouldChangeCategory() throws Exception {
-            CategoryTitleDTO title = new CategoryTitleDTO(CATEGORY_TITLE_SECOND);
+            UpdateTopicCategoryDTO title = new UpdateTopicCategoryDTO(CATEGORY_TITLE_SECOND);
             String titleJson = objectMapper.writeValueAsString(title);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(CHANGE_CATEGORY_BY_MODERATOR_ENDPOINT)
@@ -600,7 +600,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw TopicIsClosedException when topic to change category is closed, HTTP status 400")
         @Test
         void shouldThrowTopicIsClosedException_WhenTopicToChangeCategoryIsClosed() throws Exception {
-            CategoryTitleDTO title = new CategoryTitleDTO(CATEGORY_TITLE_SECOND);
+            UpdateTopicCategoryDTO title = new UpdateTopicCategoryDTO(CATEGORY_TITLE_SECOND);
             String titleJson = objectMapper.writeValueAsString(title);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(CHANGE_CATEGORY_BY_MODERATOR_IS_CLOSED_ENDPOINT)
@@ -614,7 +614,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw CategoryDoesntExistException when category to change in topic doesn't exist, HTTP status 404")
         @Test
         void shouldThrowCategoryDoesntExistException_WhenCategoryToChangeInTopicDoesntExist() throws Exception {
-            CategoryTitleDTO title = new CategoryTitleDTO(CATEGORY_NOT_FOUND);
+            UpdateTopicCategoryDTO title = new UpdateTopicCategoryDTO(CATEGORY_NOT_FOUND);
             String titleJson = objectMapper.writeValueAsString(title);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(CHANGE_CATEGORY_BY_MODERATOR_ENDPOINT)
@@ -628,7 +628,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw MethodArgumentNotValidException when category title in request body is empty, HTTP status 400")
         @Test
         void shouldThrowMethodArgumentNotValidException_WhenCategoryTitleInRequestBodyIsEmpty() throws Exception {
-            CategoryTitleDTO title = new CategoryTitleDTO(EMPTY_STRING);
+            UpdateTopicCategoryDTO title = new UpdateTopicCategoryDTO(EMPTY_STRING);
             String titleJson = objectMapper.writeValueAsString(title);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(CHANGE_CATEGORY_BY_MODERATOR_ENDPOINT)
@@ -642,7 +642,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should throw TopicDoesntExistException when topic doesn't exist, HTTP status 404")
         @Test
         void shouldThrowTopicDoesntExistException_WhenTopicDoesntExist() throws Exception {
-            CategoryTitleDTO title = new CategoryTitleDTO(CATEGORY_TITLE_SECOND);
+            UpdateTopicCategoryDTO title = new UpdateTopicCategoryDTO(CATEGORY_TITLE_SECOND);
             String titleJson = objectMapper.writeValueAsString(title);
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(CHANGE_CATEGORY_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT)
@@ -656,7 +656,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not change category when requested by user, HTTP status 403")
         @Test
         void shouldNotDeleteTopic_WhenRequestByUser() throws Exception {
-            CategoryTitleDTO title = new CategoryTitleDTO(CATEGORY_TITLE_SECOND);
+            UpdateTopicCategoryDTO title = new UpdateTopicCategoryDTO(CATEGORY_TITLE_SECOND);
             String titleJson = objectMapper.writeValueAsString(title);
             String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
             mockMvc.perform(patch(CHANGE_CATEGORY_BY_MODERATOR_ENDPOINT)
@@ -669,7 +669,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not change category when JWT is wrong, HTTP status 401")
         @Test
         void shouldNotDeleteTopic_WhenJWTIsWrong() throws Exception {
-            CategoryTitleDTO title = new CategoryTitleDTO(CATEGORY_TITLE_SECOND);
+            UpdateTopicCategoryDTO title = new UpdateTopicCategoryDTO(CATEGORY_TITLE_SECOND);
             String titleJson = objectMapper.writeValueAsString(title);
             mockMvc.perform(patch(CHANGE_CATEGORY_BY_MODERATOR_ENDPOINT)
                             .header(AUTHORIZATION, INVALID_TOKEN)
@@ -681,7 +681,7 @@ class TopicControllerTest extends ContainerIT {
         @DisplayName("Should not change category when no authorization, HTTP status 401")
         @Test
         void shouldNotChangeCategory_WhenNoAuthorization() throws Exception {
-            CategoryTitleDTO title = new CategoryTitleDTO(CATEGORY_TITLE_SECOND);
+            UpdateTopicCategoryDTO title = new UpdateTopicCategoryDTO(CATEGORY_TITLE_SECOND);
             String titleJson = objectMapper.writeValueAsString(title);
             mockMvc.perform(patch(CHANGE_CATEGORY_BY_MODERATOR_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)

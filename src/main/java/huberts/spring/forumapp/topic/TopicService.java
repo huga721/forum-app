@@ -2,7 +2,7 @@ package huberts.spring.forumapp.topic;
 
 import huberts.spring.forumapp.category.Category;
 import huberts.spring.forumapp.category.CategoryRepository;
-import huberts.spring.forumapp.category.dto.CategoryTitleDTO;
+import huberts.spring.forumapp.category.dto.UpdateTopicCategoryDTO;
 import huberts.spring.forumapp.comment.CommentService;
 import huberts.spring.forumapp.comment.dto.CommentContentDTO;
 import huberts.spring.forumapp.exception.category.CategoryDoesntExistException;
@@ -12,6 +12,7 @@ import huberts.spring.forumapp.exception.topic.TopicIsClosedException;
 import huberts.spring.forumapp.topic.dto.*;
 import huberts.spring.forumapp.user.User;
 import huberts.spring.forumapp.user.UserRepository;
+import huberts.spring.forumapp.utility.UtilityService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TopicService implements TopicServiceApi {
 
-    private final CategoryRepository categoryRepository;
-    private final TopicRepository topicRepository;
-    private final UserRepository userRepository;
-    private final CommentService commentService;
-
     private static final String CATEGORY_DOESNT_EXIST_EXCEPTION = "Category with title \"%s\" doesn't exist.";
     private static final String TOPIC_DUPLICATE_EXCEPTION = "Topic with title \"%s\" is already created by same user, in the same category, you can't double topics.";
     private static final String TOPIC_ID_DOESNT_EXIST_EXCEPTION = "Topic with id \"%d\" doesn't exist.";
@@ -38,27 +34,33 @@ public class TopicService implements TopicServiceApi {
     private static final String TOPIC_IS_CLOSED_EXCEPTION = "Topic with id \"%d\" is closed.";
     private static final String EXCEPTION_OCCURRED = "An exception occurred!";
 
-    @Override
-    public TopicDTO createTopic(TopicCreateDTO topic, String username) {
-        String topicCategory = topic.getCategory();
-        String title = topic.getTitle();
-        log.info("Creating a topic with title {} in category {}", title, topicCategory);
+    private final CategoryRepository categoryRepository;
+    private final TopicRepository topicRepository;
+    private final UserRepository userRepository;
+    private final CommentService commentService;
+    private final UtilityService utilityService;
 
-        Category category = findCategoryByTitle(topicCategory);
+    @Override
+    public TopicDTO createTopic(CreateTopicDTO createTopicDTO, String username) {
+        log.info("Creating a topic with title {} in category {}", createTopicDTO.title(), createTopicDTO.category());
+        Category category = findCategoryByTitle(createTopicDTO.category());
         User author = userRepository.findByUsername(username).get();
 
-        if (topicRepository.existsByTitleAndUserAndCategory(title, author, category)) {
-            String errorMessage = String.format(TOPIC_DUPLICATE_EXCEPTION, title);
+        if (topicRepository.existsByTitleAndUserAndCategory(createTopicDTO.title(), author, category)) {
+            String errorMessage = String.format(TOPIC_DUPLICATE_EXCEPTION, createTopicDTO.title());
             log.error(EXCEPTION_OCCURRED, new TopicAlreadyExistException(errorMessage));
             throw new TopicAlreadyExistException(errorMessage);
         }
 
-        Topic builtTopic = TopicMapper.buildNewTopic(topic, category, author);
-        topicRepository.save(builtTopic);
-
-        author.setLastActivity(LocalDateTime.now());
+        utilityService.updateUserLastActivity(username);
         log.info("Topic created");
-        return TopicMapper.buildTopicDTO(builtTopic);
+        return buildAndSaveTopic(createTopicDTO, category, author);
+    }
+
+    private TopicDTO buildAndSaveTopic(CreateTopicDTO createTopicDTO, Category category, User user) {
+        Topic topicBuilt = TopicMapper.buildTopic(createTopicDTO, category, user);
+        topicRepository.save(topicBuilt);
+        return TopicMapper.buildTopicDTO(topicBuilt);
     }
 
     private Category findCategoryByTitle(String title) {
@@ -67,48 +69,50 @@ public class TopicService implements TopicServiceApi {
                 .orElseThrow(() -> {
                     String errorMessage = String.format(CATEGORY_DOESNT_EXIST_EXCEPTION, title);
                     log.error(EXCEPTION_OCCURRED, new CategoryDoesntExistException(errorMessage));
-                    throw new CategoryDoesntExistException(errorMessage);
+                    return new CategoryDoesntExistException(errorMessage);
                 });
     }
 
     @Override
     public List<TopicDTO> getAllTopics() {
         log.info("Getting all topics");
-        return TopicMapper.mapFromListTopic(topicRepository.findAll());
+        return TopicMapper.mapTopicListToTopicDTOList(topicRepository.findAll());
     }
 
     @Override
-    public TopicDTO getTopicById(Long id) {
-        log.info("Getting a topic with id {}", id);
-        return TopicMapper.buildTopicDTO(findTopicById(id));
+    public TopicDTO getTopicById(Long topicId) {
+        log.info("Getting a topic with id {}", topicId);
+        return TopicMapper.buildTopicDTO(findTopicById(topicId));
     }
 
-    private Topic findTopicById(Long id) {
-        log.info("Finding topic with id {}", id);
-        return topicRepository.findById(id)
+    private Topic findTopicById(Long topicId) {
+        log.info("Finding topic with id {}", topicId);
+        return topicRepository.findById(topicId)
                 .orElseThrow(() -> {
-                    String errorMessage = String.format(TOPIC_ID_DOESNT_EXIST_EXCEPTION, id);
+                    String errorMessage = String.format(TOPIC_ID_DOESNT_EXIST_EXCEPTION, topicId);
                     log.error(EXCEPTION_OCCURRED, new TopicDoesntExistException(errorMessage));
-                    throw new TopicDoesntExistException(errorMessage);
+                    return new TopicDoesntExistException(errorMessage);
                 });
     }
 
     @Override
-    public TopicDTO updateTopicByAuthor(Long id, TopicEditDTO topicEditDTO, String username) {
-        log.info("Editing topic with id {} by user with username {}", id, username);
-        User currentUser = userRepository.findByUsername(username).get();
-        Topic topicFound = findTopicByUserAndId(currentUser, id);
-        if (topicFound.isClosed()) {
-            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, id);
+    public TopicDTO updateTopicByAuthor(Long topicId, UpdateTopicDTO updateTopicDTO, String username) {
+        log.info("Editing topic with id {} by user with username {}", topicId, username);
+        User author = userRepository.findByUsername(username).get();
+        Topic topicFound = findTopicByUserAndId(author, topicId);
+
+        validateTopicClosed(topicFound);
+        utilityService.updateUserLastActivity(username);
+        log.info("Topic edited");
+        return editTopicAndGetDTO(topicFound, updateTopicDTO.title(), updateTopicDTO.content());
+    }
+
+    private void validateTopicClosed(Topic topic) {
+        if (topic.isClosed()) {
+            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, topic.getId());
             log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
             throw new TopicIsClosedException(errorMessage);
         }
-        currentUser.setLastActivity(LocalDateTime.now());
-
-        String content = topicEditDTO.getContent();
-        String title = topicEditDTO.getTitle();
-        log.info("Topic edited");
-        return editTopicAndGetDTO(topicFound, title, content);
     }
 
     private TopicDTO editTopicAndGetDTO(Topic topicFound, String title, String content) {
@@ -129,102 +133,80 @@ public class TopicService implements TopicServiceApi {
         return TopicMapper.buildTopicDTO(topicFound);
     }
 
-    private Topic findTopicByUserAndId(User user, Long id) {
-        log.info("Finding topic with id {} created by user {}", id, user.getUsername());
-        return topicRepository.findByUserAndId(user, id)
+    private Topic findTopicByUserAndId(User user, Long topicId) {
+        log.info("Finding topic with id {} created by user {}", topicId, user.getUsername());
+        return topicRepository.findByUserAndId(user, topicId)
                 .orElseThrow(() -> {
-                    String errorMessage = String.format(TOPIC_DOESNT_EXIST_WITH_GIVEN_USER_EXCEPTION, id);
+                    String errorMessage = String.format(TOPIC_DOESNT_EXIST_WITH_GIVEN_USER_EXCEPTION, topicId);
                     log.error(EXCEPTION_OCCURRED, new TopicDoesntExistException(errorMessage));
                     return new TopicDoesntExistException(errorMessage);
                 });
     }
 
     @Override
-    public TopicDTO updateTopicByModerator(Long id, TopicEditDTO topicDto, String moderatorName) {
-        log.info("Editing topic with id {} by moderator or admin", id);
-        Topic topicFound = findTopicById(id);
-        if (topicFound.isClosed()) {
-            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, id);
-            log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
-            throw new TopicIsClosedException(errorMessage);
-        }
+    public TopicDTO updateTopicByModerator(Long topicId, UpdateTopicDTO updateTopicDTO, String moderatorName) {
+        log.info("Editing topic with id {} by moderator or admin", topicId);
+        Topic topicFound = findTopicById(topicId);
 
-        String title = topicDto.getTitle();
-        String content = topicDto.getContent();
-
-        updateModeratorLastActivity(moderatorName);
+        validateTopicClosed(topicFound);
+        utilityService.updateUserLastActivity(moderatorName);
         log.info("Topic edited");
-        return editTopicAndGetDTO(topicFound, title, content);
-    }
-
-    private void updateModeratorLastActivity(String username) {
-        User moderator = userRepository.findByUsername(username).get();
-        moderator.setLastActivity(LocalDateTime.now());
+        return editTopicAndGetDTO(topicFound, updateTopicDTO.title(), updateTopicDTO.content());
     }
 
     @Override
-    public TopicDTO changeCategoryOfTopic(Long id, CategoryTitleDTO categoryTitleDTO, String moderatorName) {
-        log.info("Changing category of topic with id {}", id);
-        String categoryTitle = categoryTitleDTO.getCategoryTitle();
+    public TopicDTO changeCategoryOfTopic(Long topicId, UpdateTopicCategoryDTO updateTopicCategoryDTO, String moderatorName) {
+        log.info("Changing category of topic with id {}", topicId);
+        Category categoryFound = findCategoryByTitle(updateTopicCategoryDTO.categoryTitle());
+        Topic topicFound = findTopicById(topicId);
 
-        Category categoryResult = findCategoryByTitle(categoryTitle);
-        Topic topicFound = findTopicById(id);
-        if (topicFound.isClosed()) {
-            String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, id);
-            log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
-            throw new TopicIsClosedException(errorMessage);
-        }
-
-        topicFound.setCategory(categoryResult);
-        updateModeratorLastActivity(moderatorName);
+        validateTopicClosed(topicFound);
+        utilityService.updateUserLastActivity(moderatorName);
+        topicFound.setCategory(categoryFound);
         log.info("Category changed");
         return TopicMapper.buildTopicDTO(topicFound);
     }
 
     @Override
-    public TopicDTO closeTopicByAuthor(Long id, CloseReasonDTO closeReasonDTO, String username) {
-        log.info("Closing topic with id {} by topic author", id);
-        String closeReason = closeReasonDTO.getReason();
-        CommentContentDTO commentContent = new CommentContentDTO(closeReason);
-
+    public TopicDTO closeTopicByAuthor(Long topicId, CloseReasonDTO closeReasonDTO, String username) {
+        log.info("Closing topic with id {} by topic author", topicId);
+        CommentContentDTO commentContent = new CommentContentDTO(closeReasonDTO.reason());
         User author = userRepository.findByUsername(username).get();
-        Topic topicFound = findTopicByUserAndId(author, id);
-        closeTopic(topicFound, commentContent);
-        return TopicMapper.buildTopicDTO(topicFound);
+        Topic topicFound = findTopicByUserAndId(author, topicId);
+        return closeAndBuildTopic(topicFound, commentContent);
     }
 
-    private void closeTopic(Topic topic, CommentContentDTO commentContent) {
-        commentService.createComment(topic.getId(), commentContent, topic.getUser().getUsername());
+    private TopicDTO closeAndBuildTopic(Topic topic, CommentContentDTO commentContentDTO) {
+        commentService.createComment(topic.getId(), commentContentDTO, topic.getUser().getUsername());
         topic.setClosed(true);
         log.info("Topic closed");
+        return TopicMapper.buildTopicDTO(topic);
     }
 
     @Override
-    public TopicDTO closeTopicByModerator(Long id, CloseReasonDTO closeTopicDTO, String username) {
-        log.info("Closing topic with id {} by moderator or admin", id);
-        String closeReason = closeTopicDTO.getReason();
-        CommentContentDTO commentContent = new CommentContentDTO(closeReason);
+    public TopicDTO closeTopicByModerator(Long topicId, CloseReasonDTO closeReasonDTO, String username) {
+        log.info("Closing topic with id {} by moderator or admin", topicId);
+        CommentContentDTO commentContent = new CommentContentDTO(closeReasonDTO.reason());
+        Topic topicFound = findTopicById(topicId);
+        return closeAndBuildTopic(topicFound, commentContent);
 
-        Topic topicFound = findTopicById(id);
-        closeTopic(topicFound, commentContent);
-        return TopicMapper.buildTopicDTO(topicFound);
     }
 
     @Override
-    public void deleteTopicByAuthor(Long id, String username) {
-        log.info("Deleting topic with id {} created by user {}", id, username);
+    public void deleteTopicByAuthor(Long topicId, String username) {
+        log.info("Deleting topic with id {} created by user {}", topicId, username);
         User author = userRepository.findByUsername(username).get();
-        Topic topicResult = findTopicByUserAndId(author, id);
-        author.setLastActivity(LocalDateTime.now());
-        topicRepository.delete(topicResult);
+        Topic topicFound = findTopicByUserAndId(author, topicId);
+        utilityService.updateUserLastActivity(username);
+        topicRepository.delete(topicFound);
         log.info("Topic deleted");
     }
 
     @Override
-    public void deleteTopicByModerator(Long id, String moderatorName) {
-        Topic topicFound = findTopicById(id);
-        log.info("Deleting topic with id {} by moderator or admin", id);
-        updateModeratorLastActivity(moderatorName);
+    public void deleteTopicByModerator(Long topicId, String moderatorName) {
+        log.info("Deleting topic with id {} by moderator or admin", topicId);
+        Topic topicFound = findTopicById(topicId);
+        utilityService.updateUserLastActivity(moderatorName);
         topicRepository.delete(topicFound);
         log.info("Topic deleted");
     }
