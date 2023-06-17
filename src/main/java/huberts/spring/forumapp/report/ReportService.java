@@ -13,7 +13,7 @@ import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicRepository;
 import huberts.spring.forumapp.user.User;
 import huberts.spring.forumapp.user.UserRepository;
-import huberts.spring.forumapp.common.UtilityService;
+import huberts.spring.forumapp.utility.UtilityService;
 import huberts.spring.forumapp.warning.WarningService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,18 +52,18 @@ public class ReportService implements ReportServiceApi {
         return buildAndSaveCommentReport(user, reportReasonDTO, commentFound);
     }
 
+    private ReportDTO buildAndSaveCommentReport(User user, ReportReasonDTO reportReasonDTO, Comment comment) {
+        Report reportBuilt = ReportMapper.buildReport(user, reportReasonDTO.reason(), comment);
+        reportRepository.save(reportBuilt);
+        return ReportMapper.buildReportDTO(reportBuilt);
+    }
+
     private void validateTopicClosed(Topic topic) {
         if (topic.isClosed()) {
             String errorMessage = String.format(TOPIC_IS_CLOSED_EXCEPTION, topic.getId());
             log.error(EXCEPTION_OCCURRED, new TopicIsClosedException(errorMessage));
             throw new TopicIsClosedException(errorMessage);
         }
-    }
-
-    private ReportDTO buildAndSaveCommentReport(User user, ReportReasonDTO reportReasonDTO, Comment comment) {
-        Report reportBuilt = ReportMapper.buildReport(user, reportReasonDTO.reason(), comment);
-        reportRepository.save(reportBuilt);
-        return ReportMapper.buildReportTopicDTO(reportBuilt);
     }
 
     private User findUserByUsername(String username) {
@@ -76,7 +76,7 @@ public class ReportService implements ReportServiceApi {
                 .orElseThrow(() -> {
                     String errorMessage = String.format(COMMENT_DOESNT_EXIST_EXCEPTION, commentId);
                     log.error(EXCEPTION_OCCURRED, new CommentDoesntExistException(errorMessage));
-                    throw new CommentDoesntExistException(errorMessage);
+                    return new CommentDoesntExistException(errorMessage);
                 });
     }
 
@@ -95,7 +95,7 @@ public class ReportService implements ReportServiceApi {
     private ReportDTO buildAndSaveTopicReport(User user, ReportReasonDTO reportReasonDTO, Topic topic) {
         Report reportBuilt = ReportMapper.buildReport(user, reportReasonDTO.reason(), topic);
         reportRepository.save(reportBuilt);
-        return ReportMapper.buildReportTopicDTO(reportBuilt);
+        return ReportMapper.buildReportDTO(reportBuilt);
     }
 
     private Topic findTopicById(Long topicId) {
@@ -104,14 +104,14 @@ public class ReportService implements ReportServiceApi {
                 .orElseThrow(() -> {
                     String errorMessage = String.format(TOPIC_DOESNT_EXIST_EXCEPTION, topicId);
                     log.error(EXCEPTION_OCCURRED, new TopicDoesntExistException(errorMessage));
-                    throw new TopicDoesntExistException(errorMessage);
+                    return new TopicDoesntExistException(errorMessage);
                 });
     }
 
     @Override
     public ReportDTO getReportById(Long reportId) {
         log.info("Getting a report with id {}", reportId);
-        return ReportMapper.buildReportTopicDTO(findReportById(reportId));
+        return ReportMapper.buildReportDTO(findReportById(reportId));
     }
 
     private Report findReportById(Long reportId) {
@@ -120,29 +120,30 @@ public class ReportService implements ReportServiceApi {
                 .orElseThrow(() -> {
                     String errorMessage = String.format(REPORT_DOESNT_EXIST_EXCEPTION, reportId);
                     log.error(EXCEPTION_OCCURRED, new ReportDoesntExistException(errorMessage));
-                    throw new ReportDoesntExistException(errorMessage);
+                    return new ReportDoesntExistException(errorMessage);
                 });
     }
 
     @Override
     public List<ReportDTO> getAllReports() {
         log.info("Getting all reports");
-        return ReportMapper.mapReportsToDTOList(reportRepository.findAll());
+        return ReportMapper.mapReportListToReportDTOList(reportRepository.findAll());
     }
 
     @Override
     public List<ReportDTO> getAllNotSeenReports() {
         log.info("Getting all not seen reports");
-        return ReportMapper.mapReportsToNotSeenDTOList(reportRepository.findAll());
+        return ReportMapper.mapReportListToReportDTOList(reportRepository.findAll())
+                .stream().filter(report -> !report.seen()).toList();
     }
 
     @Override
-    public ReportDTO markReportAsSeen(Long reportId) {
+    public ReportDTO updateReportAsSeen(Long reportId) {
         log.info("Setting a report with id {} as seen", reportId);
         Report reportFound = findReportById(reportId);
         reportFound.setSeen(true);
         log.info("Report set");
-        return ReportMapper.buildReportTopicDTO(reportFound);
+        return ReportMapper.buildReportDTO(reportFound);
     }
 
     @Override
@@ -155,7 +156,7 @@ public class ReportService implements ReportServiceApi {
         validateReports(topicFound.getReports());
 
         topicRepository.delete(topicFound);
-        warningService.giveWarning(author);
+        warningService.createWarning(author);
         log.info("Deleted all reports");
     }
 
@@ -176,7 +177,7 @@ public class ReportService implements ReportServiceApi {
         validateReports(commentFound.getReports());
 
         commentRepository.delete(commentFound);
-        warningService.giveWarning(author);
+        warningService.createWarning(author);
         log.info("Deleted all reports");
     }
 
