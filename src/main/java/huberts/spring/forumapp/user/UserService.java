@@ -34,7 +34,6 @@ public class UserService implements UserServiceApi {
     private final static String ROLE_DOESNT_EXIST_EXCEPTION = "Role with name \"%s\" doesn't exist.";
     private final static String USER_HAS_THAT_ROLE_EXCEPTION = "User already has that role.";
     private final static String USER_IS_BANNED_EXCEPTION = "User with username \"%s\" is already banned";
-    private final static String USER_IS_NOT_BANNED_EXCEPTION = "User with username \"%s\" is not banned";
     private final static String ADMIN_OR_MODERATOR_DELETE_EXCEPTION = "You can't delete admin or moderator account";
     private static final String EXCEPTION_OCCURRED = "An exception occurred!";
 
