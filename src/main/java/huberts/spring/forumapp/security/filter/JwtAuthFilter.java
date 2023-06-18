@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,15 +22,16 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@PropertySource("classpath:application-security.properties")
 public class JwtAuthFilter extends BasicAuthenticationFilter {
-    private final String secret;
+
+    @Value("${spring.custom.jwt.secret}")
+    private String secret;
     private final DetailsService service;
 
     public JwtAuthFilter(AuthenticationManager authenticationManager,
-                         @Value("${spring.custom.jwt.secret}") String secret,
                          DetailsService service) {
         super(authenticationManager);
-        this.secret = secret;
         this.service = service;
     }
 

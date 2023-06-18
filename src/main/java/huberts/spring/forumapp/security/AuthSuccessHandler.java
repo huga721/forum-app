@@ -19,19 +19,15 @@ import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Component
-@PropertySource("classpath:/customAppProperties.properties")
 @Slf4j
+@Component
+@PropertySource("classpath:application-security.properties")
 public class AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final int expirationTime;
-    private final String secret;
-
-    public AuthSuccessHandler(@Value("${spring.custom.jwt.expiration}") int expirationTime,
-                              @Value("${spring.custom.jwt.secret}") String secret) {
-        this.expirationTime = expirationTime;
-        this.secret = secret;
-    }
+    @Value("${spring.custom.jwt.expiration}")
+    private int expirationTime;
+    @Value("${spring.custom.jwt.secret}")
+    private String secret;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
