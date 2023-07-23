@@ -2,6 +2,7 @@ package huberts.spring.forumapp.warning;
 
 import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import huberts.spring.forumapp.warning.dto.WarningDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,36 +12,40 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/warnings")
+@RequestMapping("api/v1/warnings")
 public class WarningController {
 
     private final WarningService service;
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Get all warnings")
     @GetMapping()
-    ResponseEntity<List<WarningDTO>> getAllWarnings() {
+    List<WarningDTO> getAllWarnings() {
         List<WarningDTO> warnings = service.getAllWarnings();
-        return ResponseEntity.ok(warnings);
+        return warnings;
     }
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Get warning by id")
     @GetMapping("/{warningId}")
-    ResponseEntity<WarningDTO> getWarningById(@PathVariable Long warningId) {
+    WarningDTO getWarningById(@PathVariable Long warningId) {
         WarningDTO warning = service.getWarningById(warningId);
-        return ResponseEntity.ok(warning);
+        return warning;
     }
 
     @ModeratorRole
-    @PostMapping("/{username}")
-    ResponseEntity<WarningDTO> createWarning(@PathVariable String username) {
-        WarningDTO warning = service.createWarning(username);
+    @Operation(summary = "[MODERATOR] Create warning")
+    @PostMapping("/{userId}")
+    ResponseEntity<WarningDTO> createWarning(@PathVariable Long userId) {
+        WarningDTO warning = service.createWarning(userId);
         return ResponseEntity.created(URI.create("/warnings")).body(warning);
     }
 
     @ModeratorRole
-    @DeleteMapping("/{username}")
-    ResponseEntity<WarningDTO> deleteWarning(@PathVariable String username) {
-        service.deleteWarning(username);
+    @Operation(summary = "[MODERATOR] Delete warning by user id")
+    @DeleteMapping("/{userId}")
+    ResponseEntity<WarningDTO> deleteWarning(@PathVariable Long userId) {
+        service.deleteWarning(userId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -5,6 +5,7 @@ import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import huberts.spring.forumapp.security.annotation.UserRole;
 import huberts.spring.forumapp.user.dto.PasswordDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,87 +17,98 @@ import java.util.List;
 
 @Validated
 @RestController
+@RequestMapping("api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService service;
 
-    @GetMapping("/staff")
-    ResponseEntity<List<UserDTO>> getAllModeratorAndAdminUsers() {
-        List<UserDTO> staffMembers = service.getAllModeratorAndAdminUsers();
-        return ResponseEntity.ok(staffMembers);
+    @Operation(summary = "Get all users")
+    @GetMapping
+    List<UserDTO> getAllUsers() {
+        List<UserDTO> users = service.getAllUsers();
+        return users;
     }
 
-    @GetMapping("/{username}")
-    ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
-        UserDTO user = service.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+    @Operation(summary = "Get all team users")
+    @GetMapping("/team")
+    List<UserDTO> getAllModeratorAndAdminUsers() {
+        List<UserDTO> teamUsers = service.getAllModeratorAndAdminUsers();
+        return teamUsers;
+    }
+
+    @Operation(summary = "Get user by username")
+    @GetMapping("/{userId}")
+    UserDTO getUserById(@PathVariable Long userId) {
+        UserDTO user = service.getUserById(userId);
+        return user;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Get authenticated user")
     @GetMapping("/profile")
-    ResponseEntity<UserDTO> getCurrentUser(Authentication authenticatedUser) {
+    UserDTO getCurrentUser(Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         UserDTO user = service.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+        return user;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Change authenticated user password")
     @PatchMapping("/change-password")
-    ResponseEntity<UserDTO> changePassword(@Valid @RequestBody PasswordDTO password,
+    UserDTO changePassword(@Valid @RequestBody PasswordDTO password,
                                            Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
-        UserDTO user = service.changePassword(password, username);
-        return ResponseEntity.ok(user);
+        UserDTO user = service.changePasswordByUsername(password, username);
+        return user;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Delete authenticated user")
     @DeleteMapping("/delete")
-    ResponseEntity<Void> deleteUserByUsername(Authentication authenticatedUser) {
+    ResponseEntity<Void> deleteUserById(Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         service.deleteUserByUsername(username);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @ModeratorRole
-    @GetMapping("/moderator/all")
-    ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = service.getAllUsers();
-        return ResponseEntity.ok(users);
+    @Operation(summary = "[MODERATOR] Ban user by id")
+    @PatchMapping("/moderator/ban/{userId}")
+    UserDTO banUser(@PathVariable Long userId) {
+        UserDTO user = service.banUserById(userId);
+        return user;
     }
 
     @ModeratorRole
-    @PatchMapping("/moderator/ban/{username}")
-    ResponseEntity<UserDTO> banUser(@PathVariable String username) {
-        UserDTO user = service.banUser(username);
-        return ResponseEntity.ok(user);
+    @Operation(summary = "[MODERATOR] Unban user by id")
+    @PatchMapping("/moderator/unban/{userId}")
+    UserDTO unbanUser(@PathVariable Long userId) {
+        UserDTO user = service.unbanUserById(userId);
+        return user;
     }
 
     @ModeratorRole
-    @PatchMapping("/moderator/unban/{username}")
-    ResponseEntity<UserDTO> unbanUser(@PathVariable String username) {
-        UserDTO user = service.unbanUser(username);
-        return ResponseEntity.ok(user);
-    }
-
-    @ModeratorRole
-    @PatchMapping("/moderator/change-password/{username}")
-    ResponseEntity<UserDTO> changePassword(@PathVariable String username,
-                                               @Valid @RequestBody PasswordDTO password) {
-        UserDTO user = service.changePassword(password, username);
-        return ResponseEntity.ok(user);
+    @Operation(summary = "[MODERATOR] Change password of user by id")
+    @PatchMapping("/moderator/change-password/{userId}")
+    UserDTO changePassword(@PathVariable Long userId, @Valid @RequestBody PasswordDTO password) {
+        UserDTO user = service.changePasswordById(password, userId);
+        return user;
     }
 
     @AdminRole
-    @DeleteMapping("/admin/delete/{username}")
-    ResponseEntity<Void> deleteUserByUsername(@PathVariable String username) {
-        service.deleteUserByUsername(username);
-        return ResponseEntity.ok().build();
+    @Operation(summary = "[ADMIN] Delete user by id")
+    @DeleteMapping("/admin/delete/{userId}")
+    ResponseEntity<Void> deleteUserById(@PathVariable Long userId) {
+        service.deleteUserById(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @AdminRole
-    @PatchMapping("/admin/edit/{username}/role/{roleName}")
-    ResponseEntity<UserDTO> changeRole(@PathVariable String username, @PathVariable String roleName) {
-        UserDTO user = service.changeRole(username, roleName);
-        return ResponseEntity.ok(user);
+    @Operation(summary = "[ADMIN] Change role of user by id")
+    @PatchMapping("/admin/edit/{userId}/role/{roleName}")
+    UserDTO changeRole(@PathVariable Long userId, @PathVariable String roleName) {
+        UserDTO user = service.changeRoleById(userId, roleName);
+        return user;
     }
 }

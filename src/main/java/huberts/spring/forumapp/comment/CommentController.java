@@ -4,6 +4,7 @@ import huberts.spring.forumapp.comment.dto.CommentDTO;
 import huberts.spring.forumapp.comment.dto.CommentContentDTO;
 import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import huberts.spring.forumapp.security.annotation.UserRole;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -17,44 +18,50 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/comments")
+@RequestMapping("api/v1/comments")
 public class CommentController {
 
     private final CommentService service;
 
+    @Operation(summary = "Get all comments")
     @GetMapping()
-    ResponseEntity<List<CommentDTO>> getAllComments() {
+    List<CommentDTO> getAllComments() {
         List<CommentDTO> comments = service.getAllComments();
-        return ResponseEntity.ok(comments);
+        return comments;
     }
 
+    @Operation(summary = "Get comment by id")
     @GetMapping("/{commentId}")
-    ResponseEntity<CommentDTO> getCommentById(@PathVariable Long commentId) {
+    CommentDTO getCommentById(@PathVariable Long commentId) {
         CommentDTO comment = service.getCommentById(commentId);
-        return ResponseEntity.ok(comment);
+        return comment;
     }
 
+    @Operation(summary = "Get all comments by topic id")
     @GetMapping("/topic/{commentId}")
-    ResponseEntity<List<CommentDTO>> getAllCommentsByTopicId(@PathVariable Long commentId) {
+    List<CommentDTO> getAllCommentsByTopicId(@PathVariable Long commentId) {
         List<CommentDTO> commentsOfTopic = service.getAllCommentsByTopicId(commentId);
-        return ResponseEntity.ok(commentsOfTopic);
+        return commentsOfTopic;
     }
 
+    @Operation(summary = "Get all comments by username")
     @GetMapping("/user/{username}")
-    ResponseEntity<List<CommentDTO>> getAllCommentsByUsername(@PathVariable String username) {
+    List<CommentDTO> getAllCommentsByUsername(@PathVariable String username) {
         List<CommentDTO> commentsOfUser = service.getAllCommentsByUsername(username);
-        return ResponseEntity.ok(commentsOfUser);
+        return commentsOfUser;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Get all comments of authenticated user")
     @GetMapping("/user")
-    ResponseEntity<List<CommentDTO>> getAllCommentsByUsername(Authentication authenticatedUser) {
+    List<CommentDTO> getAllCommentsByUsername(Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         List<CommentDTO> commentsOfCurrentUser = service.getAllCommentsByUsername(username);
-        return ResponseEntity.ok(commentsOfCurrentUser);
+        return commentsOfCurrentUser;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Create comment by topic id")
     @PostMapping("/topic/{topicId}")
     ResponseEntity<CommentDTO> createComment(@PathVariable Long topicId, @RequestBody @Valid CommentContentDTO createCommentDTO,
                                               Authentication authenticatedUser) {
@@ -64,6 +71,7 @@ public class CommentController {
     }
 
     @UserRole
+    @Operation(summary = "[USER] Delete comment of authenticated user by comment id")
     @DeleteMapping("/delete/{commentId}")
     ResponseEntity<Void> deleteCommentByAuthor(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
@@ -72,15 +80,17 @@ public class CommentController {
     }
 
     @UserRole
+    @Operation(summary = "[USER] Update comment of authenticated user by comment id")
     @PatchMapping("/edit/{commentId}")
-    ResponseEntity<CommentDTO> updateCommentByAuthor(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO contentDTO,
+    CommentDTO updateCommentByAuthor(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO contentDTO,
                                                  Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         CommentDTO commentEdited = service.updateCommentByAuthor(commentId, contentDTO, username);
-        return ResponseEntity.ok(commentEdited);
+        return commentEdited;
     }
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Delete comment by comment id")
     @DeleteMapping("/moderator/delete/{commentId}")
     ResponseEntity<Void> deleteCommentByModerator(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
@@ -89,12 +99,12 @@ public class CommentController {
     }
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Update comment by comment id")
     @PatchMapping("/moderator/edit/{commentId}")
-    ResponseEntity<CommentDTO> updateCommentByModerator(@PathVariable Long commentId,
-                                                      @RequestBody @Valid CommentContentDTO contentDTO,
-                                                      Authentication authenticatedUser) {
+    CommentDTO updateCommentByModerator(@PathVariable Long commentId, @RequestBody @Valid CommentContentDTO contentDTO,
+                                        Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         CommentDTO commentEdited = service.updateCommentByModerator(commentId, contentDTO, username);
-        return ResponseEntity.ok(commentEdited);
+        return commentEdited;
     }
 }

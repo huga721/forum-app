@@ -3,6 +3,7 @@ package huberts.spring.forumapp.category;
 import huberts.spring.forumapp.category.dto.*;
 import huberts.spring.forumapp.security.annotation.AdminRole;
 import huberts.spring.forumapp.security.annotation.ModeratorRole;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,23 +16,27 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/categories")
+@RequestMapping("api/v1/categories")
 public class CategoryController {
+
     private final CategoryService service;
 
+    @Operation(summary = "Get all categories")
     @GetMapping()
-    ResponseEntity<List<CategoryDTO>> getAllCategories() {
+    List<CategoryDTO> getAllCategories() {
         List<CategoryDTO> categories = service.getAllCategories();
-        return ResponseEntity.ok(categories);
+        return categories;
     }
 
+    @Operation(summary = "Get category by id")
     @GetMapping("/{categoryId}")
-    ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long categoryId) {
+    CategoryDTO getCategoryById(@PathVariable Long categoryId) {
         CategoryDTO category = service.getCategoryById(categoryId);
-        return ResponseEntity.ok(category);
+        return category;
     }
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Create category")
     @PostMapping("/moderator/create")
     ResponseEntity<CategoryDTO> createCategory(@RequestBody @Valid CreateCategoryDTO createCategoryDTO) {
         CategoryDTO categoryCreated = service.createCategory(createCategoryDTO);
@@ -39,22 +44,23 @@ public class CategoryController {
     }
 
     @AdminRole
+    @Operation(summary = "[ADMIN] Update title by category id")
     @PatchMapping("/admin/edit/title/{categoryId}")
-    ResponseEntity<CategoryDTO> updateTitle(@PathVariable Long categoryId,
-                                          @RequestBody @Valid NewCategoryTitleDTO newCategoryTitleDTO) {
+    CategoryDTO updateTitle(@PathVariable Long categoryId, @RequestBody @Valid NewCategoryTitleDTO newCategoryTitleDTO) {
         CategoryDTO categoryEdited = service.updateTitle(categoryId, newCategoryTitleDTO);
-        return ResponseEntity.ok(categoryEdited);
+        return categoryEdited;
     }
 
     @AdminRole
+    @Operation(summary = "[ADMIN] Update description by category id")
     @PatchMapping("/admin/edit/description/{categoryId}")
-    ResponseEntity<CategoryDTO> updateDescription(@PathVariable Long categoryId,
-                                                @RequestBody @Valid NewCategoryDescriptionDTO newCategoryDescriptionDTO) {
+    CategoryDTO updateDescription(@PathVariable Long categoryId, @RequestBody @Valid NewCategoryDescriptionDTO newCategoryDescriptionDTO) {
         CategoryDTO categoryEdited = service.updateDescription(categoryId, newCategoryDescriptionDTO);
-        return ResponseEntity.ok(categoryEdited);
+        return categoryEdited;
     }
 
     @AdminRole
+    @Operation(summary = "[ADMIN] Delete category by category id")
     @DeleteMapping("/admin/delete/{categoryId}")
     ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         service.deleteCategory(categoryId);

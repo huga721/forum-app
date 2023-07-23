@@ -3,6 +3,7 @@ package huberts.spring.forumapp.like;
 import huberts.spring.forumapp.like.dto.LikeDTO;
 import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import huberts.spring.forumapp.security.annotation.UserRole;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,32 +14,36 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/likes")
+@RequestMapping("api/v1/likes")
 public class LikeController {
 
     private final LikeService service;
 
+    @Operation(summary = "Get all likes")
     @GetMapping()
-    ResponseEntity<List<LikeDTO>> getAllLikes() {
+    List<LikeDTO> getAllLikes() {
         List<LikeDTO> likes = service.getAllLikes();
-        return ResponseEntity.ok(likes);
+        return likes;
     }
 
+    @Operation(summary = "Get like by id")
     @GetMapping("/{likeId}")
-    ResponseEntity<LikeDTO> getLikeById(@PathVariable Long likeId) {
+    LikeDTO getLikeById(@PathVariable Long likeId) {
         LikeDTO like = service.getLikeById(likeId);
-        return ResponseEntity.ok(like);
+        return like;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Get all likes")
     @GetMapping("/user")
-    ResponseEntity<List<LikeDTO>> getAllLikesByUsername(Authentication authenticatedUser) {
+    List<LikeDTO> getAllLikesByUsername(Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         List<LikeDTO> likes = service.getAllLikesByUsername(username);
-        return ResponseEntity.ok(likes);
+        return likes;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Create like of topic")
     @PostMapping("/topic/{topicId}")
     ResponseEntity<LikeDTO> createTopicLike(@PathVariable Long topicId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
@@ -47,6 +52,7 @@ public class LikeController {
     }
 
     @UserRole
+    @Operation(summary = "[USER] Create like of comment")
     @PostMapping("/comment/{commentId}")
     ResponseEntity<LikeDTO> createCommentLike(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
@@ -55,6 +61,7 @@ public class LikeController {
     }
 
     @UserRole
+    @Operation(summary = "[USER] Delete like of authenticated user by comment id")
     @DeleteMapping("/delete/{commentId}")
     ResponseEntity<Void> deleteLikeByAuthor(@PathVariable Long commentId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
@@ -63,6 +70,7 @@ public class LikeController {
     }
 
     @ModeratorRole
+    @Operation(summary = "[USER] Delete like by comment id")
     @DeleteMapping("/moderator/delete/{commentId}")
     ResponseEntity<Void> deleteLikeByModerator(@PathVariable Long commentId) {
         service.deleteLikeByModerator(commentId);

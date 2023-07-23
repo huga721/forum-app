@@ -4,6 +4,7 @@ import huberts.spring.forumapp.category.dto.UpdateTopicCategoryDTO;
 import huberts.spring.forumapp.security.annotation.ModeratorRole;
 import huberts.spring.forumapp.security.annotation.UserRole;
 import huberts.spring.forumapp.topic.dto.*;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,25 +17,28 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/topics")
+@RequestMapping("api/v1/topics")
 @RequiredArgsConstructor
 public class TopicController {
 
     private final TopicService service;
 
+    @Operation(summary = "Get all topics")
     @GetMapping()
-    ResponseEntity<List<TopicDTO>> getAllTopics() {
+    List<TopicDTO> getAllTopics() {
         List<TopicDTO> topics = service.getAllTopics();
-        return ResponseEntity.ok(topics);
+        return topics;
     }
 
+    @Operation(summary = "Get topic by id")
     @GetMapping("/{topicId}")
-    ResponseEntity<TopicDTO> getTopicById(@PathVariable Long topicId) {
+    TopicDTO getTopicById(@PathVariable Long topicId) {
         TopicDTO topic = service.getTopicById(topicId);
-        return ResponseEntity.ok(topic);
+        return topic;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Create topic")
     @PostMapping("/create")
     ResponseEntity<TopicDTO> createTopic(@RequestBody @Valid CreateTopicDTO createTopicDTO, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
@@ -43,6 +47,7 @@ public class TopicController {
     }
 
     @UserRole
+    @Operation(summary = "[USER] Delete topic of authenticated user by topic id")
     @DeleteMapping("/delete/{topicId}")
     ResponseEntity<Void> deleteTopicByAuthor(@PathVariable Long topicId, Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
@@ -51,51 +56,57 @@ public class TopicController {
     }
 
     @UserRole
+    @Operation(summary = "[USER] Close topic of authenticated user by topic id")
     @PatchMapping("/close-topic/{topicId}")
-    ResponseEntity<TopicDTO> closeTopicByAuthor(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeReasonDTO,
-                                                Authentication authenticatedUser) {
+    TopicDTO closeTopicByAuthor(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeReasonDTO,
+                                Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         TopicDTO topicClosed = service.closeTopicByAuthor(topicId, closeReasonDTO, username);
-        return ResponseEntity.ok(topicClosed);
+        return topicClosed;
     }
 
     @UserRole
+    @Operation(summary = "[USER] Edit topic of authenticated user by topic id")
     @PatchMapping("/edit/{topicId}")
-    ResponseEntity<TopicDTO> updateTopicByAuthor(@RequestBody UpdateTopicDTO updateTopicDTO, @PathVariable Long topicId,
-                                                          Authentication authenticatedUser) {
+    TopicDTO updateTopicByAuthor(@RequestBody UpdateTopicDTO updateTopicDTO, @PathVariable Long topicId,
+                                 Authentication authenticatedUser) {
         String username = authenticatedUser.getName();
         TopicDTO topicChanged = service.updateTopicByAuthor(topicId, updateTopicDTO, username);
-        return ResponseEntity.ok(topicChanged);
+        return topicChanged;
     }
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Edit topic by topic id")
     @PatchMapping("/moderator/edit/{topicId}")
-    ResponseEntity<TopicDTO> updateTopicByModerator(@RequestBody UpdateTopicDTO updateTopicDTO,
-                                                             @PathVariable Long topicId, Authentication authenticatedUser) {
+    TopicDTO updateTopicByModerator(@RequestBody UpdateTopicDTO updateTopicDTO, @PathVariable Long topicId,
+                                    Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
         TopicDTO topicChanged = service.updateTopicByModerator(topicId, updateTopicDTO, moderatorName);
-        return ResponseEntity.ok(topicChanged);
+        return topicChanged;
     }
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Change category by topic id")
     @PatchMapping("/moderator/change-category/{topicId}")
-    ResponseEntity<TopicDTO> changeCategoryOfTopic(@RequestBody @Valid UpdateTopicCategoryDTO updateTopicCategoryDTO,
+    TopicDTO changeCategoryOfTopic(@RequestBody @Valid UpdateTopicCategoryDTO updateTopicCategoryDTO,
                                                               @PathVariable Long topicId, Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
         TopicDTO topicChanged = service.changeCategoryOfTopic(topicId, updateTopicCategoryDTO, moderatorName);
-        return ResponseEntity.ok(topicChanged);
+        return topicChanged;
     }
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Close topic by topic id")
     @PatchMapping("/moderator/close-topic/{topicId}")
-    ResponseEntity<TopicDTO> closeTopicByModerator(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeReasonDTO,
+    TopicDTO closeTopicByModerator(@PathVariable Long topicId, @RequestBody @Valid CloseReasonDTO closeReasonDTO,
                                             Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
         TopicDTO topicClosed = service.closeTopicByModerator(topicId, closeReasonDTO, moderatorName);
-        return ResponseEntity.ok(topicClosed);
+        return topicClosed;
     }
 
     @ModeratorRole
+    @Operation(summary = "[MODERATOR] Delete topic by topic ids")
     @DeleteMapping("/moderator/delete/{topicId}")
     ResponseEntity<Void> deleteTopicByModerator(@PathVariable Long topicId, Authentication authenticatedUser) {
         String moderatorName = authenticatedUser.getName();
