@@ -2,15 +2,15 @@ package huberts.spring.forumapp.user;
 
 import huberts.spring.forumapp.exception.role.RoleDoesntExistException;
 import huberts.spring.forumapp.exception.role.RoleException;
-import huberts.spring.forumapp.exception.user.UserAlreadyExistingException;
+import huberts.spring.forumapp.exception.user.UserAlreadyExistException;
 import huberts.spring.forumapp.exception.user.UserBlockException;
 import huberts.spring.forumapp.exception.user.UserDoesntExistException;
+import huberts.spring.forumapp.role.ERole;
 import huberts.spring.forumapp.role.Role;
 import huberts.spring.forumapp.role.RoleRepository;
 import huberts.spring.forumapp.user.dto.PasswordDTO;
-import huberts.spring.forumapp.user.dto.RegisterDTO;
+import huberts.spring.forumapp.user.dto.CredentialsDTO;
 import huberts.spring.forumapp.user.dto.UserDTO;
-import huberts.spring.forumapp.user.service.UserService;
 import huberts.spring.forumapp.warning.WarningRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,7 @@ class UserServiceTest {
 
     private static final String ROLE_NAME_ADMIN = "ROLE_ADMIN";
     private static final String ROLE_NAME_MODERATOR = "ROLE_MODERATOR";
-    private static final String ROLE_NAME_USER = "ROLE_USER";
+    private static final String ROLE_TO_CHANGE = "admin";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
     private static final String PASSWORD_TO_CHANGE = "passwordTest";
@@ -59,13 +59,13 @@ class UserServiceTest {
     @BeforeAll
     static void beforeAll() {
         ROLE_ADMIN = Role.builder()
-                .name(ROLE_NAME_ADMIN)
+                .name(ERole.ROLE_ADMIN)
                 .build();
         ROLE_MODERATOR = Role.builder()
-                .name(ROLE_NAME_MODERATOR)
+                .name(ERole.ROLE_MODERATOR)
                 .build();
         ROLE_USER = Role.builder()
-                .name(ROLE_NAME_USER)
+                .name(ERole.ROLE_USER)
                 .build();
     }
 
@@ -90,11 +90,11 @@ class UserServiceTest {
     @Nested
     class CreateUserTests {
 
-        private RegisterDTO credentials;
+        private CredentialsDTO credentials;
 
         @BeforeEach
         void setUp() {
-            credentials = new RegisterDTO(USER, PASSWORD);
+            credentials = new CredentialsDTO(USER, PASSWORD);
         }
 
         @DisplayName("Should create and save a user")
@@ -102,7 +102,7 @@ class UserServiceTest {
         void shouldCreateUser() {
             when(userRepository.existsByUsername(any(String.class))).thenReturn(false);
             when(passwordEncoder.encode(any(String.class))).thenReturn(PASSWORD_ENCODED);
-            when(roleRepository.findByName(any(String.class))).thenReturn(Optional.of(ROLE_USER));
+            when(roleRepository.findByName(any(ERole.class))).thenReturn(Optional.of(ROLE_USER));
             when(userRepository.save(any(User.class))).thenReturn(user);
             UserDTO userSaved = userService.createUser(credentials);
 
@@ -114,7 +114,7 @@ class UserServiceTest {
         @Test
         void shouldThrowUserAlreadyExistingException_WhenUserExists() {
             when(userRepository.existsByUsername(any(String.class))).thenReturn(true);
-            assertThrows(UserAlreadyExistingException.class, () -> userService.createUser(credentials));
+            assertThrows(UserAlreadyExistException.class, () -> userService.createUser(credentials));
         }
 
         @DisplayName("Should throw RoleDoesntExistException when role doesn't exist")
@@ -125,24 +125,24 @@ class UserServiceTest {
         }
     }
 
-    @DisplayName("getUserByUsername method")
+    @DisplayName("getUserById method")
     @Nested
     class GetUserByUsernameTests {
 
         @DisplayName("Should return user by username")
         @Test
         void shouldReturnUser() {
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            UserDTO expected = userService.getUserByUsername(USER);
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            UserDTO expected = userService.getUserById(1L);
 
             assertNotNull(expected);
-            verify(userRepository, times(1)).findByUsername(USER);
+            verify(userRepository, times(1)).findById(1L);
         }
 
         @DisplayName("Should throw UserDoesntExistException when user doesn't exist")
         @Test
         void shouldThrowUserDoesntExistException_WhenUserDoesntExist() {
-            assertThrows(UserDoesntExistException.class, () -> userService.getUserByUsername(USER));
+            assertThrows(UserDoesntExistException.class, () -> userService.getUserById(1L));
         }
     }
 
@@ -190,35 +190,35 @@ class UserServiceTest {
         @DisplayName("Should change role")
         @Test
         void shouldChangeRole() {
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            when(roleRepository.findByName(any(String.class))).thenReturn(Optional.of(ROLE_ADMIN));
-            UserDTO userDTO = userService.changeRole(USER, ROLE_NAME_ADMIN);
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            when(roleRepository.findByName(any(ERole.class))).thenReturn(Optional.of(ROLE_ADMIN));
+            UserDTO userDTO = userService.changeRoleById(1L, ROLE_TO_CHANGE);
 
             assertNotNull(userDTO);
             assertEquals(userDTO.role(), ROLE_NAME_ADMIN);
-            verify(userRepository, times(1)).findByUsername(USER);
+            verify(userRepository, times(1)).findById(1L);
         }
 
         @DisplayName("Should throw RoleException when role to be changed is the same as actual role")
         @Test
         void shouldThrowRoleException_WhenRoleToBeChangedIsTheSameAsActualRole() {
             user.setRole(ROLE_MODERATOR);
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            assertThrows(RoleException.class, () -> userService.changeRole(USER, ROLE_NAME_MODERATOR));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            assertThrows(RoleException.class, () -> userService.changeRoleById(1L, ROLE_NAME_MODERATOR));
         }
 
         @DisplayName("Should throw RoleDoesntException when role to be changed doesn't exist")
         @Test
         void shouldThrowRoleDoesntExistException_WhenRoleToBeChangedDoesntExist() {
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            assertThrows(RoleDoesntExistException.class, () -> userService.changeRole(USER, EMPTY));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            assertThrows(RoleDoesntExistException.class, () -> userService.changeRoleById(1L, EMPTY));
         }
 
 
         @DisplayName("Should throw UserDoesntExistException when user to change role doesn't exist")
         @Test
         void shouldThrowUserDoesntExistException_WhenUserToChangeRoleDoesntExist() {
-            assertThrows(UserDoesntExistException.class, () -> userService.changeRole(USER, ROLE_NAME_ADMIN));
+            assertThrows(UserDoesntExistException.class, () -> userService.changeRoleById(1L, ROLE_NAME_ADMIN));
         }
     }
 
@@ -237,17 +237,17 @@ class UserServiceTest {
         @Test
         void shouldChangePassword() {
             when(passwordEncoder.encode(any(String.class))).thenReturn(PASSWORD_TO_CHANGE);
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            UserDTO result = userService.changePassword(password, USER);
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            UserDTO result = userService.changePasswordById(password, 1L);
 
             assertNotNull(result);
-            verify(userRepository, times(1)).findByUsername(USER);
+            verify(userRepository, times(1)).findById(1L);
         }
 
         @DisplayName("Should throw UserDoesntExist when user to change password doesn't exist")
         @Test
         void shouldThrowUserDoesntExist_WhenUserToChangePasswordDoesntExist() {
-            assertThrows(UserDoesntExistException.class, () -> userService.changePassword(password, USER));
+            assertThrows(UserDoesntExistException.class, () -> userService.changePasswordById(password, 1L));
         }
     }
 
@@ -257,8 +257,8 @@ class UserServiceTest {
         @DisplayName("Should ban user")
         @Test
         void shouldBanUser() {
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            UserDTO result = userService.banUser(USER);
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            UserDTO result = userService.banUserById(1L);
 
             assertNotNull(result);
             assertTrue(result.blocked());
@@ -268,14 +268,14 @@ class UserServiceTest {
         @Test
         void shouldThrowUserBlockException_WhenUserIsAlreadyBanned() {
             user.setBlocked(true);
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            assertThrows(UserBlockException.class, () -> userService.banUser(USER));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            assertThrows(UserBlockException.class, () -> userService.banUserById(1L));
         }
 
         @DisplayName("Should throw UserDoesntExistException when user to ban doesn't exist")
         @Test
         void shouldThrowUserDoesntExistException_WhenUserToBanDoesntExist() {
-            assertThrows(UserDoesntExistException.class, () -> userService.banUser(USER));
+            assertThrows(UserDoesntExistException.class, () -> userService.banUserById(1L));
         }
     }
 
@@ -288,28 +288,30 @@ class UserServiceTest {
         void shouldUnbanUser() {
             user.setBlocked(true);
 
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
             doNothing().when(warningRepository).deleteWarningsByUser(any(User.class));
-            UserDTO result = userService.unbanUser(USER);
+            UserDTO result = userService.unbanUserById(1L);
 
             assertNotNull(result);
             assertFalse(result.blocked());
         }
 
-        @DisplayName("Should throw UserBlockException when user is not banned")
+        @DisplayName("Should do nothing when user is not banned")
         @Test
-        void shouldThrowUserBlockException_WhenUserIsNotBanned() {
+        void shouldDoNothing_WhenUserToUnbanIsNotBanned() {
             user.setBlocked(false);
 
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            doNothing().when(warningRepository).deleteWarningsByUser(any(User.class));
+            UserDTO result = userService.unbanUserById(1L);
 
-            assertThrows(UserBlockException.class, () -> userService.unbanUser(USER));
+            assertFalse(result.blocked());
         }
 
         @DisplayName("Should throw UserDoesntExistException when user to ban doesn't exist")
         @Test
         void shouldThrowUserDoesntExistException_WhenUserToBanDoesntExist() {
-            assertThrows(UserDoesntExistException.class, () -> userService.unbanUser(USER));
+            assertThrows(UserDoesntExistException.class, () -> userService.unbanUserById(1L));
         }
     }
 
@@ -320,16 +322,16 @@ class UserServiceTest {
         @DisplayName("Should delete user")
         @Test
         void shouldDeleteUser() {
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
 
-            userService.deleteUserByUsername(USER);
+            userService.deleteUserById(1L);
             verify(userRepository, times(1)).delete(user);
         }
 
         @DisplayName("Should throw UserDoesntExistException when user to delete doesn't exist")
         @Test
         void shouldThrowUserDoesntExistException_WhenUserToDeleteDoesntExist() {
-            assertThrows(UserDoesntExistException.class, () -> userService.deleteUserByUsername(USER));
+            assertThrows(UserDoesntExistException.class, () -> userService.deleteUserById(1L));
         }
     }
 }

@@ -64,9 +64,9 @@ class WarningServiceTest {
         @DisplayName("Should create warning")
         @Test
         void shouldCreateWarning() {
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
 
-            WarningDTO warningCreated = warningService.createWarning(USERNAME);
+            WarningDTO warningCreated = warningService.createWarning(1L);
 
             assertEquals(warningCreated.status(), NOT_BANNED_MESSAGE);
             assertEquals(warningCreated.username(), USERNAME);
@@ -75,7 +75,7 @@ class WarningServiceTest {
         @DisplayName("Should throw UserDoesntExistException when user doesn't exist")
         @Test
         void shouldThrowUserDoesntExistException_WhenUserDoesntExist() {
-            assertThrows(UserDoesntExistException.class, () -> warningService.createWarning(USERNAME));
+            assertThrows(UserDoesntExistException.class, () -> warningService.createWarning(1L));
         }
 
         @DisplayName("Should ban user when user has 4 warnings and receive 5th")
@@ -88,8 +88,8 @@ class WarningServiceTest {
             warnings.add(warning);
             user.setWarnings(warnings);
 
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            WarningDTO warningCreated = warningService.createWarning(USERNAME);
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            WarningDTO warningCreated = warningService.createWarning(1L);
 
             assertEquals(USERNAME, warningCreated.username());
             assertEquals(BANNED_MESSAGE, warningCreated.status());
@@ -100,8 +100,8 @@ class WarningServiceTest {
         @Test
         void shouldThrowUserBlockException_WhenUserToWarnIsAlreadyBanned() {
             user.setBlocked(true);
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            assertThrows(UserBlockException.class, () -> warningService.createWarning(USERNAME));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            assertThrows(UserBlockException.class, () -> warningService.createWarning(1L));
         }
     }
 
@@ -163,8 +163,8 @@ class WarningServiceTest {
             warnings.add(warning);
             user.setWarnings(warnings);
 
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            warningService.deleteWarning(USERNAME);
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            warningService.deleteWarning(1L);
 
             assertEquals(1, user.getWarnings().size());
             verify(warningRepository, times(1)).delete(any(Warning.class));
@@ -173,22 +173,22 @@ class WarningServiceTest {
         @DisplayName("Should throw UserDoesntExistException when user doesn't exist")
         @Test
         void shouldThrowUserDoesntExistException_WhenUserDoesntExist() {
-            assertThrows(UserDoesntExistException.class, () -> warningService.deleteWarning(USERNAME));
+            assertThrows(UserDoesntExistException.class, () -> warningService.deleteWarning(1L));
         }
 
         @DisplayName("Should throw UserBlockException when deleting warning of blocked user")
         @Test
         void shouldThrowUserBlockException_WhenDeletingWarningOfBlockedUser() {
             user.setBlocked(true);
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-            assertThrows(UserBlockException.class, () -> warningService.deleteWarning(USERNAME));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            assertThrows(UserBlockException.class, () -> warningService.deleteWarning(1L));
         }
 
         @DisplayName("Should throw UserBlockException when user doesn't have any warning")
         @Test
         void shouldThrowUserBlockException_WhenUserDoesntHaveAnyWarning() {
-            when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
-            assertThrows(UserBlockException.class, () -> warningService.deleteWarning(USERNAME));
+            when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+            assertThrows(UserBlockException.class, () -> warningService.deleteWarning(1L));
         }
     }
 }

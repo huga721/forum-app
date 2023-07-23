@@ -3,6 +3,7 @@ package huberts.spring.forumapp.like;
 import huberts.spring.forumapp.comment.Comment;
 import huberts.spring.forumapp.comment.CommentRepository;
 import huberts.spring.forumapp.exception.comment.CommentDoesntExistException;
+import huberts.spring.forumapp.exception.like.LikeAlreadyExistException;
 import huberts.spring.forumapp.exception.like.LikeDoesntExistException;
 import huberts.spring.forumapp.exception.topic.TopicDoesntExistException;
 import huberts.spring.forumapp.exception.topic.TopicIsClosedException;
@@ -86,7 +87,9 @@ class LikeServiceTest {
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(likeRepository.existsByTopicAndUser(any(Topic.class), any(User.class))).thenReturn(false);
+
             LikeDTO likeCreated = service.createTopicLike(1L, USERNAME);
+
             assertEquals(likeCreated.who(), USERNAME);
             assertEquals(likeCreated.likedObjectId(), 1L);
             assertEquals(likeCreated.likedObject(), STRING_TOPIC);
@@ -98,21 +101,24 @@ class LikeServiceTest {
             assertThrows(TopicDoesntExistException.class, () -> service.createTopicLike(1L, USERNAME));
         }
 
-        @DisplayName("Should throw LikeExistException when like already exists")
+        @DisplayName("Should throw LikeAlreadyExistException when like already exists")
         @Test
         void shouldThrowLikeExistException_WhenLikeAlreadyExists() {
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(likeRepository.existsByTopicAndUser(any(Topic.class), any(User.class))).thenReturn(true);
-            assertThrows(LikeDoesntExistException.class, () -> service.createTopicLike(1L, USERNAME));
+
+            assertThrows(LikeAlreadyExistException.class, () -> service.createTopicLike(1L, USERNAME));
         }
 
         @DisplayName("Should throw TopicIsClosedException when topic where like should be created is closed")
         @Test
         void shouldThrowTopicIsClosedException_WhenTopicWhereCommentShouldBeCreatedIsClosed() {
             topic.setClosed(true);
+
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+
             assertThrows(TopicIsClosedException.class, () -> service.createTopicLike(1L, USERNAME));
         }
     }
@@ -127,7 +133,9 @@ class LikeServiceTest {
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(likeRepository.existsByCommentAndUser(any(Comment.class), any(User.class))).thenReturn(false);
+
             LikeDTO likeCreated = service.createCommentLike(1L, USERNAME);
+
             assertEquals(likeCreated.who(), USERNAME);
             assertEquals(likeCreated.likedObjectId(), 1L);
             assertEquals(likeCreated.likedObject(), STRING_COMMENT);
@@ -139,21 +147,24 @@ class LikeServiceTest {
             assertThrows(CommentDoesntExistException.class, () -> service.createCommentLike(1L, USERNAME));
         }
 
-        @DisplayName("Should throw LikeExistException when like already exist")
+        @DisplayName("Should throw LikeAlreadyExistException when like already exist")
         @Test
         void shouldThrowLikeExistException_WhenLikeAlreadyExist() {
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(likeRepository.existsByCommentAndUser(any(Comment.class), any(User.class))).thenReturn(true);
-            assertThrows(LikeDoesntExistException.class, () -> service.createCommentLike(1L, USERNAME));
+
+            assertThrows(LikeAlreadyExistException.class, () -> service.createCommentLike(1L, USERNAME));
         }
 
         @DisplayName("Should TopicIsClosedException when topic of comment where like should be created in is closed")
         @Test
         void shouldTopicIsClosedException_WhenTopicOfCommentWhereLikeShouldBeCreatedInIsClosed() {
             topic.setClosed(true);
+
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+
             assertThrows(TopicIsClosedException.class, () -> service.createCommentLike(1L, USERNAME));
         }
     }
@@ -166,7 +177,9 @@ class LikeServiceTest {
         @Test
         void shouldGetLike() {
             when(likeRepository.findById(any(Long.class))).thenReturn(Optional.of(like));
+
             LikeDTO likeFound = service.getLikeById(1L);
+
             assertEquals(likeFound.who(), USERNAME);
         }
 
@@ -185,7 +198,9 @@ class LikeServiceTest {
         @Test
         void shouldReturnAllLikes() {
             when(likeRepository.findAll()).thenReturn(List.of(like, like));
+
             List<LikeDTO> likesFound = service.getAllLikes();
+
             assertEquals(likesFound.size(), 2);
             assertEquals(likesFound.get(0).who(), USERNAME);
         }
@@ -200,7 +215,9 @@ class LikeServiceTest {
         void shouldReturnAllLikesByUsername() {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(likeRepository.findAllByUser(any(User.class))).thenReturn(List.of(like, like));
+
             List<LikeDTO> likesFound = service.getAllLikesByUsername(USERNAME);
+
             assertEquals(likesFound.size(), 2);
             assertEquals(likesFound.get(0).who(), USERNAME);
         }
@@ -214,8 +231,11 @@ class LikeServiceTest {
         @Test
         void shouldDeleteLike() {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+            when(likeRepository.existsById(any(Long.class))).thenReturn(true);
             when(likeRepository.findByUserAndId(any(User.class), any(Long.class))).thenReturn(Optional.of(like));
+
             service.deleteLikeByAuthor(1L, USERNAME);
+
             verify(likeRepository, times(1)).delete(like);
         }
 

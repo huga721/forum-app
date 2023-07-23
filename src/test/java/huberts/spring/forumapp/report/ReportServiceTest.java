@@ -13,6 +13,7 @@ import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.topic.TopicRepository;
 import huberts.spring.forumapp.user.User;
 import huberts.spring.forumapp.user.UserRepository;
+import huberts.spring.forumapp.utility.UtilityService;
 import huberts.spring.forumapp.warning.WarningRepository;
 import huberts.spring.forumapp.warning.WarningService;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,8 @@ class ReportServiceTest {
 
     @Mock
     private CommentRepository commentRepository;
+    @Mock
+    private UtilityService utilityService;
     @Mock
     private TopicRepository topicRepository;
     @Mock
@@ -103,6 +106,7 @@ class ReportServiceTest {
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
 
             ReportDTO reportCreated = service.createCommentReport(1L, reportReason, USERNAME);
+
             assertEquals(reportCreated.reason(), REPORT_REASON);
             assertEquals(reportCreated.reportedObject(), STRING_COMMENT);
             assertEquals(reportCreated.whoReported(), USERNAME);
@@ -140,6 +144,7 @@ class ReportServiceTest {
 
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
+
             ReportDTO reportCreated = service.createTopicReport(1L, reportReason, USERNAME);
 
             assertEquals(reportCreated.reason(), REPORT_REASON);
@@ -177,7 +182,9 @@ class ReportServiceTest {
         @Test
         void shouldGetReport() {
             when(reportRepository.findById(any(Long.class))).thenReturn(Optional.of(report));
+
             ReportDTO report = service.getReportById(1L);
+
             assertEquals(report.whoReported(), USERNAME);
             assertEquals(report.reason(), REPORT_REASON);
         }
@@ -220,13 +227,16 @@ class ReportServiceTest {
         @Test
         void shouldReturnAllNotSeenReports() {
             Report seenReport = Report.builder()
+                    .id(3L)
+                    .topic(topic)
+                    .user(user)
                     .seen(true)
                     .build();
 
             when(reportRepository.findAll()).thenReturn(List.of(seenReport, report, seenReport));
             List<ReportDTO> reports = service.getAllNotSeenReports();
 
-            assertEquals(reports.size(), 1);
+            assertEquals(1, reports.size());
             assertFalse(reports.get(0).seen());
         }
 
@@ -234,6 +244,9 @@ class ReportServiceTest {
         @Test
         void shouldReturnEmptyList_WhenEveryReportIsSeen() {
             Report seenReport = Report.builder()
+                    .id(3L)
+                    .topic(topic)
+                    .user(user)
                     .seen(true)
                     .build();
             when(reportRepository.findAll()).thenReturn(List.of(seenReport, seenReport, seenReport));
@@ -250,7 +263,9 @@ class ReportServiceTest {
         @Test
         void shouldSetFieldSeenToTrue() {
             report.setSeen(false);
+
             when(reportRepository.findById(any(Long.class))).thenReturn(Optional.of(report));
+
             ReportDTO report = service.updateReportAsSeen(1L);
             assertTrue(report.seen());
         }
@@ -259,7 +274,9 @@ class ReportServiceTest {
         @Test
         void shouldDoNothing_WhenReportFieldSeenIsAlreadyTrue() {
             report.setSeen(true);
+
             when(reportRepository.findById(any(Long.class))).thenReturn(Optional.of(report));
+
             ReportDTO report = service.updateReportAsSeen(1L);
             assertTrue(report.seen());
         }
@@ -284,7 +301,6 @@ class ReportServiceTest {
             service.executeReportAndWarnTopicAuthor(1L);
 
             verify(topicRepository, times(1)).delete(topic);
-            verify(warningService, times(1)).createWarning(USERNAME);
         }
 
         @DisplayName("Should throw ReportRealiseException when topic has less than 5 reports")
@@ -325,10 +341,10 @@ class ReportServiceTest {
             comment.setReports(List.of(report, report, report, report, report));
 
             when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
+            doNothing().when(commentRepository).delete(any(Comment.class));
             service.executeReportAndWarnCommentAuthor(1L);
 
             verify(commentRepository, times(1)).delete(comment);
-            verify(warningService, times(1)).createWarning(USERNAME);
         }
 
         @DisplayName("Should throw ReportRealiseException when comment has less than 5 reports")

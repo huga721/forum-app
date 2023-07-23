@@ -13,6 +13,7 @@ import huberts.spring.forumapp.topic.dto.TopicDTO;
 import huberts.spring.forumapp.topic.dto.UpdateTopicDTO;
 import huberts.spring.forumapp.user.User;
 import huberts.spring.forumapp.user.UserRepository;
+import huberts.spring.forumapp.utility.UtilityService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,6 +46,8 @@ class TopicServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UtilityService utilityService;
     @Mock
     private CommentService commentService;
     @InjectMocks
@@ -200,7 +203,6 @@ class TopicServiceTest {
             UpdateTopicDTO editDTO = new UpdateTopicDTO(TITLE_TO_CHANGE, CONTENT_TO_CHANGE);
 
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             TopicDTO result = service.updateTopicByModerator(1L, editDTO, USERNAME);
 
             assertEquals(result.title(), TITLE_TO_CHANGE);
@@ -213,7 +215,6 @@ class TopicServiceTest {
             UpdateTopicDTO editDTO = new UpdateTopicDTO(EMPTY, EMPTY);
 
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             TopicDTO result = service.updateTopicByModerator(1L, editDTO, USERNAME);
 
             assertEquals(result.title(), topic.getTitle());
@@ -246,8 +247,8 @@ class TopicServiceTest {
         @Test
         void shouldChangeCategory() {
             UpdateTopicCategoryDTO titleDTO = new UpdateTopicCategoryDTO(TITLE_TO_CHANGE);
+
             when(categoryRepository.findByTitle(any(String.class))).thenReturn(Optional.of(categoryToChange));
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
             TopicDTO result = service.changeCategoryOfTopic(1L, titleDTO, USERNAME);
 
@@ -278,8 +279,10 @@ class TopicServiceTest {
         @Test
         void shouldCloseTopic() {
             CloseReasonDTO closeTopicDTO = new CloseReasonDTO(CLOSE_REASON);
+
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(topicRepository.findByUserAndId(any(User.class), any(Long.class))).thenReturn(Optional.of(topic));
+
             TopicDTO result = service.closeTopicByAuthor(1L, closeTopicDTO, USERNAME);
             assertTrue(result.closed());
         }
@@ -301,7 +304,9 @@ class TopicServiceTest {
         @Test
         void shouldCloseTopic() {
             CloseReasonDTO closeTopicDTO = new CloseReasonDTO(CLOSE_REASON);
+
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
+
             TopicDTO result = service.closeTopicByModerator(1L, closeTopicDTO, USERNAME);
             assertTrue(result.closed());
         }
@@ -323,6 +328,7 @@ class TopicServiceTest {
         void shouldDeleteTopic() {
             when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             when(topicRepository.findByUserAndId(any(User.class), any(Long.class))).thenReturn(Optional.of(topic));
+
             service.deleteTopicByAuthor(1L, USERNAME);
             verify(topicRepository, times(1)).delete(topic);
         }
@@ -343,7 +349,6 @@ class TopicServiceTest {
         @Test
         void shouldDeleteTopic() {
             when(topicRepository.findById(any(Long.class))).thenReturn(Optional.of(topic));
-            when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
             service.deleteTopicByModerator(1L, USERNAME);
             verify(topicRepository, times(1)).delete(topic);
         }
