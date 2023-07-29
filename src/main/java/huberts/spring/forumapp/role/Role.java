@@ -1,21 +1,26 @@
 package huberts.spring.forumapp.role;
 
+import huberts.spring.forumapp.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Entity(name = "`role`")
 @Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column(unique = true)
-    private String name;
-    private String code;
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    private ERole name;
+
+    @OneToMany(mappedBy = "role")
+    private List<User> users;
 }
