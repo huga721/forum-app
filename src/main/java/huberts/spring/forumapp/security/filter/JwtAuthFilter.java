@@ -22,16 +22,16 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-@PropertySource("classpath:application-security.properties")
+@PropertySource("classpath:application.yaml")
 public class JwtAuthFilter extends BasicAuthenticationFilter {
 
-    @Value("${spring.custom.jwt.secret}")
-    private String secret;
+    private final String secret;
     private final DetailsService service;
 
-    public JwtAuthFilter(AuthenticationManager authenticationManager,
+    public JwtAuthFilter(AuthenticationManager authenticationManager, @Value("${spring.custom.jwt.secret}") String secret,
                          DetailsService service) {
         super(authenticationManager);
+        this.secret = secret;
         this.service = service;
     }
 

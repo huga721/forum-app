@@ -21,13 +21,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @Component
-@PropertySource("classpath:application-security.properties")
+@PropertySource("classpath:application.yaml")
 public class AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("${spring.custom.jwt.expiration}")
-    private int expirationTime;
-    @Value("${spring.custom.jwt.secret}")
-    private String secret;
+    private final int expirationTime;
+    private final String secret;
+
+    public AuthSuccessHandler(@Value("${spring.custom.jwt.expiration}") int expirationTime,
+                              @Value("${spring.custom.jwt.secret}") String secret) {
+        this.expirationTime = expirationTime;
+        this.secret = secret;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
