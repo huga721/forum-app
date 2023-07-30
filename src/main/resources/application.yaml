@@ -1,14 +1,9 @@
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/forum-app
-    username: root
-    password: admin
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: true
+  profiles:
+    active: dev
+  config:
+    import: optional:file:.env[.properties]
+  custom:
+    jwt:
+      expiration: ${JWT_EXPIRATION}
+      secret: ${JWT_SECRET}

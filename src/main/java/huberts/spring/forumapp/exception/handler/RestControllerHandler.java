@@ -30,9 +30,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class RestControllerHandler {
 
-    @ExceptionHandler(value = UserAlreadyExistingException.class)
+    @ExceptionHandler(value = UserAlreadyExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String userAlreadyExistingHandler(UserAlreadyExistingException e) {
+    public String userAlreadyExistingHandler(UserAlreadyExistException e) {
         return e.getMessage();
     }
 
