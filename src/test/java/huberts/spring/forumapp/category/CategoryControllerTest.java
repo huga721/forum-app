@@ -37,18 +37,18 @@ class CategoryControllerTest extends ContainerIT {
             "test description is too long test description is f";
     private static final String EMPTY = "";
 
-    private static final String GET_ALL_CATEGORIES_ENDPOINT = "/categories";
-    private static final String GET_CATEGORY_BY_ID_ENDPOINT = "/categories/1";
-    private static final String GET_CATEGORY_BY_ID_DOESNT_EXIST_ENDPOINT = "/categories/999";
-    private static final String CREATE_CATEGORY_ENDPOINT = "/categories/moderator/create";
-    private static final String CHANGE_TITLE_ENDPOINT = "/categories/admin/edit/title/3";
-    private static final String CHANGE_TITLE_ARE_THE_SAME_ENDPOINT = "/categories/admin/edit/title/1";
-    private static final String CHANGE_TITLE_ID_DOESNT_EXIST_ENDPOINT = "/categories/admin/edit/title/999";
-    private static final String CHANGE_DESCRIPTION_ENDPOINT = "/categories/admin/edit/description/4";
-    private static final String CHANGE_DESCRIPTION_ARE_THE_SAME_ENDPOINT = "/categories/admin/edit/description/1";
-    private static final String CHANGE_DESCRIPTION_ID_DOESNT_EXIST_ENDPOINT = "/categories/admin/edit/description/999";
-    private static final String DELETE_CATEGORY_ENDPOINT = "/categories/admin/delete/5";
-    private static final String DELETE_CATEGORY_ID_DOESNT_EXIST_ENDPOINT = "/categories/admin/delete/999";
+    private static final String GET_ALL_CATEGORIES_ENDPOINT = "/api/v1/categories";
+    private static final String GET_CATEGORY_BY_ID_ENDPOINT = "/api/v1/categories/1";
+    private static final String GET_CATEGORY_BY_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/categories/999";
+    private static final String CREATE_CATEGORY_ENDPOINT = "/api/v1/categories/moderator/create";
+    private static final String CHANGE_TITLE_ENDPOINT = "/api/v1/categories/admin/edit/title/3";
+    private static final String CHANGE_TITLE_ARE_THE_SAME_ENDPOINT = "/api/v1/categories/admin/edit/title/1";
+    private static final String CHANGE_TITLE_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/categories/admin/edit/title/999";
+    private static final String CHANGE_DESCRIPTION_ENDPOINT = "/api/v1/categories/admin/edit/description/4";
+    private static final String CHANGE_DESCRIPTION_ARE_THE_SAME_ENDPOINT = "/api/v1/categories/admin/edit/description/1";
+    private static final String CHANGE_DESCRIPTION_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/categories/admin/edit/description/999";
+    private static final String DELETE_CATEGORY_ENDPOINT = "/api/v1/categories/admin/delete/5";
+    private static final String DELETE_CATEGORY_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/categories/admin/delete/999";
 
     private static final String TITLE_ARRAY_0_JSON_PATH = "$.[0].title";
     private static final String TITLE_ARRAY_1_JSON_PATH = "$.[1].title";

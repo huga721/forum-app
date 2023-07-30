@@ -25,17 +25,17 @@ class WarningControllerTest extends ContainerIT {
     private final static String NOT_BANNED_MESSAGE = "Not banned";
     private final static String BANNED_MESSAGE = "Banned";
 
-    private static final String GET_ALL_WARNINGS_ENDPOINT = "/warnings";
-    private static final String GET_WARNING_BY_ID_ENDPOINT = "/warnings/1";
-    private static final String GET_WARNING_BY_ID_DOESNT_EXIST_ENDPOINT = "/warnings/999";
-    private static final String CREATE_WARNING_ENDPOINT = "/warnings/userToWarn";
-    private static final String CREATE_WARNING_USER_BLOCKED_ENDPOINT = "/warnings/userBanned";
-    private static final String CREATE_WARNING_5_WARN_ENDPOINT = "/warnings/userToWarnBlock";
-    private static final String CREATE_WARNING_DOESNT_EXIST_ENDPOINT = "/warnings/userDoesntExist";
-    private static final String DELETE_WARNING_ENDPOINT = "/warnings/userToWarn";
-    private static final String DELETE_WARNING_USER_BLOCKED_ENDPOINT = "/warnings/userBanned";
-    private static final String DELETE_WARNING_NO_WARNINGS_ENDPOINT = "/warnings/user";
-    private static final String DELETE_WARNING_DOESNT_EXIST_ENDPOINT = "/warnings/userDoesntExist";
+    private static final String GET_ALL_WARNINGS_ENDPOINT = "/api/v1/warnings";
+    private static final String GET_WARNING_BY_ID_ENDPOINT = "/api/v1/warnings/1";
+    private static final String GET_WARNING_BY_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/warnings/999";
+    private static final String CREATE_WARNING_ENDPOINT = "/api/v1/warnings/15";
+    private static final String CREATE_WARNING_USER_BLOCKED_ENDPOINT = "/api/v1/warnings/14";
+    private static final String CREATE_WARNING_5_WARN_ENDPOINT = "/api/v1/warnings/16";
+    private static final String CREATE_WARNING_DOESNT_EXIST_ENDPOINT = "/api/v1/warnings/999";
+    private static final String DELETE_WARNING_ENDPOINT = "/api/v1/warnings/15";
+    private static final String DELETE_WARNING_USER_BLOCKED_ENDPOINT = "/api/v1/warnings/14";
+    private static final String DELETE_WARNING_NO_WARNINGS_ENDPOINT = "/api/v1/warnings/4";
+    private static final String DELETE_WARNING_DOESNT_EXIST_ENDPOINT = "/api/v1/warnings/999";
 
     private static final String AUTHORIZATION = "Authorization";
     private static final String INVALID_TOKEN = "wrong_token_123";

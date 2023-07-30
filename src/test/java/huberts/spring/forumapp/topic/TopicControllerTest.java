@@ -40,30 +40,30 @@ class TopicControllerTest extends ContainerIT {
     private static final String CONTENT_DEFAULT = "random test content";
     private static final String EMPTY_STRING = "";
 
-    private static final String ALL_TOPICS_ENDPOINT = "/topics";
-    private static final String GET_TOPIC_BY_ID_ENDPOINT = "/topics/1";
-    private static final String GET_TOPIC_BY_ID_DOESNT_EXIST_ENDPOINT = "/topics/999";
-    private static final String CREATE_TOPIC_ENDPOINT = "/topics/create";
-    private static final String DELETE_TOPIC_ENDPOINT = "/topics/delete/4";
-    private static final String DELETE_TOPIC_WRONG_AUTHOR_ENDPOINT = "/topics/delete/5";
-    private static final String DELETE_TOPIC_ID_DOESNT_EXIST_ENDPOINT = "/topics/delete/999";
-    private static final String CLOSE_TOPIC_BY_AUTHOR_ENDPOINT = "/topics/close-topic/6";
-    private static final String CLOSE_TOPIC_BY_AUTHOR_WRONG_AUTHOR_ENDPOINT = "/topics/close-topic/1";
-    private static final String CLOSE_TOPIC_BY_AUTHOR_ID_DOESNT_EXIST_ENDPOINT = "/topics/close-topic/999";
-    private static final String EDIT_TOPIC_BY_AUTHOR_ENDPOINT = "/topics/edit/7";
-    private static final String EDIT_TOPIC_BY_AUTHOR_WRONG_AUTHOR_ENDPOINT = "/topics/edit/1";
-    private static final String EDIT_TOPIC_BY_AUTHOR_ID_DOESNT_EXIST_ENDPOINT = "/topics/edit/999";
-    private static final String EDIT_TOPIC_BY_AUTHOR_IS_CLOSED_ENDPOINT = "/topics/edit/8";
-    private static final String EDIT_TOPIC_BY_MODERATOR_ENDPOINT = "/topics/moderator/edit/9";
-    private static final String EDIT_TOPIC_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT = "/topics/moderator/edit/999";
-    private static final String EDIT_TOPIC_BY_MODERATOR_IS_CLOSED_ENDPOINT = "/topics/moderator/edit/8";
-    private static final String CHANGE_CATEGORY_BY_MODERATOR_ENDPOINT = "/topics/moderator/change-category/11";
-    private static final String CHANGE_CATEGORY_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT = "/topics/moderator/change-category/999";
-    private static final String CHANGE_CATEGORY_BY_MODERATOR_IS_CLOSED_ENDPOINT = "/topics/moderator/change-category/8";
-    private static final String CLOSE_TOPIC_BY_MODERATOR_ENDPOINT = "/topics/moderator/close-topic/12";
-    private static final String CLOSE_TOPIC_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT = "/topics/moderator/close-topic/999";
-    private static final String DELETE_TOPIC_BY_MODERATOR_ENDPOINT = "/topics/moderator/delete/13";
-    private static final String DELETE_TOPIC_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT = "/topics/moderator/delete/999";
+    private static final String ALL_TOPICS_ENDPOINT = "/api/v1/topics";
+    private static final String GET_TOPIC_BY_ID_ENDPOINT = "/api/v1/topics/1";
+    private static final String GET_TOPIC_BY_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/topics/999";
+    private static final String CREATE_TOPIC_ENDPOINT = "/api/v1/topics/create";
+    private static final String DELETE_TOPIC_ENDPOINT = "/api/v1/topics/delete/4";
+    private static final String DELETE_TOPIC_WRONG_AUTHOR_ENDPOINT = "/api/v1/topics/delete/5";
+    private static final String DELETE_TOPIC_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/topics/delete/999";
+    private static final String CLOSE_TOPIC_BY_AUTHOR_ENDPOINT = "/api/v1/topics/close-topic/6";
+    private static final String CLOSE_TOPIC_BY_AUTHOR_WRONG_AUTHOR_ENDPOINT = "/api/v1/topics/close-topic/1";
+    private static final String CLOSE_TOPIC_BY_AUTHOR_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/topics/close-topic/999";
+    private static final String EDIT_TOPIC_BY_AUTHOR_ENDPOINT = "/api/v1/topics/edit/7";
+    private static final String EDIT_TOPIC_BY_AUTHOR_WRONG_AUTHOR_ENDPOINT = "/api/v1/topics/edit/1";
+    private static final String EDIT_TOPIC_BY_AUTHOR_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/topics/edit/999";
+    private static final String EDIT_TOPIC_BY_AUTHOR_IS_CLOSED_ENDPOINT = "/api/v1/topics/edit/8";
+    private static final String EDIT_TOPIC_BY_MODERATOR_ENDPOINT = "/api/v1/topics/moderator/edit/9";
+    private static final String EDIT_TOPIC_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/topics/moderator/edit/999";
+    private static final String EDIT_TOPIC_BY_MODERATOR_IS_CLOSED_ENDPOINT = "/api/v1/topics/moderator/edit/8";
+    private static final String CHANGE_CATEGORY_BY_MODERATOR_ENDPOINT = "/api/v1/topics/moderator/change-category/11";
+    private static final String CHANGE_CATEGORY_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/topics/moderator/change-category/999";
+    private static final String CHANGE_CATEGORY_BY_MODERATOR_IS_CLOSED_ENDPOINT = "/api/v1/topics/moderator/change-category/8";
+    private static final String CLOSE_TOPIC_BY_MODERATOR_ENDPOINT = "/api/v1/topics/moderator/close-topic/12";
+    private static final String CLOSE_TOPIC_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/topics/moderator/close-topic/999";
+    private static final String DELETE_TOPIC_BY_MODERATOR_ENDPOINT = "/api/v1/topics/moderator/delete/13";
+    private static final String DELETE_TOPIC_BY_MODERATOR_ID_DOESNT_EXIST_ENDPOINT = "/api/v1/topics/moderator/delete/999";
 
     private static final String ID_ARRAY_0_JSON_PATH = "$.[0].id";
     private static final String ID_ARRAY_1_JSON_PATH = "$.[1].id";
@@ -737,7 +737,7 @@ class TopicControllerTest extends ContainerIT {
         }
 
 
-        @DisplayName("Should not close topic when requested by user, HTTP status 403")
+        @DisplayName("Should not close topic when requested by user, HTTP status 400")
         @Test
         void shouldNotCloseTopic_WhenRequestByUser() throws Exception {
             CloseReasonDTO closeReason = new CloseReasonDTO(REASON);
@@ -748,7 +748,7 @@ class TopicControllerTest extends ContainerIT {
                             .header(AUTHORIZATION, userToken)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(titleJson))
-                    .andExpect(status().is(403));
+                    .andExpect(status().is(400));
         }
 
         @DisplayName("Should not close topic when JWT is wrong, HTTP status 401")

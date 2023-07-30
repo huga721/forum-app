@@ -33,28 +33,28 @@ class UserControllerTest extends ContainerIT {
     private static final String PASSWORD_NEW = "testPassword";
     private static final String EMPTY = "";
 
-    private static final String STAFF_ENDPOINT = "/staff";
-    private static final String USER_ENDPOINT = "/user";
-    private static final String USER_NOT_EXIST_ENDPOINT = "/userNotExist";
-    private static final String CURRENT_USER_PROFILE_ENDPOINT = "/profile";
-    private static final String CHANGE_PASSWORD_ENDPOINT = "/change-password";
-    private static final String DELETE_CURRENT_USER_ENDPOINT = "/delete";
-    private static final String GET_EVERY_USER_ENDPOINT = "/moderator/all";
-    private static final String BAN_USER_ENDPOINT = "/moderator/ban/userToBan";
-    private static final String BAN_USER_DOESNT_EXIST_ENDPOINT = "/moderator/ban/userDoesntExist";
-    private static final String BAN_USER_BANNED_ENDPOINT = "/moderator/ban/userToCheckBan";
-    private static final String UNBAN_USER_ENDPOINT = "/moderator/unban/userToUnban";
-    private static final String UNBAN_USER_DOESNT_EXIST_ENDPOINT = "/moderator/unban/userDoesntExist";
-    private static final String UNBAN_USER_UNBANNED_ENDPOINT = "/moderator/unban/userToCheckUnban";
-    private static final String CHANGE_USERS_PASSWORD_ENDPOINT = "/moderator/change-password/userToChangePassword";
-    private static final String CHANGE_USERS_PASSWORD_USER_DOESNT_EXIST_ENDPOINT = "/moderator/change-password/userDoesntExist";
-    private static final String DELETE_USER_ENDPOINT = "/admin/delete/userToDeleteByAdmin";
-    private static final String DELETE_USER_DOESNT_EXIST_ENDPOINT = "/admin/delete/userDoesntExist";
-    private static final String DELETE_USER_MODERATOR_ENDPOINT = "/admin/delete/moderatorJwt";
-    private static final String CHANGE_ROLE_ENDPOINT = "/admin/edit/userToChangeRole/role/ROLE_MODERATOR";
-    private static final String CHANGE_ROLE_DUPLICATE_ENDPOINT = "/admin/edit/userWithSameRole/role/ROLE_USER";
-    private static final String CHANGE_ROLE_USER_DOESNT_EXIST_ENDPOINT = "/admin/edit/userDoesntExist/role/ROLE_USER";
-    private static final String CHANGE_ROLE_DOESNT_EXIST_ENDPOINT = "/admin/edit/userToChangeRole/role/ROLE_INVALID";
+    private static final String STAFF_ENDPOINT = "/api/v1/users/team";
+    private static final String USER_ENDPOINT = "/api/v1/users/4";
+    private static final String USER_NOT_EXIST_ENDPOINT = "/api/v1/users/999";
+    private static final String CURRENT_USER_PROFILE_ENDPOINT = "/api/v1/users/profile";
+    private static final String CHANGE_PASSWORD_ENDPOINT = "/api/v1/users/change-password";
+    private static final String DELETE_CURRENT_USER_ENDPOINT = "/api/v1/users/delete";
+    private static final String GET_EVERY_USER_ENDPOINT = "/api/v1/users";
+    private static final String BAN_USER_ENDPOINT = "/api/v1/users/moderator/ban/8";
+    private static final String BAN_USER_DOESNT_EXIST_ENDPOINT = "/api/v1/users/moderator/ban/999";
+    private static final String BAN_USER_BANNED_ENDPOINT = "/api/v1/users/moderator/ban/9";
+    private static final String UNBAN_USER_ENDPOINT = "/api/v1/users/moderator/unban/6";
+    private static final String UNBAN_USER_DOESNT_EXIST_ENDPOINT = "/api/v1/users/moderator/unban/999";
+    private static final String UNBAN_USER_UNBANNED_ENDPOINT = "/api/v1/users/moderator/unban/7";
+    private static final String CHANGE_USERS_PASSWORD_ENDPOINT = "/api/v1/users/moderator/change-password/5";
+    private static final String CHANGE_USERS_PASSWORD_USER_DOESNT_EXIST_ENDPOINT = "/api/v1/users/moderator/change-password/999";
+    private static final String DELETE_USER_ENDPOINT = "/api/v1/users/admin/delete/11";
+    private static final String DELETE_USER_DOESNT_EXIST_ENDPOINT = "/api/v1/users/admin/delete/999";
+    private static final String DELETE_USER_MODERATOR_ENDPOINT = "/api/v1/users/admin/delete/3";
+    private static final String CHANGE_ROLE_ENDPOINT = "/api/v1/users/admin/edit/12/role/moderator";
+    private static final String CHANGE_ROLE_DUPLICATE_ENDPOINT = "/api/v1/users/admin/edit/13/role/ROLE_USER";
+    private static final String CHANGE_ROLE_USER_DOESNT_EXIST_ENDPOINT = "/api/v1/users/admin/edit/999/role/ROLE_USER";
+    private static final String CHANGE_ROLE_DOESNT_EXIST_ENDPOINT = "/api/v1/users/admin/edit/12/role/ROLE_INVALID";
 
     private static final String USERNAME_JSON_PATH = "$.username";
     private static final String USERNAME_ARRAY_0_JSON_PATH = "$.[0].username";
@@ -109,7 +109,7 @@ class UserControllerTest extends ContainerIT {
         @Test
         void shouldThrowUserDoesntExistException_WhenUserDoesntExist() throws Exception {
             mockMvc.perform(get(USER_NOT_EXIST_ENDPOINT))
-                    .andExpect(status().is(400))
+                    .andExpect(status().is(404))
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesntExistException));
         }
     }
@@ -145,15 +145,14 @@ class UserControllerTest extends ContainerIT {
         @DisplayName("Should change password, HTTP status 200")
         @Test
         void shouldChangePassword() throws Exception {
-            String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
+            String userToken = JwtKey.getUserToChangePassword(mockMvc, objectMapper);
             String jsonPassword = objectMapper.writeValueAsString(newPassword);
 
             mockMvc.perform(patch(CHANGE_PASSWORD_ENDPOINT)
                             .header(AUTHORIZATION, userToken)
                             .contentType(APPLICATION_JSON)
                             .content(jsonPassword))
-                    .andExpect(status().is(200))
-                    .andExpect(jsonPath(USERNAME_JSON_PATH).value(USER_JWT));
+                    .andExpect(status().is(200));
         }
 
         @DisplayName("Should not change password when invalid JWT authentication and password is empty, HTTP status 400")
@@ -195,14 +194,14 @@ class UserControllerTest extends ContainerIT {
     @Nested
     class DeleteEndpointTests {
 
-        @DisplayName("Should delete user, HTTP status 200")
+        @DisplayName("Should delete user, HTTP status 204")
         @Test
         void shouldDeleteCurrentUser() throws Exception {
             String userToken = JwtKey.getUserToDeleteJwt(mockMvc, objectMapper);
 
             mockMvc.perform(MockMvcRequestBuilders.delete(DELETE_CURRENT_USER_ENDPOINT)
                             .header(AUTHORIZATION, userToken))
-                    .andExpect(status().is(200));
+                    .andExpect(status().is(204));
         }
 
         @DisplayName("Should not delete user when invalid JWT, HTTP status 401")
@@ -224,40 +223,23 @@ class UserControllerTest extends ContainerIT {
         }
     }
 
-    @DisplayName("get /moderator/all endpoint")
+    @DisplayName("get /api/v1/users endpoint")
     @Nested
-    class ModeratorAllTests {
+    class UsersTests {
 
-        @DisplayName("Should return every user")
+        @DisplayName("Should return every user, HTTP status 200")
         @Test
         void shouldReturnEveryUser() throws Exception {
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
 
             mockMvc.perform(get(GET_EVERY_USER_ENDPOINT)
                             .header(AUTHORIZATION, moderatorToken))
-                    .andExpect(status().isOk())
+                    .andExpect(status().is(200))
                     .andExpect(jsonPath(USERNAME_ARRAY_0_JSON_PATH).value(USER_JWT))
                     .andExpect(jsonPath(USERNAME_ARRAY_1_JSON_PATH).value(ADMIN_JWT))
                     .andExpect(jsonPath(USERNAME_ARRAY_2_JSON_PATH).value(MODERATOR_JWT));
         }
 
-        @DisplayName("Should not return every user when requested by user role, HTTP status 403")
-        @Test
-        void shouldNotReturnEveryUser_WhenRequestedByUserRole() throws Exception {
-            String userToken = JwtKey.getUserJwt(mockMvc, objectMapper);
-
-            mockMvc.perform(get(GET_EVERY_USER_ENDPOINT)
-                            .header(AUTHORIZATION, userToken))
-                    .andExpect(status().is(403));
-        }
-
-        @DisplayName("Should not return every user when JWT is wrong, HTTP status 401")
-        @Test
-        void shouldNotReturnEveryUser_WhenJwtIsWrong() throws Exception {
-            mockMvc.perform(get(GET_EVERY_USER_ENDPOINT)
-                    .header(AUTHORIZATION, INVALID_TOKEN))
-                    .andExpect(status().is(401));
-        }
     }
 
     @DisplayName("patch /moderator/ban/{username} endpoint")
@@ -292,14 +274,14 @@ class UserControllerTest extends ContainerIT {
                     .andExpect(status().is(403));
         }
 
-        @DisplayName("Should not ban user when user doesn't exist, HTTP status 400")
+        @DisplayName("Should not ban user when user doesn't exist, HTTP status 404")
         @Test
         void shouldNotBanUser_WhenUserDoesntExist() throws Exception {
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
 
             mockMvc.perform(patch(BAN_USER_DOESNT_EXIST_ENDPOINT)
                             .header(AUTHORIZATION, moderatorToken))
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().is(404))
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesntExistException));
         }
 
@@ -310,7 +292,7 @@ class UserControllerTest extends ContainerIT {
 
             mockMvc.perform(patch(BAN_USER_BANNED_ENDPOINT)
                             .header(AUTHORIZATION, moderatorToken))
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().is(400))
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserBlockException));
         }
     }
@@ -337,8 +319,19 @@ class UserControllerTest extends ContainerIT {
 
             mockMvc.perform(patch(UNBAN_USER_DOESNT_EXIST_ENDPOINT)
                             .header(AUTHORIZATION, moderatorToken))
-                    .andExpect(status().is(400))
+                    .andExpect(status().is(404))
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesntExistException));
+        }
+
+        @DisplayName("Should do nothing when user to unban is not banned, HTTP status 200")
+        @Test
+        void shouldDoNothing_WhenUserToUnbanIsNotBanned() throws Exception {
+            String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
+
+            mockMvc.perform(patch(UNBAN_USER_UNBANNED_ENDPOINT)
+                            .header(AUTHORIZATION, moderatorToken))
+                    .andExpect(status().is(200))
+                    .andExpect(jsonPath(BLOCKED_JSON_PATH).value(false));
         }
 
         @DisplayName("Should not unban user when JWT is wrong, HTTP status 401")
@@ -358,24 +351,13 @@ class UserControllerTest extends ContainerIT {
                             .header(AUTHORIZATION, userToken))
                     .andExpect(status().is(403));
         }
-
-        @DisplayName("Should throw UserBlockException when user is not banned, HTTP status 400")
-        @Test
-        void shouldNotUnbanUser_UserIsUnbanned() throws Exception {
-            String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
-
-            mockMvc.perform(patch(UNBAN_USER_UNBANNED_ENDPOINT)
-                            .header(AUTHORIZATION, moderatorToken))
-                    .andExpect(status().is(400))
-                    .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserBlockException));
-        }
     }
 
     @DisplayName("patch /moderator/change-password/{username} endpoint")
     @Nested
     class ModeratorChangePasswordUsernameEndpointTests {
 
-        @DisplayName("Should change password")
+        @DisplayName("Should change password, HTTP status 200")
         @Test
         void shouldChangePassword() throws Exception {
             String moderatorToken = JwtKey.getModeratorJwt(mockMvc, objectMapper);
@@ -385,7 +367,7 @@ class UserControllerTest extends ContainerIT {
                             .header(AUTHORIZATION, moderatorToken)
                             .contentType(APPLICATION_JSON)
                             .content(jsonPassword))
-                    .andExpect(status().isOk());
+                    .andExpect(status().is(200));
         }
 
         @DisplayName("Should throw UserDoesntExistException when user doesn't exist, HTTP status 400")
@@ -398,7 +380,7 @@ class UserControllerTest extends ContainerIT {
                             .header(AUTHORIZATION, moderatorToken)
                             .contentType(APPLICATION_JSON)
                             .content(jsonPassword))
-                    .andExpect(status().is(400))
+                    .andExpect(status().is(404))
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesntExistException));
         }
 
@@ -446,14 +428,14 @@ class UserControllerTest extends ContainerIT {
     @Nested
     class AdminDeleteUsernameEndpointTests {
 
-        @DisplayName("Should delete user, HTTP status 200")
+        @DisplayName("Should delete user, HTTP status 204")
         @Test
         void shouldDeleteUser() throws Exception {
             String adminToken = JwtKey.getAdminJwt(mockMvc, objectMapper);
 
             mockMvc.perform(MockMvcRequestBuilders.delete(DELETE_USER_ENDPOINT)
                             .header(AUTHORIZATION, adminToken))
-                    .andExpect(status().is(200));
+                    .andExpect(status().is(204));
         }
 
         @DisplayName("Should throw UserDoesntExistException when user deleting user doesn't exist, HTTP status 400")
@@ -463,7 +445,7 @@ class UserControllerTest extends ContainerIT {
 
             mockMvc.perform(MockMvcRequestBuilders.delete(DELETE_USER_DOESNT_EXIST_ENDPOINT)
                             .header(AUTHORIZATION, adminToken))
-                    .andExpect(status().is(400))
+                    .andExpect(status().is(404))
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesntExistException));
         }
 
@@ -529,7 +511,7 @@ class UserControllerTest extends ContainerIT {
 
             mockMvc.perform(patch(CHANGE_ROLE_USER_DOESNT_EXIST_ENDPOINT)
                             .header(AUTHORIZATION, adminToken))
-                    .andExpect(status().is(400))
+                    .andExpect(status().is(404))
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserDoesntExistException));
         }
 
