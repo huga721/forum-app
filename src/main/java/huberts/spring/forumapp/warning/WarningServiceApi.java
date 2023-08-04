@@ -5,10 +5,10 @@ import huberts.spring.forumapp.warning.dto.WarningDTO;
 import java.util.List;
 
 public interface WarningServiceApi {
-    WarningDTO createWarning(String username);
+    WarningDTO createWarning(Long userId);
 
-    WarningDTO getWarningById(Long id);
+    WarningDTO getWarningById(Long warningId);
     List<WarningDTO> getAllWarnings();
 
-    void deleteWarning(String username);
+    void deleteWarning(Long userId);
 }

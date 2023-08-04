@@ -9,14 +9,17 @@ import java.util.List;
 public interface UserServiceApi {
     UserDTO createUser(CredentialsDTO credentialsDTO);
 
+    UserDTO getUserById(Long userId);
     UserDTO getUserByUsername(String username);
     List<UserDTO> getAllUsers();
     List<UserDTO> getAllModeratorAndAdminUsers();
 
-    UserDTO changeRole(String username, String roleName);
-    UserDTO changePassword(PasswordDTO passwordDTO, String username);
-    UserDTO banUser(String username);
-    UserDTO unbanUser(String username);
+    UserDTO changeRoleById(Long userId, String roleName);
+    UserDTO changePasswordById(PasswordDTO passwordDTO, Long userId);
+    UserDTO changePasswordByUsername(PasswordDTO passwordDTO, String username);
+    UserDTO banUserById(Long userId);
+    UserDTO unbanUserById(Long userId);
 
+    void deleteUserById(Long userId);
     void deleteUserByUsername(String username);
 }

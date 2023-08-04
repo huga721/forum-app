@@ -27,7 +27,7 @@ public class DetailsService implements UserDetailsService {
     }
 
     private User getUser(String username) {
-        log.debug("Authenticating user \"{}\"", username);
+        log.info("Authenticating user \"{}\"", username);
         return userService.findUserByUsername(username);
     }
 }

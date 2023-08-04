@@ -28,7 +28,7 @@ public class Report {
     private boolean seen;
 
     @OneToOne
-    @JoinColumn(referencedColumnName = "username", name = "user_report")
+    @JoinColumn(referencedColumnName = "id", name = "user_id")
     private User user;
 
     @ManyToOne

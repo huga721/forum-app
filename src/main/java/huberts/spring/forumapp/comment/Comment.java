@@ -23,7 +23,6 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true)
     private Long id;
 
     private String content;

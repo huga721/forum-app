@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class JwtHelper {
 
-    private static final String LOGIN_ENDPOINT = "/login";
+    private static final String LOGIN_ENDPOINT = "/api/v1/login";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String TOKEN = "token";
 

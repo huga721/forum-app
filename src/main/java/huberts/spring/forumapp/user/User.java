@@ -7,7 +7,6 @@ import huberts.spring.forumapp.topic.Topic;
 import huberts.spring.forumapp.role.Role;
 import huberts.spring.forumapp.warning.Warning;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,8 +39,8 @@ public class User {
 
     private LocalDateTime lastActivity;
 
-    @OneToOne
-    @JoinColumn(referencedColumnName = "name", name = "role_name")
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", name = "role_id")
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
@@ -58,4 +57,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Warning> warnings;
+
+    public void addWarning(Warning warning) {
+        warnings.add(warning);
+    }
 }

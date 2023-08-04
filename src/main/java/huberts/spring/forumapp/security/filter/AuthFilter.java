@@ -23,6 +23,7 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
         this.mapper = mapper;
         setAuthenticationManager(manager);
         setAuthenticationSuccessHandler(successHandler);
+        setFilterProcessesUrl("/api/v1/login");
     }
 
     @Override

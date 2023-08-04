@@ -7,6 +7,7 @@ import org.springframework.test.web.servlet.MockMvc;
 public class JwtKey {
 
     private static final String USER_USERNAME = "userJwt";
+    private static final String USER_TO_CHANGE_PASSWORD = "userToChangePasswordByUser";
     private static final String USER_TO_DELETE_USERNAME = "userToDelete";
     private static final String MODERATOR_USERNAME = "moderatorJwt";
     private static final String ADMIN_USERNAME = "adminJwt";
@@ -18,6 +19,10 @@ public class JwtKey {
 
     public static String getUserToDeleteJwt(MockMvc mockMvc, ObjectMapper objectMapper) throws Exception {
         return getJwt(mockMvc, objectMapper, USER_TO_DELETE_USERNAME);
+    }
+
+    public static String getUserToChangePassword(MockMvc mockMvc, ObjectMapper objectMapper) throws Exception {
+        return getJwt(mockMvc, objectMapper, USER_TO_CHANGE_PASSWORD);
     }
 
     public static String getModeratorJwt(MockMvc mockMvc, ObjectMapper objectMapper) throws Exception {

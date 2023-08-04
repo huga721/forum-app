@@ -17,9 +17,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WarningService implements WarningServiceApi {
 
-    private static final String USER_DOESNT_EXIST_EXCEPTION = "User \"%s\" doesn't exist.";
+    private final static String USER_DOESNT_EXIST_ID_EXCEPTION = "User with id \"%s\" doesn't exists.";
     private static final String USER_BANNED_EXCEPTION = "User \"%s\" is banned.";
-    private static final String USER_IS_NOT_WARNED_EXCEPTION = "User \"%s\" is not warned.";
+    private static final String USER_IS_NOT_WARNED_EXCEPTION = "User with id \"%s\" is not warned.";
     private static final String WARNING_DOESNT_EXIST_EXCEPTION = "Warning with id \"%d\" doesn't exist.";
     private static final String EXCEPTION_OCCURRED = "An exception occurred!";
 
@@ -27,9 +27,10 @@ public class WarningService implements WarningServiceApi {
     private final UserRepository userRepository;
 
     @Override
-    public WarningDTO createWarning(String username) {
-        log.info("Creating a warning for a user with username {}", username);
-        User user = findUserByUsername(username);
+    public WarningDTO createWarning(Long userId) {
+        log.info("Creating a warning for a user with id {}", userId);
+        User user = findUserById(userId);
+
         validateUserBlocked(user);
         log.info("Warning created");
         return buildAndSaveWarning(user);
@@ -37,10 +38,8 @@ public class WarningService implements WarningServiceApi {
 
     public WarningDTO buildAndSaveWarning(User user) {
         Warning warning = WarningMapper.buildWarning(user);
-        log.info("BEFORE SAVE = {}", user.getWarnings().size());
-        warningRepository.save(warning);
-        user.getWarnings().add(warning);
-        log.info("AFTER SAVE = {}", user.getWarnings().size());
+        user.addWarning(warning);
+        warningRepository.saveAndFlush(warning);
         if (user.getWarnings().size() >= 5) {
             log.debug("Blocking user {} because number of his/her warnings is 5", user.getUsername());
             user.setBlocked(true);
@@ -56,11 +55,11 @@ public class WarningService implements WarningServiceApi {
         }
     }
 
-    private User findUserByUsername(String username) {
-        log.info("Fining user with username {}", username);
-        return userRepository.findByUsername(username)
+    private User findUserById(Long userId) {
+        log.info("Fining user with id {}", userId);
+        return userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    String errorMessage = String.format(USER_DOESNT_EXIST_EXCEPTION, username);
+                    String errorMessage = String.format(USER_DOESNT_EXIST_ID_EXCEPTION, userId);
                     log.error(EXCEPTION_OCCURRED, new UserDoesntExistException(errorMessage));
                     return new UserDoesntExistException(errorMessage);
                 });
@@ -84,19 +83,23 @@ public class WarningService implements WarningServiceApi {
     }
 
     @Override
-    public void deleteWarning(String username) {
-        log.info("Deleting last warning of user {}", username);
-        User user = findUserByUsername(username);
+    public void deleteWarning(Long userId) {
+        log.info("Deleting last warning of user with id {}", userId);
+        User user = findUserById(userId);
+
         validateUserBlocked(user);
+
         if (user.getWarnings().isEmpty()) {
-            String errorMessage = String.format(USER_IS_NOT_WARNED_EXCEPTION, username);
+            String errorMessage = String.format(USER_IS_NOT_WARNED_EXCEPTION, userId);
             log.error(EXCEPTION_OCCURRED, new UserBlockException(errorMessage));
             throw new UserBlockException(errorMessage);
         }
+
         int lastWarning = user.getWarnings().size() - 1;
         Warning warning = user.getWarnings().get(lastWarning);
+
         user.getWarnings().remove(warning);
-        log.info("Deleted last warning of user {}", username);
+        log.info("Deleted warning");
         warningRepository.delete(warning);
     }
 }

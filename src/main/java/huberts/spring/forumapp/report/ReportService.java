@@ -150,13 +150,13 @@ public class ReportService implements ReportServiceApi {
     public void executeReportAndWarnTopicAuthor(Long topicId) {
         log.info("Deleting all reports of topic and deleting topic with id {} and warning author of topic", topicId);
         Topic topicFound = findTopicById(topicId);
-        String author = topicFound.getUser().getUsername();
+        Long userId = topicFound.getUser().getId();
 
         validateTopicClosed(topicFound);
         validateReports(topicFound.getReports());
 
         topicRepository.delete(topicFound);
-        warningService.createWarning(author);
+        warningService.createWarning(userId);
         log.info("Deleted all reports");
     }
 
@@ -171,13 +171,13 @@ public class ReportService implements ReportServiceApi {
     public void executeReportAndWarnCommentAuthor(Long commentId) {
         log.info("Deleting all reports for comment with id {} and warning author of comment", commentId);
         Comment commentFound = findCommentById(commentId);
-        String author = commentFound.getUser().getUsername();
+        Long userId = commentFound.getUser().getId();
 
         validateTopicClosed(commentFound.getTopic());
         validateReports(commentFound.getReports());
 
         commentRepository.delete(commentFound);
-        warningService.createWarning(author);
+        warningService.createWarning(userId);
         log.info("Deleted all reports");
     }
 

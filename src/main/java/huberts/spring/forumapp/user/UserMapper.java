@@ -30,8 +30,9 @@ public class UserMapper {
 
     public static UserDTO buildUserDTO(User user) {
         return UserDTO.builder()
+                .id(user.getId())
                 .username(user.getUsername())
-                .role(user.getRole().getName())
+                .role(user.getRole().getName().toString())
                 .topics(mapTopicListToShortTopicDTOList(user.getTopics()))
                 .warningPoints(user.getWarnings().size() * 20)
                 .blocked(user.isBlocked())

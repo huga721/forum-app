@@ -26,8 +26,8 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(UNAUTHORIZED))
