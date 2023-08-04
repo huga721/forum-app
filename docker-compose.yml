@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: mysqldb
+    image: mysql:8.0.33
+    restart: always
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: localdb
+    ports:
+      - "3309:3306"
+    networks:
+      - app-network
+
+  app:
+    container_name: forum-rest-api
+    image: forum:latest
+    ports:
+      - "8085:8080"
+    networks:
+      - app-network
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/localdb?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_SHOW-SQL: true
+
+volumes:
+  data: {}
+
+networks:
+  app-network:
+    name: app-network
